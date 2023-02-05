@@ -1,8 +1,8 @@
 package org.bukkit.craftbukkit.v1_18_R2.enchantments;
 
-import net.minecraft.core.IRegistry;
-import net.minecraft.world.item.enchantment.EnchantmentBinding;
-import net.minecraft.world.item.enchantment.EnchantmentVanishing;
+import net.minecraft.core.Registry;
+import net.minecraft.world.item.enchantment.BindingCurseEnchantment;
+import net.minecraft.world.item.enchantment.VanishingCurseEnchantment;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -14,7 +14,7 @@ public class CraftEnchantment extends Enchantment {
     private final net.minecraft.world.item.enchantment.Enchantment target;
 
     public CraftEnchantment(net.minecraft.world.item.enchantment.Enchantment target) {
-        super(CraftNamespacedKey.fromMinecraft(IRegistry.ENCHANTMENT.getKey(target)));
+        super(CraftNamespacedKey.fromMinecraft(Registry.ENCHANTMENT.getKey(target)));
         this.target = target;
     }
 
@@ -71,7 +71,7 @@ public class CraftEnchantment extends Enchantment {
 
     @Override
     public boolean isCursed() {
-        return target instanceof EnchantmentBinding || target instanceof EnchantmentVanishing;
+        return target instanceof BindingCurseEnchantment || target instanceof VanishingCurseEnchantment;
     }
 
     @Override
@@ -82,7 +82,7 @@ public class CraftEnchantment extends Enchantment {
     @Override
     public String getName() {
         // PAIL: migration paths
-        switch (IRegistry.ENCHANTMENT.getId(target)) {
+        switch (Registry.ENCHANTMENT.getId(target)) {
         case 0:
             return "PROTECTION_ENVIRONMENTAL";
         case 1:
@@ -160,7 +160,7 @@ public class CraftEnchantment extends Enchantment {
         case 37:
             return "VANISHING_CURSE";
         default:
-            return "UNKNOWN_ENCHANT_" + IRegistry.ENCHANTMENT.getId(target);
+            return "UNKNOWN_ENCHANT_" + Registry.ENCHANTMENT.getId(target);
         }
     }
 
