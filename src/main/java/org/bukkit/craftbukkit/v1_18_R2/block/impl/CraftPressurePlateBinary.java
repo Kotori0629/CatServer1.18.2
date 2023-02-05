@@ -11,13 +11,13 @@ public final class CraftPressurePlateBinary extends CraftBlockData implements or
         super();
     }
 
-    public CraftPressurePlateBinary(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftPressurePlateBinary(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftPowerable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean POWERED = getBoolean(net.minecraft.world.level.block.BlockPressurePlateBinary.class, "powered");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty POWERED = getBoolean(net.minecraft.world.level.block.PressurePlateBlock.class, "powered");
 
     @Override
     public boolean isPowered() {

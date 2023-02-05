@@ -144,6 +144,7 @@ subprojects {
             url = 'https://maven.minecraftforge.net/'
         }
         maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+        maven { url 'https://raw.githubusercontent.com/CauldronX/libraries/master/v1_19_2/' }
     }
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)

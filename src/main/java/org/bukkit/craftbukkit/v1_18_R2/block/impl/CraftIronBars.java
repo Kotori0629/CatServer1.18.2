@@ -11,19 +11,19 @@ public final class CraftIronBars extends CraftBlockData implements org.bukkit.bl
         super();
     }
 
-    public CraftIronBars(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftIronBars(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftMultipleFacing
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean[] FACES = new net.minecraft.world.level.block.state.properties.BlockStateBoolean[]{
-        getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "north", true), getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "east", true), getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "south", true), getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "west", true), getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "up", true), getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "down", true)
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty[] FACES = new net.minecraft.world.level.block.state.properties.BooleanProperty[]{
+        getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "north", true), getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "east", true), getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "south", true), getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "west", true), getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "up", true), getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "down", true)
     };
 
     @Override
     public boolean hasFace(org.bukkit.block.BlockFace face) {
-        net.minecraft.world.level.block.state.properties.BlockStateBoolean state = FACES[face.ordinal()];
+        net.minecraft.world.level.block.state.properties.BooleanProperty state = FACES[face.ordinal()];
         if (state == null) {
             throw new IllegalArgumentException("Non-allowed face " + face + ". Check MultipleFacing.getAllowedFaces.");
         }
@@ -32,7 +32,7 @@ public final class CraftIronBars extends CraftBlockData implements org.bukkit.bl
 
     @Override
     public void setFace(org.bukkit.block.BlockFace face, boolean has) {
-        net.minecraft.world.level.block.state.properties.BlockStateBoolean state = FACES[face.ordinal()];
+        net.minecraft.world.level.block.state.properties.BooleanProperty state = FACES[face.ordinal()];
         if (state == null) {
             throw new IllegalArgumentException("Non-allowed face " + face + ". Check MultipleFacing.getAllowedFaces.");
         }
@@ -67,7 +67,7 @@ public final class CraftIronBars extends CraftBlockData implements org.bukkit.bl
 
     // org.bukkit.craftbukkit.block.data.CraftWaterlogged
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean WATERLOGGED = getBoolean(net.minecraft.world.level.block.BlockIronBars.class, "waterlogged");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = getBoolean(net.minecraft.world.level.block.IronBarsBlock.class, "waterlogged");
 
     @Override
     public boolean isWaterlogged() {

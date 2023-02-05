@@ -11,13 +11,13 @@ public final class CraftConduit extends CraftBlockData implements org.bukkit.blo
         super();
     }
 
-    public CraftConduit(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftConduit(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftWaterlogged
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean WATERLOGGED = getBoolean(net.minecraft.world.level.block.BlockConduit.class, "waterlogged");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = getBoolean(net.minecraft.world.level.block.ConduitBlock.class, "waterlogged");
 
     @Override
     public boolean isWaterlogged() {

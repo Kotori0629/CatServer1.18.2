@@ -11,13 +11,13 @@ public final class CraftStoneButton extends CraftBlockData implements org.bukkit
         super();
     }
 
-    public CraftStoneButton(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftStoneButton(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.type.CraftSwitch
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateEnum<?> FACE = getEnum(net.minecraft.world.level.block.BlockStoneButton.class, "face");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACE = getEnum(net.minecraft.world.level.block.StoneButtonBlock.class, "face");
 
     @Override
     public org.bukkit.block.data.type.Switch.Face getFace() {
@@ -31,7 +31,7 @@ public final class CraftStoneButton extends CraftBlockData implements org.bukkit
 
     // org.bukkit.craftbukkit.block.data.CraftDirectional
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateEnum<?> FACING = getEnum(net.minecraft.world.level.block.BlockStoneButton.class, "facing");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACING = getEnum(net.minecraft.world.level.block.StoneButtonBlock.class, "facing");
 
     @Override
     public org.bukkit.block.BlockFace getFacing() {
@@ -50,7 +50,7 @@ public final class CraftStoneButton extends CraftBlockData implements org.bukkit
 
     // org.bukkit.craftbukkit.block.data.CraftFaceAttachable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateEnum<?> ATTACH_FACE = getEnum(net.minecraft.world.level.block.BlockStoneButton.class, "face");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> ATTACH_FACE = getEnum(net.minecraft.world.level.block.StoneButtonBlock.class, "face");
 
     @Override
     public org.bukkit.block.data.FaceAttachable.AttachedFace getAttachedFace() {
@@ -64,7 +64,7 @@ public final class CraftStoneButton extends CraftBlockData implements org.bukkit
 
     // org.bukkit.craftbukkit.block.data.CraftPowerable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean POWERED = getBoolean(net.minecraft.world.level.block.BlockStoneButton.class, "powered");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty POWERED = getBoolean(net.minecraft.world.level.block.StoneButtonBlock.class, "powered");
 
     @Override
     public boolean isPowered() {

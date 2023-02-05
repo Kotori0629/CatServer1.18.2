@@ -11,13 +11,13 @@ public final class CraftStonecutter extends CraftBlockData implements org.bukkit
         super();
     }
 
-    public CraftStonecutter(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftStonecutter(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftDirectional
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateEnum<?> FACING = getEnum(net.minecraft.world.level.block.BlockStonecutter.class, "facing");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACING = getEnum(net.minecraft.world.level.block.StonecutterBlock.class, "facing");
 
     @Override
     public org.bukkit.block.BlockFace getFacing() {

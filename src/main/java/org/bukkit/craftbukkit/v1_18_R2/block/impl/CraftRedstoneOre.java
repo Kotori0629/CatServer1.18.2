@@ -11,13 +11,13 @@ public final class CraftRedstoneOre extends CraftBlockData implements org.bukkit
         super();
     }
 
-    public CraftRedstoneOre(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftRedstoneOre(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftLightable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean LIT = getBoolean(net.minecraft.world.level.block.BlockRedstoneOre.class, "lit");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty LIT = getBoolean(net.minecraft.world.level.block.RedStoneOreBlock.class, "lit");
 
     @Override
     public boolean isLit() {

@@ -11,13 +11,13 @@ public final class CraftCarrots extends CraftBlockData implements org.bukkit.blo
         super();
     }
 
-    public CraftCarrots(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftCarrots(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftAgeable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateInteger AGE = getInteger(net.minecraft.world.level.block.BlockCarrots.class, "age");
+    private static final net.minecraft.world.level.block.state.properties.IntegerProperty AGE = getInteger(net.minecraft.world.level.block.CarrotBlock.class, "age");
 
     @Override
     public int getAge() {

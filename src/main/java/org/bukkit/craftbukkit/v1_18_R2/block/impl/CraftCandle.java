@@ -11,13 +11,13 @@ public final class CraftCandle extends CraftBlockData implements org.bukkit.bloc
         super();
     }
 
-    public CraftCandle(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftCandle(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.type.CraftCandle
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateInteger CANDLES = getInteger(net.minecraft.world.level.block.CandleBlock.class, "candles");
+    private static final net.minecraft.world.level.block.state.properties.IntegerProperty CANDLES = getInteger(net.minecraft.world.level.block.CandleBlock.class, "candles");
 
     @Override
     public int getCandles() {
@@ -36,7 +36,7 @@ public final class CraftCandle extends CraftBlockData implements org.bukkit.bloc
 
     // org.bukkit.craftbukkit.block.data.CraftLightable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean LIT = getBoolean(net.minecraft.world.level.block.CandleBlock.class, "lit");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty LIT = getBoolean(net.minecraft.world.level.block.CandleBlock.class, "lit");
 
     @Override
     public boolean isLit() {
@@ -50,7 +50,7 @@ public final class CraftCandle extends CraftBlockData implements org.bukkit.bloc
 
     // org.bukkit.craftbukkit.block.data.CraftWaterlogged
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean WATERLOGGED = getBoolean(net.minecraft.world.level.block.CandleBlock.class, "waterlogged");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = getBoolean(net.minecraft.world.level.block.CandleBlock.class, "waterlogged");
 
     @Override
     public boolean isWaterlogged() {

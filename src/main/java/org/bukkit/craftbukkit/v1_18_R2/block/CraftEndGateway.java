@@ -1,21 +1,22 @@
 package org.bukkit.craftbukkit.v1_18_R2.block;
 
 import java.util.Objects;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.world.level.block.entity.TileEntityEndGateway;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.TheEndGatewayBlockEntity;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.EndGateway;
 
-public class CraftEndGateway extends CraftBlockEntityState<TileEntityEndGateway> implements EndGateway {
+public class CraftEndGateway extends CraftBlockEntityState<TheEndGatewayBlockEntity> implements EndGateway {
 
-    public CraftEndGateway(World world, TileEntityEndGateway tileEntity) {
+    public CraftEndGateway(World world, TheEndGatewayBlockEntity tileEntity) {
         super(world, tileEntity);
     }
 
     @Override
     public Location getExitLocation() {
-        BlockPosition pos = this.getSnapshot().exitPortal;
+        BlockPos pos = this.getSnapshot().exitPortal;
         return pos == null ? null : new Location(this.isPlaced() ? this.getWorld() : null, pos.getX(), pos.getY(), pos.getZ());
     }
 
@@ -26,7 +27,7 @@ public class CraftEndGateway extends CraftBlockEntityState<TileEntityEndGateway>
         } else if (!Objects.equals(location.getWorld(), this.isPlaced() ? this.getWorld() : null)) {
             throw new IllegalArgumentException("Cannot set exit location to different world");
         } else {
-            this.getSnapshot().exitPortal = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            this.getSnapshot().exitPortal = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         }
     }
 
@@ -51,7 +52,7 @@ public class CraftEndGateway extends CraftBlockEntityState<TileEntityEndGateway>
     }
 
     @Override
-    public void applyTo(TileEntityEndGateway endGateway) {
+    public void applyTo(TheEndGatewayBlockEntity endGateway) {
         super.applyTo(endGateway);
 
         if (this.getSnapshot().exitPortal == null) {

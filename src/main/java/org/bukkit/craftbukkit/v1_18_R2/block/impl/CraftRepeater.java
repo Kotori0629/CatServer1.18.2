@@ -11,14 +11,14 @@ public final class CraftRepeater extends CraftBlockData implements org.bukkit.bl
         super();
     }
 
-    public CraftRepeater(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftRepeater(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.type.CraftRepeater
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateInteger DELAY = getInteger(net.minecraft.world.level.block.BlockRepeater.class, "delay");
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean LOCKED = getBoolean(net.minecraft.world.level.block.BlockRepeater.class, "locked");
+    private static final net.minecraft.world.level.block.state.properties.IntegerProperty DELAY = getInteger(net.minecraft.world.level.block.RepeaterBlock.class, "delay");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty LOCKED = getBoolean(net.minecraft.world.level.block.RepeaterBlock.class, "locked");
 
     @Override
     public int getDelay() {
@@ -52,7 +52,7 @@ public final class CraftRepeater extends CraftBlockData implements org.bukkit.bl
 
     // org.bukkit.craftbukkit.block.data.CraftDirectional
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateEnum<?> FACING = getEnum(net.minecraft.world.level.block.BlockRepeater.class, "facing");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACING = getEnum(net.minecraft.world.level.block.RepeaterBlock.class, "facing");
 
     @Override
     public org.bukkit.block.BlockFace getFacing() {
@@ -71,7 +71,7 @@ public final class CraftRepeater extends CraftBlockData implements org.bukkit.bl
 
     // org.bukkit.craftbukkit.block.data.CraftPowerable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean POWERED = getBoolean(net.minecraft.world.level.block.BlockRepeater.class, "powered");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty POWERED = getBoolean(net.minecraft.world.level.block.RepeaterBlock.class, "powered");
 
     @Override
     public boolean isPowered() {

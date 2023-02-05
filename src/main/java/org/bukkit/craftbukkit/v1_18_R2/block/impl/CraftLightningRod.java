@@ -11,13 +11,13 @@ public final class CraftLightningRod extends CraftBlockData implements org.bukki
         super();
     }
 
-    public CraftLightningRod(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftLightningRod(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftDirectional
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateEnum<?> FACING = getEnum(net.minecraft.world.level.block.LightningRodBlock.class, "facing");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACING = getEnum(net.minecraft.world.level.block.LightningRodBlock.class, "facing");
 
     @Override
     public org.bukkit.block.BlockFace getFacing() {
@@ -36,7 +36,7 @@ public final class CraftLightningRod extends CraftBlockData implements org.bukki
 
     // org.bukkit.craftbukkit.block.data.CraftPowerable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean POWERED = getBoolean(net.minecraft.world.level.block.LightningRodBlock.class, "powered");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty POWERED = getBoolean(net.minecraft.world.level.block.LightningRodBlock.class, "powered");
 
     @Override
     public boolean isPowered() {
@@ -50,7 +50,7 @@ public final class CraftLightningRod extends CraftBlockData implements org.bukki
 
     // org.bukkit.craftbukkit.block.data.CraftWaterlogged
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean WATERLOGGED = getBoolean(net.minecraft.world.level.block.LightningRodBlock.class, "waterlogged");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = getBoolean(net.minecraft.world.level.block.LightningRodBlock.class, "waterlogged");
 
     @Override
     public boolean isWaterlogged() {

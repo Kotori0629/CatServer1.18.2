@@ -11,13 +11,13 @@ public final class CraftLayeredCauldron extends CraftBlockData implements org.bu
         super();
     }
 
-    public CraftLayeredCauldron(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftLayeredCauldron(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftLevelled
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateInteger LEVEL = getInteger(net.minecraft.world.level.block.LayeredCauldronBlock.class, "level");
+    private static final net.minecraft.world.level.block.state.properties.IntegerProperty LEVEL = getInteger(net.minecraft.world.level.block.LayeredCauldronBlock.class, "level");
 
     @Override
     public int getLevel() {

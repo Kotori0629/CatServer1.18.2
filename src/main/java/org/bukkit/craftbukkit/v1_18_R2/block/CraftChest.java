@@ -1,11 +1,11 @@
 package org.bukkit.craftbukkit.v1_18_R2.block;
 
-import net.minecraft.sounds.SoundEffects;
-import net.minecraft.world.ITileInventory;
-import net.minecraft.world.level.block.BlockChest;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.TileEntityChest;
-import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Chest;
@@ -14,9 +14,9 @@ import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryDoubleChest;
 import org.bukkit.inventory.Inventory;
 
-public class CraftChest extends CraftLootable<TileEntityChest> implements Chest {
+public class CraftChest extends CraftLootable<ChestBlockEntity> implements Chest {
 
-    public CraftChest(World world, TileEntityChest tileEntity) {
+    public CraftChest(World world, ChestBlockEntity tileEntity) {
         super(world, tileEntity);
     }
 
@@ -44,11 +44,11 @@ public class CraftChest extends CraftLootable<TileEntityChest> implements Chest 
         // The logic here is basically identical to the logic in BlockChest.interact
         CraftWorld world = (CraftWorld) this.getWorld();
 
-        BlockChest blockChest = (BlockChest) (this.getType() == Material.CHEST ? Blocks.CHEST : Blocks.TRAPPED_CHEST);
-        ITileInventory nms = blockChest.getMenuProvider(data, world.getHandle(), this.getPosition(), true);
+        ChestBlock blockChest = (ChestBlock) (this.getType() == Material.CHEST ? Blocks.CHEST : Blocks.TRAPPED_CHEST);
+        MenuProvider nms = blockChest.getMenuProvider(data, world.getHandle(), this.getPosition(), true);
 
-        if (nms instanceof BlockChest.DoubleInventory) {
-            inventory = new CraftInventoryDoubleChest((BlockChest.DoubleInventory) nms);
+        if (nms instanceof ChestBlock.DoubleInventory) {
+            inventory = new CraftInventoryDoubleChest((ChestBlock.DoubleInventory) nms);
         }
         return inventory;
     }
@@ -56,10 +56,10 @@ public class CraftChest extends CraftLootable<TileEntityChest> implements Chest 
     @Override
     public void open() {
         requirePlaced();
-        if (!getTileEntity().openersCounter.opened && getWorldHandle() instanceof net.minecraft.world.level.World) {
-            IBlockData block = getTileEntity().getBlockState();
+        if (!getTileEntity().openersCounter.opened && getWorldHandle() instanceof net.minecraft.world.level.Level) {
+            BlockState block = getTileEntity().getBlockState();
             getTileEntity().getLevel().blockEvent(getPosition(), block.getBlock(), 1, getTileEntity().openersCounter.getOpenerCount() + 1);
-            TileEntityChest.playSound(getTileEntity().getLevel(), getPosition(), block, SoundEffects.CHEST_OPEN);
+            ChestBlockEntity.playSound(getTileEntity().getLevel(), getPosition(), block, SoundEvents.CHEST_OPEN);
         }
         getTileEntity().openersCounter.opened = true;
     }
@@ -67,10 +67,10 @@ public class CraftChest extends CraftLootable<TileEntityChest> implements Chest 
     @Override
     public void close() {
         requirePlaced();
-        if (getTileEntity().openersCounter.opened && getWorldHandle() instanceof net.minecraft.world.level.World) {
-            IBlockData block = getTileEntity().getBlockState();
+        if (getTileEntity().openersCounter.opened && getWorldHandle() instanceof net.minecraft.world.level.Level) {
+            BlockState block = getTileEntity().getBlockState();
             getTileEntity().getLevel().blockEvent(getPosition(), block.getBlock(), 1, 0);
-            TileEntityChest.playSound(getTileEntity().getLevel(), getPosition(), block, SoundEffects.CHEST_CLOSE);
+            ChestBlockEntity.playSound(getTileEntity().getLevel(), getPosition(), block, SoundEvents.CHEST_CLOSE);
         }
         getTileEntity().openersCounter.opened = false;
     }

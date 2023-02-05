@@ -11,13 +11,13 @@ public final class CraftStem extends CraftBlockData implements org.bukkit.block.
         super();
     }
 
-    public CraftStem(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftStem(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftAgeable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateInteger AGE = getInteger(net.minecraft.world.level.block.BlockStem.class, "age");
+    private static final net.minecraft.world.level.block.state.properties.IntegerProperty AGE = getInteger(net.minecraft.world.level.block.StemBlock.class, "age");
 
     @Override
     public int getAge() {

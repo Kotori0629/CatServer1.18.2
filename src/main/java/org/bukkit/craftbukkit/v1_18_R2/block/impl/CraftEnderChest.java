@@ -11,13 +11,13 @@ public final class CraftEnderChest extends CraftBlockData implements org.bukkit.
         super();
     }
 
-    public CraftEnderChest(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftEnderChest(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftDirectional
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateEnum<?> FACING = getEnum(net.minecraft.world.level.block.BlockEnderChest.class, "facing");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACING = getEnum(net.minecraft.world.level.block.EnderChestBlock.class, "facing");
 
     @Override
     public org.bukkit.block.BlockFace getFacing() {
@@ -36,7 +36,7 @@ public final class CraftEnderChest extends CraftBlockData implements org.bukkit.
 
     // org.bukkit.craftbukkit.block.data.CraftWaterlogged
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean WATERLOGGED = getBoolean(net.minecraft.world.level.block.BlockEnderChest.class, "waterlogged");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = getBoolean(net.minecraft.world.level.block.EnderChestBlock.class, "waterlogged");
 
     @Override
     public boolean isWaterlogged() {

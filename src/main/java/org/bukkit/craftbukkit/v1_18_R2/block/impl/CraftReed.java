@@ -11,13 +11,13 @@ public final class CraftReed extends CraftBlockData implements org.bukkit.block.
         super();
     }
 
-    public CraftReed(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftReed(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftAgeable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateInteger AGE = getInteger(net.minecraft.world.level.block.BlockReed.class, "age");
+    private static final net.minecraft.world.level.block.state.properties.IntegerProperty AGE = getInteger(net.minecraft.world.level.block.SugarCaneBlock.class, "age");
 
     @Override
     public int getAge() {

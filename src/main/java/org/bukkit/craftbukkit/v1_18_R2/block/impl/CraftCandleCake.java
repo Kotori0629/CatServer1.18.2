@@ -11,13 +11,13 @@ public final class CraftCandleCake extends CraftBlockData implements org.bukkit.
         super();
     }
 
-    public CraftCandleCake(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftCandleCake(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftLightable
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean LIT = getBoolean(net.minecraft.world.level.block.CandleCakeBlock.class, "lit");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty LIT = getBoolean(net.minecraft.world.level.block.CandleCakeBlock.class, "lit");
 
     @Override
     public boolean isLit() {

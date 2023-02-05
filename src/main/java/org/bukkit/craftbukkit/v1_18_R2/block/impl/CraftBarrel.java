@@ -11,13 +11,13 @@ public final class CraftBarrel extends CraftBlockData implements org.bukkit.bloc
         super();
     }
 
-    public CraftBarrel(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftBarrel(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftDirectional
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateEnum<?> FACING = getEnum(net.minecraft.world.level.block.BlockBarrel.class, "facing");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACING = getEnum(net.minecraft.world.level.block.BarrelBlock.class, "facing");
 
     @Override
     public org.bukkit.block.BlockFace getFacing() {

@@ -11,13 +11,13 @@ public final class CraftBigDripleafStem extends CraftBlockData implements org.bu
         super();
     }
 
-    public CraftBigDripleafStem(net.minecraft.world.level.block.state.IBlockData state) {
+    public CraftBigDripleafStem(net.minecraft.world.level.block.state.BlockState state) {
         super(state);
     }
 
     // org.bukkit.craftbukkit.block.data.CraftDirectional
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateEnum<?> FACING = getEnum(net.minecraft.world.level.block.BigDripleafStemBlock.class, "facing");
+    private static final net.minecraft.world.level.block.state.properties.EnumProperty<?> FACING = getEnum(net.minecraft.world.level.block.BigDripleafStemBlock.class, "facing");
 
     @Override
     public org.bukkit.block.BlockFace getFacing() {
@@ -36,7 +36,7 @@ public final class CraftBigDripleafStem extends CraftBlockData implements org.bu
 
     // org.bukkit.craftbukkit.block.data.CraftWaterlogged
 
-    private static final net.minecraft.world.level.block.state.properties.BlockStateBoolean WATERLOGGED = getBoolean(net.minecraft.world.level.block.BigDripleafStemBlock.class, "waterlogged");
+    private static final net.minecraft.world.level.block.state.properties.BooleanProperty WATERLOGGED = getBoolean(net.minecraft.world.level.block.BigDripleafStemBlock.class, "waterlogged");
 
     @Override
     public boolean isWaterlogged() {
