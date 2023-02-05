@@ -1,0 +1,84 @@
+--- a/net/minecraft/world/level/storage/Convertable.java
++++ b/net/minecraft/world/level/storage/Convertable.java
+@@ -58,6 +58,10 @@
+ import net.minecraft.world.level.levelgen.GeneratorSettings;
+ import org.slf4j.Logger;
+ 
++// CraftBukkit start
++import net.minecraft.world.level.dimension.WorldDimension;
++// CraftBukkit end
++
+ public class Convertable {
+ 
+     static final Logger LOGGER = LogUtils.getLogger();
+@@ -112,7 +116,7 @@
+     }
+ 
+     private static DataPackConfiguration readDataPackConfig(Dynamic<?> dynamic) {
+-        DataResult dataresult = DataPackConfiguration.CODEC.parse(dynamic);
++        DataResult<DataPackConfiguration> dataresult = DataPackConfiguration.CODEC.parse(dynamic); // CraftBukkit - decompile error
+         Logger logger = Convertable.LOGGER;
+ 
+         Objects.requireNonNull(logger);
+@@ -232,7 +236,11 @@
+                 WorldSettings worldsettings = WorldSettings.parse(dynamic, datapackconfiguration);
+                 Lifecycle lifecycle1 = ((Lifecycle) pair.getSecond()).add(lifecycle);
+ 
+-                return WorldDataServer.parse(dynamic, datafixer, i, nbttagcompound2, worldsettings, levelversion, (GeneratorSettings) pair.getFirst(), lifecycle1);
++                // CraftBukkit start - Add PDC to world
++                WorldDataServer worldDataServer = WorldDataServer.parse(dynamic, datafixer, i, nbttagcompound2, worldsettings, levelversion, (GeneratorSettings) pair.getFirst(), lifecycle1);
++                worldDataServer.pdc = nbttagcompound1.get("BukkitValues");
++                return worldDataServer;
++                // CraftBukkit end
+             } catch (Exception exception) {
+                 Convertable.LOGGER.error("Exception reading {}", file, exception);
+                 return null;
+@@ -305,9 +313,23 @@
+         return this.backupDir;
+     }
+ 
+-    public Convertable.ConversionSession createAccess(String s) throws IOException {
+-        return new Convertable.ConversionSession(s);
++    // CraftBukkit start
++    public Convertable.ConversionSession createAccess(String s, ResourceKey<WorldDimension> dimensionType) throws IOException {
++        return new Convertable.ConversionSession(s, dimensionType);
++    }
++
++    public static Path getStorageFolder(Path path, ResourceKey<WorldDimension> dimensionType) {
++        if (dimensionType == WorldDimension.OVERWORLD) {
++            return path;
++        } else if (dimensionType == WorldDimension.NETHER) {
++            return path.resolve("DIM-1");
++        } else if (dimensionType == WorldDimension.END) {
++            return path.resolve("DIM1");
++        } else {
++            return path.resolve("dimensions").resolve(dimensionType.location().getNamespace()).resolve(dimensionType.location().getPath());
++        }
+     }
++    // CraftBukkit end
+ 
+     public class ConversionSession implements AutoCloseable {
+ 
+@@ -315,8 +337,12 @@
+         public final Path levelPath;
+         private final String levelId;
+         private final Map<SavedFile, Path> resources = Maps.newHashMap();
++        // CraftBukkit start
++        public final ResourceKey<WorldDimension> dimensionType;
+ 
+-        public ConversionSession(String s) throws IOException {
++        public ConversionSession(String s, ResourceKey<WorldDimension> dimensionType) throws IOException {
++            this.dimensionType = dimensionType;
++            // CraftBukkit end
+             this.levelId = s;
+             this.levelPath = Convertable.this.baseDir.resolve(s);
+             this.lock = SessionLock.create(this.levelPath);
+@@ -333,7 +359,7 @@
+         }
+ 
+         public Path getDimensionPath(ResourceKey<World> resourcekey) {
+-            return DimensionManager.getStorageFolder(resourcekey, this.levelPath);
++            return getStorageFolder(this.levelPath, this.dimensionType); // CraftBukkit
+         }
+ 
+         private void checkLock() {
