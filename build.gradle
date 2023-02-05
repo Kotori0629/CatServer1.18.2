@@ -143,6 +143,7 @@ subprojects {
             name = 'forge'
             url = 'https://maven.minecraftforge.net/'
         }
+        maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
     }
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -280,6 +281,22 @@ def sharedDeps = {
     installer "org.spongepowered:mixin:${MIXIN_VERSION}"
     installer 'org.openjdk.nashorn:nashorn-core:15.3'
     installer "net.minecraftforge:JarJar:${JARJAR_VERSION}"
+    // Bukkit
+    installer 'org.yaml:snakeyaml:1.30'
+    installer 'org.apache.maven:maven-resolver-provider:3.8.4'
+    installer 'org.apache.maven.resolver:maven-resolver-connector-basic:1.7.2'
+    installer 'org.apache.maven.resolver:maven-resolver-transport-http:1.7.2'
+    compileOnly 'org.jetbrains:annotations:21.0.1'
+    // CraftBukkit
+    installer 'org.fusesource.jansi:jansi:1.18'
+    installer 'jline:jline:2.12.1'
+    installer 'com.googlecode.json-simple:json-simple:1.1.1'
+    installer 'org.xerial:sqlite-jdbc:3.36.0.3'
+    installer 'mysql:mysql-connector-java:8.0.27'
+    installer 'org.apache.logging.log4j:log4j-iostreams:2.17.1'
+    installer 'net.md-5:SpecialSource:1.10.0'
+    // Spigot
+    installer 'net.md-5:bungeecord-chat:1.16-R0.4'
 
     /*
     installer 'org.lwjgl:lwjgl:3.2.2'
