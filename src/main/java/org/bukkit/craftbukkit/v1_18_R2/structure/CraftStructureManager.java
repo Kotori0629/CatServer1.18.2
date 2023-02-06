@@ -25,9 +25,9 @@ import org.bukkit.structure.StructureManager;
 
 public class CraftStructureManager implements StructureManager {
 
-    private final StructureManager structureManager;
+    private final net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager structureManager;
 
-    public CraftStructureManager(StructureManager structureManager) {
+    public CraftStructureManager(net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager structureManager) {
         this.structureManager = structureManager;
     }
 

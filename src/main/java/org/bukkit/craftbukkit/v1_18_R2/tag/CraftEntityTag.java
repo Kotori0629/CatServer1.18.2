@@ -11,7 +11,7 @@ import org.bukkit.entity.EntityType;
 
 public class CraftEntityTag extends CraftTag<net.minecraft.world.entity.EntityType<?>, EntityType> {
 
-    public CraftEntityTag(IRegistry<net.minecraft.world.entity.EntityType<?>> registry, TagKey<net.minecraft.world.entity.EntityType<?>> tag) {
+    public CraftEntityTag(net.minecraft.core.Registry<net.minecraft.world.entity.EntityType<?>> registry, TagKey<net.minecraft.world.entity.EntityType<?>> tag) {
         super(registry, tag);
     }
 
