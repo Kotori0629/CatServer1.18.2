@@ -54,10 +54,4 @@
      public IRegistryCustom registryAccess() {
          return this.server.registryAccess();
      }
-+
-+    // CraftBukkit start
-+    public org.bukkit.command.CommandSender getBukkitSender() {
-+        return source.getBukkitSender(this);
-+    }
-+    // CraftBukkit end
  }

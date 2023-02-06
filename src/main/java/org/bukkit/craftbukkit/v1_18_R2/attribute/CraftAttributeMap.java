@@ -28,7 +28,7 @@ public class CraftAttributeMap implements Attributable {
         return net.minecraft.core.Registry.ATTRIBUTE.get(CraftNamespacedKey.toMinecraft(attribute.getKey()));
     }
 
-    public static net.minecraft.world.entity.ai.attributes.Attribute fromMinecraft(String nms) {
+    public static Attribute fromMinecraft(String nms) {
         return Registry.ATTRIBUTE.get(CraftNamespacedKey.fromString(nms));
     }
 }

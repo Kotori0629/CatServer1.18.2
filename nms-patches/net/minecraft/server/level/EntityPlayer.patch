@@ -1013,9 +1013,4 @@
 +        this.setDeltaMovement(0, 0, 0); // CraftBukkit - SPIGOT-6948: Reset velocity on death
 +    }
 +
-+    @Override
-+    public CraftPlayer getBukkitEntity() {
-+        return (CraftPlayer) super.getBukkitEntity();
-+    }
-+    // CraftBukkit end
  }

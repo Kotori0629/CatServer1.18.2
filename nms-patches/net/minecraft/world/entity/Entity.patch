@@ -35,33 +35,6 @@
 +// CraftBukkit end
 +
  public abstract class Entity implements INamableTileEntity, EntityAccess, ICommandListener {
- 
-+    // CraftBukkit start
-+    private static final int CURRENT_LEVEL = 2;
-+    static boolean isLevelAtLeast(NBTTagCompound tag, int level) {
-+        return tag.contains("Bukkit.updateLevel") && tag.getInt("Bukkit.updateLevel") >= level;
-+    }
-+
-+    private CraftEntity bukkitEntity;
-+
-+    public CraftEntity getBukkitEntity() {
-+        if (bukkitEntity == null) {
-+            bukkitEntity = CraftEntity.getEntity(level.getCraftServer(), this);
-+        }
-+        return bukkitEntity;
-+    }
-+
-+    @Override
-+    public CommandSender getBukkitSender(CommandListenerWrapper wrapper) {
-+        return getBukkitEntity();
-+    }
-+
-+    // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
-+    public int getDefaultMaxAirSupply() {
-+        return TOTAL_AIR_SUPPLY;
-+    }
-+    // CraftBukkit end
-+
      private static final Logger LOGGER = LogUtils.getLogger();
      public static final String ID_TAG = "id";
      public static final String PASSENGERS_TAG = "Passengers";
@@ -69,24 +42,6 @@
      public boolean hasVisualFire;
      @Nullable
      private IBlockData feetBlockState;
-+    // CraftBukkit start
-+    public boolean persist = true;
-+    public boolean valid;
-+    public boolean generation;
-+    public int maxAirTicks = getDefaultMaxAirSupply(); // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
-+    public org.bukkit.projectiles.ProjectileSource projectileSource; // For projectiles only
-+    public boolean lastDamageCancelled; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
-+    public boolean persistentInvisibility = false;
-+    public BlockPosition lastLavaContact;
-+
-+    public float getBukkitYaw() {
-+        return this.yRot;
-+    }
-+
-+    public boolean isChunkLoaded() {
-+        return level.hasChunk((int) Math.floor(this.getX()) >> 4, (int) Math.floor(this.getZ()) >> 4);
-+    }
-+    // CraftBukkit end
  
      public Entity(EntityTypes<?> entitytypes, World world) {
          this.id = Entity.ENTITY_COUNTER.incrementAndGet();

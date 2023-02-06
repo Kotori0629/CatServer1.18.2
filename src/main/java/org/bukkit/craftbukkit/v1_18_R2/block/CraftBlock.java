@@ -339,7 +339,7 @@ public class CraftBlock implements Block {
         getWorld().setBiome(getX(), getY(), getZ(), bio);
     }
 
-    public static Biome biomeBaseToBiome(net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome> registry, Holder<Biome> base) {
+    public static Biome biomeBaseToBiome(net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome> registry, Holder<net.minecraft.world.level.biome.Biome> base) {
         return biomeBaseToBiome(registry, base.value());
     }
 
@@ -469,7 +469,7 @@ public class CraftBlock implements Block {
     @Override
     public boolean breakNaturally(ItemStack item) {
         // Order matters here, need to drop before setting to air so skulls can get their data
-        net.minecraft.world.level.block.state.IBlockData iblockdata = this.getNMS();
+        net.minecraft.world.level.block.state.BlockState iblockdata = this.getNMS();
         net.minecraft.world.level.block.Block block = iblockdata.getBlock();
         net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
         boolean result = false;
