@@ -7,12 +7,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.world.entity.raid.EntityRaider;
-import net.minecraft.world.level.World;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import org.bukkit.Location;
 import org.bukkit.Raid;
-import org.bukkit.Raid.RaidStatus;
 import org.bukkit.entity.Raider;
 
 public final class CraftRaid implements Raid {
@@ -35,20 +34,20 @@ public final class CraftRaid implements Raid {
 
     @Override
     public int getBadOmenLevel() {
-        return handle.badOmenLevel;
+        return handle.getBadOmenLevel();
     }
 
     @Override
     public void setBadOmenLevel(int badOmenLevel) {
         int max = handle.getMaxBadOmenLevel();
         Preconditions.checkArgument(0 <= badOmenLevel && badOmenLevel <= max, "Bad Omen level must be between 0 and %s", max);
-        handle.badOmenLevel = badOmenLevel;
+        handle.setBadOmenLevel(badOmenLevel);
     }
 
     @Override
     public Location getLocation() {
-        BlockPosition pos = handle.getCenter();
-        World world = handle.getLevel();
+        BlockPos pos = handle.getCenter();
+        Level world = handle.getLevel();
         return new Location(world.getWorld(), pos.getX(), pos.getY(), pos.getZ());
     }
 
@@ -72,7 +71,7 @@ public final class CraftRaid implements Raid {
 
     @Override
     public int getTotalGroups() {
-        return handle.numGroups + (handle.badOmenLevel > 1 ? 1 : 0);
+        return handle.numGroups + (handle.getBadOmenLevel() > 1 ? 1 : 0);
     }
 
     @Override
@@ -92,9 +91,9 @@ public final class CraftRaid implements Raid {
 
     @Override
     public List<Raider> getRaiders() {
-        return handle.getRaiders().stream().map(new Function<EntityRaider, Raider>() {
+        return handle.getRaiders().stream().map(new Function<net.minecraft.world.entity.raid.Raider, Raider>() {
             @Override
-            public Raider apply(EntityRaider entityRaider) {
+            public Raider apply(net.minecraft.world.entity.raid.Raider entityRaider) {
                 return (Raider) entityRaider.getBukkitEntity();
             }
         }).collect(ImmutableList.toImmutableList());

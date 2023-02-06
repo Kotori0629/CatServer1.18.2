@@ -2,15 +2,15 @@ package org.bukkit.craftbukkit.v1_18_R2.tag;
 
 import java.util.Set;
 import java.util.stream.Collectors;
-import net.minecraft.core.IRegistry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Recipe;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
 
 public class CraftItemTag extends CraftTag<Item, Material> {
 
-    public CraftItemTag(IRegistry<Item> registry, TagKey<Item> tag) {
+    public CraftItemTag(Recipe<Item> registry, TagKey<Item> tag) {
         super(registry, tag);
     }
 
