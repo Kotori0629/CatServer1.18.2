@@ -1,9 +1,8 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.world.entity.projectile.EntityArrow;
-import org.apache.commons.lang.Validate;
+import net.minecraft.core.BlockPos;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.entity.AbstractArrow;
@@ -13,7 +12,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 public class CraftArrow extends AbstractProjectile implements AbstractArrow {
 
-    public CraftArrow(CraftServer server, EntityArrow entity) {
+    public CraftArrow(CraftServer server, net.minecraft.world.entity.projectile.AbstractArrow entity) {
         super(server, entity);
     }
 
@@ -25,7 +24,7 @@ public class CraftArrow extends AbstractProjectile implements AbstractArrow {
 
     @Override
     public int getKnockbackStrength() {
-        return getHandle().knockback;
+        return getHandle().getKnockback();
     }
 
     @Override
@@ -87,7 +86,7 @@ public class CraftArrow extends AbstractProjectile implements AbstractArrow {
             return null;
         }
 
-        BlockPosition pos = getHandle().blockPosition();
+        BlockPos pos = getHandle().blockPosition();
         return getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
     }
 
@@ -99,7 +98,7 @@ public class CraftArrow extends AbstractProjectile implements AbstractArrow {
     @Override
     public void setPickupStatus(PickupStatus status) {
         Preconditions.checkNotNull(status, "status");
-        getHandle().pickup = EntityArrow.PickupStatus.byOrdinal(status.ordinal());
+        getHandle().pickup = net.minecraft.world.entity.projectile.AbstractArrow.Pickup.byOrdinal(status.ordinal());
     }
 
     @Override
@@ -121,8 +120,8 @@ public class CraftArrow extends AbstractProjectile implements AbstractArrow {
     }
 
     @Override
-    public EntityArrow getHandle() {
-        return (EntityArrow) entity;
+    public net.minecraft.world.entity.projectile.AbstractArrow getHandle() {
+        return (net.minecraft.world.entity.projectile.AbstractArrow) entity;
     }
 
     @Override
