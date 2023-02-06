@@ -1,8 +1,7 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.world.entity.monster.EntityZombie;
-import net.minecraft.world.entity.monster.EntityZombieVillager;
+import net.minecraft.world.entity.monster.ZombieVillager;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
@@ -10,13 +9,13 @@ import org.bukkit.entity.Zombie;
 
 public class CraftZombie extends CraftMonster implements Zombie {
 
-    public CraftZombie(CraftServer server, EntityZombie entity) {
+    public CraftZombie(CraftServer server, net.minecraft.world.entity.monster.Zombie entity) {
         super(server, entity);
     }
 
     @Override
-    public EntityZombie getHandle() {
-        return (EntityZombie) entity;
+    public net.minecraft.world.entity.monster.Zombie getHandle() {
+        return (net.minecraft.world.entity.monster.Zombie) entity;
     }
 
     @Override
@@ -41,7 +40,7 @@ public class CraftZombie extends CraftMonster implements Zombie {
 
     @Override
     public boolean isVillager() {
-        return getHandle() instanceof EntityZombieVillager;
+        return getHandle() instanceof ZombieVillager;
     }
 
     @Override
@@ -75,7 +74,7 @@ public class CraftZombie extends CraftMonster implements Zombie {
     public void setConversionTime(int time) {
         if (time < 0) {
             getHandle().conversionTime = -1;
-            getHandle().getEntityData().set(EntityZombie.DATA_DROWNED_CONVERSION_ID, false);
+            getHandle().getEntityData().set(net.minecraft.world.entity.monster.Zombie.DATA_DROWNED_CONVERSION_ID, false);
         } else {
             getHandle().startUnderWaterConversion(time);
         }

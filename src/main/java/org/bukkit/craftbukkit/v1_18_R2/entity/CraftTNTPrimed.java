@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
-import net.minecraft.world.entity.EntityLiving;
-import net.minecraft.world.entity.item.EntityTNTPrimed;
+import net.minecraft.world.entity.item.PrimedTnt;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -10,7 +9,7 @@ import org.bukkit.entity.TNTPrimed;
 
 public class CraftTNTPrimed extends CraftEntity implements TNTPrimed {
 
-    public CraftTNTPrimed(CraftServer server, EntityTNTPrimed entity) {
+    public CraftTNTPrimed(CraftServer server, PrimedTnt entity) {
         super(server, entity);
     }
 
@@ -45,8 +44,8 @@ public class CraftTNTPrimed extends CraftEntity implements TNTPrimed {
     }
 
     @Override
-    public EntityTNTPrimed getHandle() {
-        return (EntityTNTPrimed) entity;
+    public PrimedTnt getHandle() {
+        return (PrimedTnt) entity;
     }
 
     @Override
@@ -61,7 +60,7 @@ public class CraftTNTPrimed extends CraftEntity implements TNTPrimed {
 
     @Override
     public Entity getSource() {
-        EntityLiving source = getHandle().getOwner();
+        net.minecraft.world.entity.LivingEntity source = getHandle().getOwner();
 
         return (source != null) ? source.getBukkitEntity() : null;
     }

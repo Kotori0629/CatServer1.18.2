@@ -2,7 +2,7 @@ package org.bukkit.craftbukkit.v1_18_R2.entity;
 
 import java.util.UUID;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.EntityItem;
+import net.minecraft.world.entity.item.ItemEntity;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
@@ -10,14 +10,14 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
 public class CraftItem extends CraftEntity implements Item {
-    private final EntityItem item;
+    private final ItemEntity item;
 
-    public CraftItem(CraftServer server, Entity entity, EntityItem item) {
+    public CraftItem(CraftServer server, Entity entity, ItemEntity item) {
         super(server, entity);
         this.item = item;
     }
 
-    public CraftItem(CraftServer server, EntityItem entity) {
+    public CraftItem(CraftServer server, ItemEntity entity) {
         this(server, entity, entity);
     }
 

@@ -1,9 +1,7 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
-import net.minecraft.world.entity.animal.horse.EntityHorse;
-import net.minecraft.world.entity.animal.horse.HorseColor;
-import net.minecraft.world.entity.animal.horse.HorseStyle;
-import org.apache.commons.lang.Validate;
+import net.minecraft.world.entity.animal.horse.Markings;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryHorse;
 import org.bukkit.entity.EntityType;
@@ -12,13 +10,13 @@ import org.bukkit.inventory.HorseInventory;
 
 public class CraftHorse extends CraftAbstractHorse implements Horse {
 
-    public CraftHorse(CraftServer server, EntityHorse entity) {
+    public CraftHorse(CraftServer server, net.minecraft.world.entity.animal.horse.Horse entity) {
         super(server, entity);
     }
 
     @Override
-    public EntityHorse getHandle() {
-        return (EntityHorse) super.getHandle();
+    public net.minecraft.world.entity.animal.horse.Horse getHandle() {
+        return (net.minecraft.world.entity.animal.horse.Horse) super.getHandle();
     }
 
     @Override
@@ -34,7 +32,7 @@ public class CraftHorse extends CraftAbstractHorse implements Horse {
     @Override
     public void setColor(Color color) {
         Validate.notNull(color, "Color cannot be null");
-        getHandle().setVariantAndMarkings(HorseColor.byId(color.ordinal()), getHandle().getMarkings());
+        getHandle().setVariantAndMarkings(net.minecraft.world.entity.animal.horse.Variant.byId(color.ordinal()), getHandle().getMarkings());
     }
 
     @Override
@@ -45,7 +43,7 @@ public class CraftHorse extends CraftAbstractHorse implements Horse {
     @Override
     public void setStyle(Style style) {
         Validate.notNull(style, "Style cannot be null");
-        getHandle().setVariantAndMarkings(getHandle().getVariant(), HorseStyle.byId(style.ordinal()));
+        getHandle().setVariantAndMarkings(getHandle().getVariant(), Markings.byId(style.ordinal()));
     }
 
     @Override

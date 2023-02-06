@@ -1,8 +1,6 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.resources.MinecraftKey;
-import net.minecraft.world.entity.EntityInsentient;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
@@ -12,7 +10,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.loot.LootTable;
 
 public abstract class CraftMob extends CraftLivingEntity implements Mob {
-    public CraftMob(CraftServer server, EntityInsentient entity) {
+    public CraftMob(CraftServer server, net.minecraft.world.entity.Mob entity) {
         super(server, entity);
     }
 
@@ -20,7 +18,7 @@ public abstract class CraftMob extends CraftLivingEntity implements Mob {
     public void setTarget(LivingEntity target) {
         Preconditions.checkState(!getHandle().generation, "Cannot set target during world generation");
 
-        EntityInsentient entity = getHandle();
+        net.minecraft.world.entity.Mob entity = getHandle();
         if (target == null) {
             entity.setTarget(null, null, false);
         } else if (target instanceof CraftLivingEntity) {
@@ -46,8 +44,8 @@ public abstract class CraftMob extends CraftLivingEntity implements Mob {
     }
 
     @Override
-    public EntityInsentient getHandle() {
-        return (EntityInsentient) entity;
+    public net.minecraft.world.entity.Mob getHandle() {
+        return (net.minecraft.world.entity.Mob) entity;
     }
 
     @Override

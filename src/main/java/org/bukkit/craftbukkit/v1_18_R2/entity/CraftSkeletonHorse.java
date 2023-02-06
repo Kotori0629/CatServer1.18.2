@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
-import net.minecraft.world.entity.animal.horse.EntityHorseSkeleton;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse.Variant;
@@ -8,7 +7,7 @@ import org.bukkit.entity.SkeletonHorse;
 
 public class CraftSkeletonHorse extends CraftAbstractHorse implements SkeletonHorse {
 
-    public CraftSkeletonHorse(CraftServer server, EntityHorseSkeleton entity) {
+    public CraftSkeletonHorse(CraftServer server, net.minecraft.world.entity.animal.horse.SkeletonHorse entity) {
         super(server, entity);
     }
 
@@ -28,8 +27,8 @@ public class CraftSkeletonHorse extends CraftAbstractHorse implements SkeletonHo
     }
 
     @Override
-    public EntityHorseSkeleton getHandle() {
-        return (EntityHorseSkeleton) entity;
+    public net.minecraft.world.entity.animal.horse.SkeletonHorse getHandle() {
+        return (net.minecraft.world.entity.animal.horse.SkeletonHorse) entity;
     }
 
     @Override

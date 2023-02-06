@@ -1,12 +1,12 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
-import net.minecraft.world.entity.vehicle.EntityMinecartMobSpawner;
+import net.minecraft.world.entity.vehicle.MinecartSpawner;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 
 final class CraftMinecartMobSpawner extends CraftMinecart implements SpawnerMinecart {
-    CraftMinecartMobSpawner(CraftServer server, EntityMinecartMobSpawner entity) {
+    CraftMinecartMobSpawner(CraftServer server, MinecartSpawner entity) {
         super(server, entity);
     }
 

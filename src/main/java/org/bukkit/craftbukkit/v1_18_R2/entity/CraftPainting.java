@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
 import net.minecraft.world.entity.decoration.EntityPainting;
+import net.minecraft.world.entity.decoration.Motive;
 import net.minecraft.world.entity.decoration.Paintings;
 import org.bukkit.Art;
 import org.bukkit.block.BlockFace;
@@ -11,13 +12,13 @@ import org.bukkit.entity.Painting;
 
 public class CraftPainting extends CraftHanging implements Painting {
 
-    public CraftPainting(CraftServer server, EntityPainting entity) {
+    public CraftPainting(CraftServer server, net.minecraft.world.entity.decoration.Painting entity) {
         super(server, entity);
     }
 
     @Override
     public Art getArt() {
-        Paintings art = getHandle().motive;
+        Motive art = getHandle().motive;
         return CraftArt.NotchToBukkit(art);
     }
 
@@ -28,8 +29,8 @@ public class CraftPainting extends CraftHanging implements Painting {
 
     @Override
     public boolean setArt(Art art, boolean force) {
-        EntityPainting painting = this.getHandle();
-        Paintings oldArt = painting.motive;
+        net.minecraft.world.entity.decoration.Painting painting = this.getHandle();
+        Motive oldArt = painting.motive;
         painting.motive = CraftArt.BukkitToNotch(art);
         painting.setDirection(painting.getDirection());
         if (!force && !getHandle().generation && !painting.survives()) {
@@ -53,8 +54,8 @@ public class CraftPainting extends CraftHanging implements Painting {
     }
 
     @Override
-    public EntityPainting getHandle() {
-        return (EntityPainting) entity;
+    public net.minecraft.world.entity.decoration.Painting getHandle() {
+        return (net.minecraft.world.entity.decoration.Painting) entity;
     }
 
     @Override
