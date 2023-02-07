@@ -24,12 +24,7 @@ public class CraftMerchant implements Merchant {
 
     @Override
     public List<MerchantRecipe> getRecipes() {
-        return Collections.unmodifiableList(Lists.transform(merchant.getOffers(), new Function<net.minecraft.world.item.trading.Merchant, MerchantRecipe>() {
-            @Override
-            public MerchantRecipe apply(net.minecraft.world.item.trading.Merchant recipe) {
-                return recipe.asBukkit();
-            }
-        }));
+        return Collections.unmodifiableList(Lists.transform(merchant.getOffers(), (Function<net.minecraft.world.item.trading.MerchantOffer, MerchantRecipe>) recipe -> recipe.asBukkit()));
     }
 
     @Override

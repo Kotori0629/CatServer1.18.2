@@ -17,12 +17,6 @@
      private final int luck;
      private final int lureSpeed;
  
-+    // CraftBukkit start - Extra variables to enable modification of fishing wait time, values are minecraft defaults
-+    public int minWaitTime = 100;
-+    public int maxWaitTime = 600;
-+    public boolean applyLure = true;
-+    // CraftBukkit end
-+
      private EntityFishingHook(EntityTypes<? extends EntityFishingHook> entitytypes, World world, int i, int j) {
          super(entitytypes, world);
          this.syncronizedRandom = new Random();

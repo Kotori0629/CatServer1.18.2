@@ -104,7 +104,7 @@ public class CraftInventoryPlayer extends CraftInventory implements org.bukkit.i
         // to reverse the order of the index from 8. That means we need 0 to correspond to 8, 1 to correspond to 7,
         // 2 to correspond to 6, and 3 to correspond to 5. We do this simply by taking the result of (index - 36) and
         // subtracting that value from 8.
-        if (index < PlayerInventory.getSelectionSize()) {
+        if (index < Inventory.getSelectionSize()) {
             index += 36;
         } else if (index > 39) {
             index += 5; // Off hand
@@ -176,7 +176,7 @@ public class CraftInventoryPlayer extends CraftInventory implements org.bukkit.i
 
     @Override
     public void setHeldItemSlot(int slot) {
-        Validate.isTrue(slot >= 0 && slot < PlayerInventory.getSelectionSize(), "Slot is not between 0 and 8 inclusive");
+        Validate.isTrue(slot >= 0 && slot < Inventory.getSelectionSize(), "Slot is not between 0 and 8 inclusive");
         this.getInventory().selected = slot;
         ((CraftPlayer) this.getHolder()).getHandle().connection.send(new ClientboundSetCarriedItemPacket(slot));
     }

@@ -6,13 +6,13 @@ import org.bukkit.entity.Giant;
 
 public class CraftGiant extends CraftMonster implements Giant {
 
-    public CraftGiant(CraftServer server, Giant entity) {
+    public CraftGiant(CraftServer server, net.minecraft.world.entity.monster.Giant entity) {
         super(server, entity);
     }
 
     @Override
-    public Giant getHandle() {
-        return (Giant) entity;
+    public net.minecraft.world.entity.monster.Giant getHandle() {
+        return (net.minecraft.world.entity.monster.Giant) entity;
     }
 
     @Override

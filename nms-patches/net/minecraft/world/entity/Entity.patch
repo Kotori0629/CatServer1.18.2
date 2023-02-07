@@ -218,13 +218,7 @@
 @@ -1455,6 +1631,12 @@
          return false;
      }
- 
-+    // CraftBukkit start - collidable API
-+    public boolean canCollideWithBukkit(Entity entity) {
-+        return isPushable();
-+    }
-+    // CraftBukkit end
-+
+
      public void awardKillScore(Entity entity, int i, DamageSource damagesource) {
          if (entity instanceof EntityPlayer) {
              CriterionTriggers.ENTITY_KILLED_PLAYER.trigger((EntityPlayer) entity, this, damagesource);

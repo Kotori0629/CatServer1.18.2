@@ -39,74 +39,10 @@
      public int latency;
      public boolean wonGame;
  
-+    // CraftBukkit start
-+    public String displayName;
-+    public IChatBaseComponent listName;
-+    public org.bukkit.Location compassTarget;
-+    public int newExp = 0;
-+    public int newLevel = 0;
-+    public int newTotalExp = 0;
-+    public boolean keepLevel = false;
-+    public double maxHealthCache;
-+    public boolean joining = true;
-+    public boolean sentListPacket = false;
-+    public Integer clientViewDistance;
-+    public String kickLeaveMessage = null; // SPIGOT-3034: Forward leave message to PlayerQuitEvent
-+    // CraftBukkit end
-+
      public EntityPlayer(MinecraftServer minecraftserver, WorldServer worldserver, GameProfile gameprofile) {
          super(worldserver, worldserver.getSharedSpawnPos(), worldserver.getSharedSpawnAngle(), gameprofile);
          this.chatVisibility = EnumChatVisibility.FULL;
 @@ -256,12 +299,56 @@
-         this.advancements = minecraftserver.getPlayerList().getPlayerAdvancements(this);
-         this.maxUpStep = 1.0F;
-         this.fudgeSpawnLocation(worldserver);
-+
-+        // CraftBukkit start
-+        this.displayName = this.getScoreboardName();
-+        this.bukkitPickUpLoot = true;
-+        this.maxHealthCache = this.getMaxHealth();
-+    }
-+
-+    // Yes, this doesn't match Vanilla, but it's the best we can do for now.
-+    // If this is an issue, PRs are welcome
-+    public final BlockPosition getSpawnPoint(WorldServer worldserver) {
-+        BlockPosition blockposition = worldserver.getSharedSpawnPos();
-+
-+        if (worldserver.dimensionType().hasSkyLight() && worldserver.serverLevelData.getGameType() != EnumGamemode.ADVENTURE) {
-+            int i = Math.max(0, this.server.getSpawnRadius(worldserver));
-+            int j = MathHelper.floor(worldserver.getWorldBorder().getDistanceToBorder((double) blockposition.getX(), (double) blockposition.getZ()));
-+
-+            if (j < i) {
-+                i = j;
-+            }
-+
-+            if (j <= 1) {
-+                i = 1;
-+            }
-+
-+            long k = (long) (i * 2 + 1);
-+            long l = k * k;
-+            int i1 = l > 2147483647L ? Integer.MAX_VALUE : (int) l;
-+            int j1 = this.getCoprime(i1);
-+            int k1 = (new Random()).nextInt(i1);
-+
-+            for (int l1 = 0; l1 < i1; ++l1) {
-+                int i2 = (k1 + j1 * l1) % i1;
-+                int j2 = i2 % (i * 2 + 1);
-+                int k2 = i2 / (i * 2 + 1);
-+                BlockPosition blockposition1 = WorldProviderNormal.getOverworldRespawnPos(worldserver, blockposition.getX() + j2 - i, blockposition.getZ() + k2 - i);
-+
-+                if (blockposition1 != null) {
-+                    return blockposition1;
-+                }
-+            }
-+        }
-+
-+        return blockposition;
-     }
-+    // CraftBukkit end
- 
      private void fudgeSpawnLocation(WorldServer worldserver) {
          BlockPosition blockposition = worldserver.getSharedSpawnPos();
  
@@ -661,12 +597,6 @@
          this.connection.send(new PacketPlayOutOpenSignEditor(tileentitysign.getBlockPos()));
      }
  
--    public void nextContainerCounter() {
-+    public int nextContainerCounter() { // CraftBukkit - void -> int
-         this.containerCounter = this.containerCounter % 100 + 1;
-+        return containerCounter; // CraftBukkit
-     }
- 
      @Override
 @@ -1039,13 +1360,35 @@
          if (itileinventory == null) {
@@ -810,7 +740,6 @@
          return s;
      }
  
-+    public String locale = "en_us"; // CraftBukkit - add, lowercase
      public void updateOptions(PacketPlayInSettings packetplayinsettings) {
 +        // CraftBukkit start
 +        if (getMainArm() != packetplayinsettings.mainHand()) {
@@ -876,141 +805,4 @@
      public boolean allowsListing() {
          return this.allowsListing;
      }
-+
-+    // CraftBukkit start - Add per-player time and weather.
-+    public long timeOffset = 0;
-+    public boolean relativeTime = true;
-+
-+    public long getPlayerTime() {
-+        if (this.relativeTime) {
-+            // Adds timeOffset to the current server time.
-+            return this.level.getDayTime() + this.timeOffset;
-+        } else {
-+            // Adds timeOffset to the beginning of this day.
-+            return this.level.getDayTime() - (this.level.getDayTime() % 24000) + this.timeOffset;
-+        }
-+    }
-+
-+    public WeatherType weather = null;
-+
-+    public WeatherType getPlayerWeather() {
-+        return this.weather;
-+    }
-+
-+    public void setPlayerWeather(WeatherType type, boolean plugin) {
-+        if (!plugin && this.weather != null) {
-+            return;
-+        }
-+
-+        if (plugin) {
-+            this.weather = type;
-+        }
-+
-+        if (type == WeatherType.DOWNFALL) {
-+            this.connection.send(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.STOP_RAINING, 0));
-+        } else {
-+            this.connection.send(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.START_RAINING, 0));
-+        }
-+    }
-+
-+    private float pluginRainPosition;
-+    private float pluginRainPositionPrevious;
-+
-+    public void updateWeather(float oldRain, float newRain, float oldThunder, float newThunder) {
-+        if (this.weather == null) {
-+            // Vanilla
-+            if (oldRain != newRain) {
-+                this.connection.send(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.RAIN_LEVEL_CHANGE, newRain));
-+            }
-+        } else {
-+            // Plugin
-+            if (pluginRainPositionPrevious != pluginRainPosition) {
-+                this.connection.send(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.RAIN_LEVEL_CHANGE, pluginRainPosition));
-+            }
-+        }
-+
-+        if (oldThunder != newThunder) {
-+            if (weather == WeatherType.DOWNFALL || weather == null) {
-+                this.connection.send(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.THUNDER_LEVEL_CHANGE, newThunder));
-+            } else {
-+                this.connection.send(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.THUNDER_LEVEL_CHANGE, 0));
-+            }
-+        }
-+    }
-+
-+    public void tickWeather() {
-+        if (this.weather == null) return;
-+
-+        pluginRainPositionPrevious = pluginRainPosition;
-+        if (weather == WeatherType.DOWNFALL) {
-+            pluginRainPosition += 0.01;
-+        } else {
-+            pluginRainPosition -= 0.01;
-+        }
-+
-+        pluginRainPosition = MathHelper.clamp(pluginRainPosition, 0.0F, 1.0F);
-+    }
-+
-+    public void resetPlayerWeather() {
-+        this.weather = null;
-+        this.setPlayerWeather(this.level.getLevelData().isRaining() ? WeatherType.DOWNFALL : WeatherType.CLEAR, false);
-+    }
-+
-+    @Override
-+    public String toString() {
-+        return super.toString() + "(" + this.getScoreboardName() + " at " + this.getX() + "," + this.getY() + "," + this.getZ() + ")";
-+    }
-+
-+    // SPIGOT-1903, MC-98153
-+    public void forceSetPositionRotation(double x, double y, double z, float yaw, float pitch) {
-+        this.moveTo(x, y, z, yaw, pitch);
-+        this.connection.resetPosition();
-+    }
-+
-+    @Override
-+    public boolean isImmobile() {
-+        return super.isImmobile() || !getBukkitEntity().isOnline();
-+    }
-+
-+    @Override
-+    public Scoreboard getScoreboard() {
-+        return getBukkitEntity().getScoreboard().getHandle();
-+    }
-+
-+    public void reset() {
-+        float exp = 0;
-+        boolean keepInventory = this.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
-+
-+        if (this.keepLevel) { // CraftBukkit - SPIGOT-6687: Only use keepLevel (was pre-set with RULE_KEEPINVENTORY value in PlayerDeathEvent)
-+            exp = this.experienceProgress;
-+            this.newTotalExp = this.totalExperience;
-+            this.newLevel = this.experienceLevel;
-+        }
-+
-+        this.setHealth(this.getMaxHealth());
-+        this.stopUsingItem(); // CraftBukkit - SPIGOT-6682: Clear active item on reset
-+        this.remainingFireTicks = 0;
-+        this.fallDistance = 0;
-+        this.foodData = new FoodMetaData(this);
-+        this.experienceLevel = this.newLevel;
-+        this.totalExperience = this.newTotalExp;
-+        this.experienceProgress = 0;
-+        this.deathTime = 0;
-+        this.setArrowCount(0, true); // CraftBukkit - ArrowBodyCountChangeEvent
-+        this.removeAllEffects(org.bukkit.event.entity.EntityPotionEffectEvent.Cause.DEATH);
-+        this.effectsDirty = true;
-+        this.containerMenu = this.inventoryMenu;
-+        this.lastHurtByPlayer = null;
-+        this.lastHurtByMob = null;
-+        this.combatTracker = new CombatTracker(this);
-+        this.lastSentExp = -1;
-+        if (this.keepLevel) { // CraftBukkit - SPIGOT-6687: Only use keepLevel (was pre-set with RULE_KEEPINVENTORY value in PlayerDeathEvent)
-+            this.experienceProgress = exp;
-+        } else {
-+            this.giveExperiencePoints(this.newExp);
-+        }
-+        this.keepLevel = false;
-+        this.setDeltaMovement(0, 0, 0); // CraftBukkit - SPIGOT-6948: Reset velocity on death
-+    }
-+
  }

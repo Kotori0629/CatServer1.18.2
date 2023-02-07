@@ -26,11 +26,6 @@
 +        this.setPowered(true);
      }
  
-+    public void setPowered(boolean powered) {
-+        this.entityData.set(EntityCreeper.DATA_IS_POWERED, powered);
-+    }
-+    // CraftBukkit end
-+
      @Override
      protected EnumInteractionResult mobInteract(EntityHuman entityhuman, EnumHand enumhand) {
          ItemStack itemstack = entityhuman.getItemInHand(enumhand);

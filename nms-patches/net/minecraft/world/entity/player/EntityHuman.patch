@@ -318,12 +318,6 @@
      public void updateTutorialInventoryAction(ItemStack itemstack, ItemStack itemstack1, ClickAction clickaction) {}
  
      public Either<EntityHuman.EnumBedResult, Unit> startSleepInBed(BlockPosition blockposition) {
-+        // CraftBukkit start
-+        return this.startSleepInBed(blockposition, false);
-+    }
-+
-+    public Either<EntityHuman.EnumBedResult, Unit> startSleepInBed(BlockPosition blockposition, boolean force) {
-+        // CraftBukkit end
          this.startSleeping(blockposition);
          this.sleepCounter = 0;
          return Either.right(Unit.INSTANCE);
@@ -421,26 +415,6 @@
 @@ -1651,10 +1802,21 @@
          return this.experienceLevel >= 30 ? 112 + (this.experienceLevel - 30) * 9 : (this.experienceLevel >= 15 ? 37 + (this.experienceLevel - 15) * 5 : 7 + this.experienceLevel * 2);
      }
- 
-+    // CraftBukkit start
-     public void causeFoodExhaustion(float f) {
-+        this.causeFoodExhaustion(f, EntityExhaustionEvent.ExhaustionReason.UNKNOWN);
-+    }
-+
-+    public void causeFoodExhaustion(float f, EntityExhaustionEvent.ExhaustionReason reason) {
-+        // CraftBukkit end
-         if (!this.abilities.invulnerable) {
-             if (!this.level.isClientSide) {
--                this.foodData.addExhaustion(f);
-+                // CraftBukkit start
-+                EntityExhaustionEvent event = CraftEventFactory.callPlayerExhaustionEvent(this, reason, f);
-+                if (!event.isCancelled()) {
-+                    this.foodData.addExhaustion(event.getExhaustion());
-+                }
-+                // CraftBukkit end
-             }
- 
-         }
 @@ -1731,15 +1893,22 @@
  
      @Override

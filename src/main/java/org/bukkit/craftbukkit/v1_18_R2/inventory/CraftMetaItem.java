@@ -427,7 +427,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
                 continue;
             }
 
-            net.minecraft.world.entity.ai.attributes.Attribute attribute = CraftAttributeMap.fromMinecraft(attributeName);
+            Attribute attribute = CraftAttributeMap.fromMinecraft(attributeName);
             if (attribute == null) {
                 continue;
             }

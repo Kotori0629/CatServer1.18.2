@@ -28,10 +28,12 @@ import java.util.logging.Logger;
 import javax.annotation.Nullable;
 
 import net.md_5.bungee.api.ChatMessageType;
+import net.minecraft.Util;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.*;
@@ -42,11 +44,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.UserWhiteListEntry;
+import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
@@ -200,7 +204,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         if (getHandle().connection == null) return;
 
         for (Component component : CraftChatMessage.fromString(message)) {
-            getHandle().connection.send(new ClientboundChatPacket(component, ChatMessageType.SYSTEM, SystemUtils.NIL_UUID));
+            getHandle().connection.send(new ClientboundChatPacket(component, ChatType.SYSTEM, Util.NIL_UUID));
         }
     }
 
@@ -209,7 +213,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         if (getHandle().connection == null) return;
 
         for (Component component : CraftChatMessage.fromString(message)) {
-            getHandle().connection.send(new ClientboundChatPacket(component, ChatMessageType.CHAT, (sender == null) ? SystemUtils.NIL_UUID : sender));
+            getHandle().connection.send(new ClientboundChatPacket(component, ChatType.CHAT, (sender == null) ? Util.NIL_UUID : sender));
         }
     }
 

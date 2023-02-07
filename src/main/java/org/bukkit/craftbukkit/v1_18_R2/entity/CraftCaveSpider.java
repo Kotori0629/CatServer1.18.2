@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
-import net.minecraft.world.entity.monster.EntityCaveSpider;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.EntityType;

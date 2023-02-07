@@ -62,24 +62,4 @@
                  this.playSound(this.getRemoveItemSound(), 1.0F, 1.0F);
              }
 @@ -277,6 +294,12 @@
-     }
- 
-     public void setItem(ItemStack itemstack, boolean flag) {
-+        // CraftBukkit start
-+        this.setItem(itemstack, flag, true);
-+    }
-+
-+    public void setItem(ItemStack itemstack, boolean flag, boolean playSound) {
-+        // CraftBukkit end
-         if (!itemstack.isEmpty()) {
-             itemstack = itemstack.copy();
-             itemstack.setCount(1);
-@@ -284,7 +307,7 @@
-         }
- 
-         this.getEntityData().set(EntityItemFrame.DATA_ITEM, itemstack);
--        if (!itemstack.isEmpty()) {
-+        if (!itemstack.isEmpty() && playSound) { // CraftBukkit
-             this.playSound(this.getAddItemSound(), 1.0F, 1.0F);
-         }
  

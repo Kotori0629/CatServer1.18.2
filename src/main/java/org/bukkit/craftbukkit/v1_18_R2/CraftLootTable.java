@@ -41,7 +41,7 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
 
     @Override
     public Collection<ItemStack> populateLoot(Random random, LootContext context) {
-        LootContext nmsContext = convertContext(context, random);
+        net.minecraft.world.level.storage.loot.LootContext nmsContext = convertContext(context, random);
         List<net.minecraft.world.item.ItemStack> nmsItems = handle.getRandomItems(nmsContext);
         Collection<ItemStack> bukkit = new ArrayList<>(nmsItems.size());
 
@@ -57,7 +57,7 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
 
     @Override
     public void fillInventory(Inventory inventory, Random random, LootContext context) {
-        LootContext nmsContext = convertContext(context, random);
+        net.minecraft.world.level.storage.loot.LootContext nmsContext = convertContext(context, random);
         CraftInventory craftInventory = (CraftInventory) inventory;
         Container handle = craftInventory.getInventory();
 
@@ -70,11 +70,11 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
         return key;
     }
 
-    private LootContext convertContext(LootContext context, Random random) {
+    private net.minecraft.world.level.storage.loot.LootContext convertContext(LootContext context, Random random) {
         Location loc = context.getLocation();
         ServerLevel handle = ((CraftWorld) loc.getWorld()).getHandle();
 
-        LootContext.Builder builder = new LootContext.Builder(handle);
+        net.minecraft.world.level.storage.loot.LootContext.Builder builder = new net.minecraft.world.level.storage.loot.LootContext.Builder(handle);
         if (random != null) {
             builder = builder.withRandom(random);
         }
@@ -119,13 +119,13 @@ public class CraftLootTable implements org.bukkit.loot.LootTable {
         return builder.create(nmsBuilder.build());
     }
 
-    private <T> void setMaybe(LootContext.Builder builder, LootContextParam<T> param, T value) {
+    private <T> void setMaybe(net.minecraft.world.level.storage.loot.LootContext.Builder builder, LootContextParam<T> param, T value) {
         if (getHandle().getParamSet().getRequired().contains(param) || getHandle().getParamSet().getAllowed().contains(param)) {
             builder.withParameter(param, value);
         }
     }
 
-    public static LootContext convertContext(LootContext info) {
+    public static LootContext convertContext(net.minecraft.world.level.storage.loot.LootContext info) {
         Vec3 position = info.getParamOrNull(LootContextParams.ORIGIN);
         if (position == null) {
             position = info.getParamOrNull(LootContextParams.THIS_ENTITY).position(); // Every vanilla context has origin or this_entity, see LootContextParameterSets

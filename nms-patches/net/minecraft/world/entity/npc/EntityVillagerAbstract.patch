@@ -13,15 +13,7 @@
 +// CraftBukkit end
 +
  public abstract class EntityVillagerAbstract extends EntityAgeable implements InventoryCarrier, NPC, IMerchant {
- 
-+    // CraftBukkit start
-+    private CraftMerchant craftMerchant;
-+
-+    @Override
-+    public CraftMerchant getCraftMerchant() {
-+        return (craftMerchant == null) ? craftMerchant = new CraftMerchant(this) : craftMerchant;
-+    }
-+    // CraftBukkit end
+
      private static final DataWatcherObject<Integer> DATA_UNHAPPY_COUNTER = DataWatcher.defineId(EntityVillagerAbstract.class, DataWatcherRegistry.INT);
      public static final int VILLAGER_SLOT_OFFSET = 300;
      private static final int VILLAGER_INVENTORY_SIZE = 8;

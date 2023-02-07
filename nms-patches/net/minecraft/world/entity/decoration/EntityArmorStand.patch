@@ -19,14 +19,7 @@
 @@ -105,6 +114,13 @@
          this.setPos(d0, d1, d2);
      }
- 
-+    // CraftBukkit start - SPIGOT-3607, SPIGOT-3637
-+    @Override
-+    public float getBukkitYaw() {
-+        return this.getYRot();
-+    }
-+    // CraftBukkit end
-+
+
      @Override
      public void refreshDimensions() {
          double d0 = this.getX();

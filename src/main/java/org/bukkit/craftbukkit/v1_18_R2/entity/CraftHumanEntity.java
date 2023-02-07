@@ -313,7 +313,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
     private static void openCustomInventory(Inventory inventory, ServerPlayer player, MenuType<?> windowType) {
         if (player.connection == null) return;
         Preconditions.checkArgument(windowType != null, "Unknown windowType");
-        AbstractContainerMenu container = new CraftContainer(inventory, player, player.nextContainerCounter());
+        AbstractContainerMenu container = new CraftContainer(inventory, player, player.cBNextContainerCounter());
 
         container = CraftEventFactory.callInventoryOpenEvent(player, container);
         if (container == null) return;
@@ -378,7 +378,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
         if (inventory instanceof CraftInventoryView) {
             container = ((CraftInventoryView) inventory).getHandle();
         } else {
-            container = new CraftContainer(inventory, this.getHandle(), player.nextContainerCounter());
+            container = new CraftContainer(inventory, this.getHandle(), player.cBNextContainerCounter());
         }
 
         // Trigger an INVENTORY_OPEN event
@@ -413,7 +413,7 @@ public class CraftHumanEntity extends CraftLivingEntity implements HumanEntity {
             merchant.getTrader().closeInventory();
         }
 
-        Merchant mcMerchant;
+        net.minecraft.world.item.trading.Merchant mcMerchant;
         Component name;
         int level = 1; // note: using level 0 with active 'is-regular-villager'-flag allows hiding the name suffix
         if (merchant instanceof CraftAbstractVillager) {

@@ -15,23 +15,7 @@
      public float saturationLevel = 5.0F;
      public float exhaustionLevel;
      private int tickTimer;
-+    // CraftBukkit start
-+    private EntityHuman entityhuman;
-+    public int saturatedRegenRate = 10;
-+    public int unsaturatedRegenRate = 80;
-+    public int starvationRate = 80;
-+    // CraftBukkit end
      private int lastFoodLevel = 20;
- 
--    public FoodMetaData() {}
-+    public FoodMetaData() { throw new AssertionError("Whoopsie, we missed the bukkit."); } // CraftBukkit start - throw an error
-+
-+    // CraftBukkit start - added EntityHuman constructor
-+    public FoodMetaData(EntityHuman entityhuman) {
-+        org.apache.commons.lang.Validate.notNull(entityhuman);
-+        this.entityhuman = entityhuman;
-+    }
-+    // CraftBukkit end
  
      public void eat(int i, float f) {
          this.foodLevel = Math.min(i + this.foodLevel, 20);

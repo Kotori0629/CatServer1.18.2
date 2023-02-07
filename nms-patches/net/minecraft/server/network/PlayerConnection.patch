@@ -78,31 +78,6 @@
          entityplayer.connection = this;
          this.keepAliveTime = SystemUtils.getMillis();
          entityplayer.getTextFilter().join();
-+
-+        // CraftBukkit start - add fields and methods
-+        this.cserver = minecraftserver.server;
-+    }
-+
-+    private final org.bukkit.craftbukkit.CraftServer cserver;
-+    public boolean processedDisconnect;
-+    private int lastTick = MinecraftServer.currentTick;
-+    private int allowedPlayerTicks = 1;
-+    private int lastDropTick = MinecraftServer.currentTick;
-+    private int lastBookTick  = MinecraftServer.currentTick;
-+    private int dropCount = 0;
-+
-+    // Get position of last block hit for BlockDamageLevel.STOPPED
-+    private double lastPosX = Double.MAX_VALUE;
-+    private double lastPosY = Double.MAX_VALUE;
-+    private double lastPosZ = Double.MAX_VALUE;
-+    private float lastPitch = Float.MAX_VALUE;
-+    private float lastYaw = Float.MAX_VALUE;
-+    private boolean justTeleported = false;
-+
-+    public CraftPlayer getCraftPlayer() {
-+        return (this.player == null) ? null : (CraftPlayer) this.player.getBukkitEntity();
-     }
-+    // CraftBukkit end
  
      public void tick() {
          this.resetPosition();

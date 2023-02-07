@@ -4,14 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.IRegistry;
 import net.minecraft.core.Registry;
-import net.minecraft.world.level.biome.BiomeBase;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;

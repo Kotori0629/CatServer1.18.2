@@ -1,8 +1,6 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
-import net.minecraft.world.entity.decoration.EntityPainting;
 import net.minecraft.world.entity.decoration.Motive;
-import net.minecraft.world.entity.decoration.Paintings;
 import org.bukkit.Art;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_18_R2.CraftArt;

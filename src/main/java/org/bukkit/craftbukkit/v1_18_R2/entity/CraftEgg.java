@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
-import net.minecraft.world.entity.projectile.EntityEgg;
 import net.minecraft.world.entity.projectile.ThrownEgg;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.entity.Egg;

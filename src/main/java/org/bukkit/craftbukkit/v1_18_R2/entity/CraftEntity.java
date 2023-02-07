@@ -253,7 +253,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         else if (entity instanceof ThrowableProjectile) {
             if (entity instanceof ThrownEgg) { return new CraftEgg(server, (ThrownEgg) entity); }
             else if (entity instanceof Snowball) { return new CraftSnowball(server, (Snowball) entity); }
-            else if (entity instanceof Potion) { return new CraftThrownPotion(server, (Potion) entity); }
+            else if (entity instanceof ThrownPotion) { return new CraftThrownPotion(server, (ThrownPotion) entity); }
             else if (entity instanceof ThrownEnderpearl) { return new CraftEnderPearl(server, (ThrownEnderpearl) entity); }
             else if (entity instanceof ThrownExperienceBottle) { return new CraftThrownExpBottle(server, (ThrownExperienceBottle) entity); }
         }

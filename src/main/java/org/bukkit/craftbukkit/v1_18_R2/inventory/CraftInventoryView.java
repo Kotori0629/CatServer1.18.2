@@ -73,7 +73,7 @@ public class CraftInventoryView extends InventoryView {
         return rawSlot < viewing.getSize();
     }
 
-    public Container getHandle() {
+    public AbstractContainerMenu getHandle() {
         return container;
     }
 }

@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 
-public class CraftContainer extends Container {
+public class CraftContainer extends AbstractContainerMenu {
 
     private final InventoryView view;
     private InventoryType cachedType;
@@ -178,7 +178,7 @@ public class CraftContainer extends Container {
                 delegate = new LecternMenu(windowId, top, new SimpleContainerData(1), bottom);
                 break;
             case SMOKER:
-                delegate = new SmithingMenu(windowId, bottom, top, new SimpleContainerData(4));
+                delegate = new SmokerMenu(windowId, bottom, top, new SimpleContainerData(4));
                 break;
             case LOOM:
                 delegate = new LoomMenu(windowId, bottom);

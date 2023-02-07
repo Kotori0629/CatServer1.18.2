@@ -28,7 +28,7 @@ public class CraftAnimals extends CraftAgeable implements Animals {
 
     @Override
     public UUID getBreedCause() {
-        return getHandle().getLoveCause();
+        return getHandle().loveCause;
     }
 
     @Override

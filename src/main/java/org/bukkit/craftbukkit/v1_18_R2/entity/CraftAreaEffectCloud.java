@@ -187,7 +187,7 @@ public class CraftAreaEffectCloud extends CraftEntity implements AreaEffectCloud
     @Override
     public boolean removeCustomEffect(PotionEffectType effect) {
         int effectId = effect.getId();
-        MobEffect existing = null;
+        MobEffectInstance existing = null;
         for (MobEffectInstance mobEffect : getHandle().effects) {
             if (MobEffect.getId(mobEffect.getEffect()) == effectId) {
                 existing = mobEffect;

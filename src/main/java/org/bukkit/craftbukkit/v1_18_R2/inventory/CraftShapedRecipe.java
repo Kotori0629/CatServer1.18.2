@@ -12,13 +12,13 @@ import org.bukkit.inventory.ShapedRecipe;
 
 public class CraftShapedRecipe extends ShapedRecipe implements CraftRecipe {
     // TODO: Could eventually use this to add a matches() method or some such
-    private ShapedRecipe recipe;
+    private net.minecraft.world.item.crafting.ShapedRecipe recipe;
 
     public CraftShapedRecipe(NamespacedKey key, ItemStack result) {
         super(key, result);
     }
 
-    public CraftShapedRecipe(ItemStack result, ShapedRecipe recipe) {
+    public CraftShapedRecipe(ItemStack result, net.minecraft.world.item.crafting.ShapedRecipe recipe) {
         this(CraftNamespacedKey.fromMinecraft(recipe.getId()), result);
         this.recipe = recipe;
     }
@@ -55,6 +55,6 @@ public class CraftShapedRecipe extends ShapedRecipe implements CraftRecipe {
             }
         }
 
-        MinecraftServer.getServer().getRecipeManager().addRecipe(new ShapedRecipe(CraftNamespacedKey.toMinecraft(this.getKey()), this.getGroup(), width, shape.length, data, CraftItemStack.asNMSCopy(this.getResult())));
+        MinecraftServer.getServer().getRecipeManager().addRecipe(new net.minecraft.world.item.crafting.ShapedRecipe(CraftNamespacedKey.toMinecraft(this.getKey()), this.getGroup(), width, shape.length, data, CraftItemStack.asNMSCopy(this.getResult())));
     }
 }

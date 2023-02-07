@@ -123,7 +123,7 @@ public class CustomChunkGenerator extends InternalChunkGenerator {
     }
 
     @Override
-    public void buildSurface(WorldGenRegion regionlimitedworldaccess, StructureManager structuremanager, ChunkAccess ichunkaccess) {
+    public void buildSurface(WorldGenRegion regionlimitedworldaccess, StructureFeatureManager structuremanager, ChunkAccess ichunkaccess) {
         if (generator.shouldGenerateSurface()) {
             delegate.buildSurface(regionlimitedworldaccess, structuremanager, ichunkaccess);
         }
@@ -221,7 +221,7 @@ public class CustomChunkGenerator extends InternalChunkGenerator {
     }
 
     @Override
-    public void applyCarvers(WorldGenRegion regionlimitedworldaccess, long seed, BiomeManager biomemanager, StructureManager structuremanager, ChunkAccess ichunkaccess, GenerationStep.Carving worldgenstage_features) {
+    public void applyCarvers(WorldGenRegion regionlimitedworldaccess, long seed, BiomeManager biomemanager, StructureFeatureManager structuremanager, ChunkAccess ichunkaccess, GenerationStep.Carving worldgenstage_features) {
         if (generator.shouldGenerateCaves()) {
             delegate.applyCarvers(regionlimitedworldaccess, seed, biomemanager, structuremanager, ichunkaccess, worldgenstage_features);
         }
@@ -239,7 +239,7 @@ public class CustomChunkGenerator extends InternalChunkGenerator {
     }
 
     @Override
-    public CompletableFuture<ChunkAccess> fillFromNoise(Executor executor, Blender blender, StructureManager structuremanager, ChunkAccess ichunkaccess) {
+    public CompletableFuture<ChunkAccess> fillFromNoise(Executor executor, Blender blender, StructureFeatureManager structuremanager, ChunkAccess ichunkaccess) {
         CompletableFuture<ChunkAccess> future = null;
         if (generator.shouldGenerateNoise()) {
             future = delegate.fillFromNoise(executor, blender, structuremanager, ichunkaccess);
@@ -279,12 +279,12 @@ public class CustomChunkGenerator extends InternalChunkGenerator {
     }
 
     @Override
-    public WeightedRandomList<MobSpawnSettings.SpawnerData> getMobsAt(Holder<net.minecraft.world.level.biome.Biome> holder, StructureManager structuremanager, MobCategory enumcreaturetype, BlockPos blockposition) {
+    public WeightedRandomList<MobSpawnSettings.SpawnerData> getMobsAt(Holder<net.minecraft.world.level.biome.Biome> holder, StructureFeatureManager structuremanager, MobCategory enumcreaturetype, BlockPos blockposition) {
         return delegate.getMobsAt(holder, structuremanager, enumcreaturetype, blockposition);
     }
 
     @Override
-    public void applyBiomeDecoration(WorldGenLevel generatoraccessseed, ChunkAccess ichunkaccess, StructureManager structuremanager) {
+    public void applyBiomeDecoration(WorldGenLevel generatoraccessseed, ChunkAccess ichunkaccess, StructureFeatureManager structuremanager) {
         super.applyBiomeDecoration(generatoraccessseed, ichunkaccess, structuremanager, generator.shouldGenerateDecorations());
     }
 
