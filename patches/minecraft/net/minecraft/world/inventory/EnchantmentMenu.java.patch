@@ -211,6 +211,14 @@
                       itemstack1.m_41774_(i);
                       if (itemstack1.m_41619_()) {
 @@ -191,6 +_,7 @@
+       }
+    }
+ 
++
+    private List<EnchantmentInstance> m_39471_(ItemStack p_39472_, int p_39473_, int p_39474_) {
+       this.f_39451_.setSeed((long)(this.f_39452_.m_6501_() + p_39473_));
+       List<EnchantmentInstance> list = EnchantmentHelper.m_44909_(this.f_39451_, p_39472_, p_39474_, false);
+@@ -218,6 +_,7 @@
     }
  
     public boolean m_6875_(Player p_39463_) {
