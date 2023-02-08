@@ -2,7 +2,7 @@ package org.bukkit.conversations;
 
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3s.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
