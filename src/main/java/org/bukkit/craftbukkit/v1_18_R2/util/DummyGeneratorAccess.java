@@ -218,7 +218,7 @@ public class DummyGeneratorAccess implements WorldGenLevel {
     }
 
     @Override
-    public boolean isFluidAtPosition(BlockPos bp, Predicate<Fluid> prdct) {
+    public boolean isFluidAtPosition(BlockPos bp, Predicate<FluidState> prdct) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlockState;
@@ -42,7 +43,7 @@ public class BlockStateListPopulator extends DummyGeneratorAccess {
     }
 
     @Override
-    public Fluid getFluidState(BlockPos bp) {
+    public FluidState getFluidState(BlockPos bp) {
         BlockState blockData = dataMap.get(bp);
         return (blockData != null) ? blockData.getFluidState() : world.getFluidState(bp);
     }

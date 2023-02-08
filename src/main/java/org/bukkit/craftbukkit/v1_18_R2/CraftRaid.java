@@ -91,11 +91,6 @@ public final class CraftRaid implements Raid {
 
     @Override
     public List<Raider> getRaiders() {
-        return handle.getRaiders().stream().map(new Function<net.minecraft.world.entity.raid.Raider, Raider>() {
-            @Override
-            public Raider apply(net.minecraft.world.entity.raid.Raider entityRaider) {
-                return (Raider) entityRaider.getBukkitEntity();
-            }
-        }).collect(ImmutableList.toImmutableList());
+        return handle.getRaiders().stream().map((Function<net.minecraft.world.entity.raid.Raider, Raider>) entityRaider -> (Raider) entityRaider.getBukkitEntity()).collect(ImmutableList.toImmutableList());
     }
 }

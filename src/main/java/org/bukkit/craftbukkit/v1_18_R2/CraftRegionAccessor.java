@@ -859,11 +859,11 @@ public abstract class CraftRegionAccessor implements RegionAccessor {
                 Direction dir = CraftBlock.blockFaceToNotch(face).getOpposite();
                 if (Painting.class.isAssignableFrom(clazz)) {
                     if (isNormalWorld() && randomizeData) {
-                        entity = new Painting(getHandle().getMinecraftWorld(), new BlockPos(x, y, z), dir);
+                        entity = new net.minecraft.world.entity.decoration.Painting(getHandle().getMinecraftWorld(), new BlockPos(x, y, z), dir);
                     } else {
-                        entity = new Painting(net.minecraft.world.entity.EntityType.PAINTING, getHandle().getMinecraftWorld());
+                        entity = new net.minecraft.world.entity.decoration.Painting(net.minecraft.world.entity.EntityType.PAINTING, getHandle().getMinecraftWorld());
                         entity.absMoveTo(x, y, z, yaw, pitch);
-                        ((Painting) entity).setDirection(dir);
+                        ((net.minecraft.world.entity.decoration.Painting) entity).setDirection(dir);
                     }
                 } else if (ItemFrame.class.isAssignableFrom(clazz)) {
                     if (GlowItemFrame.class.isAssignableFrom(clazz)) {

@@ -1,17 +1,16 @@
 package org.bukkit.craftbukkit.v1_18_R2.block.data;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Block;
@@ -20,7 +19,6 @@ import net.minecraft.world.level.block.state.StateHolder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 import org.bukkit.Material;
 import org.bukkit.SoundGroup;
 import org.bukkit.block.BlockFace;
@@ -28,13 +26,11 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_18_R2.CraftSoundGroup;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.v1_18_R2.block.impl.*;
-import org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftRotatable;
 
 public class CraftBlockData implements BlockData {
 
     private BlockState state;
-    private Map<BlockState<?>, Comparable<?>> parsedStates;
+    private Map<net.minecraft.world.level.block.state.properties.Property<?>, Comparable<?>> parsedStates;
 
     protected CraftBlockData() {
         throw new AssertionError("Template Constructor");
@@ -54,11 +50,11 @@ public class CraftBlockData implements BlockData {
     }
 
     /**
-     * Get a given BlockStateEnum's value as its Bukkit counterpart.
+     * Get a given EnumProperty's value as its Bukkit counterpart.
      *
-     * @param nms the NMS state to convert
+     * @param nms    the NMS state to convert
      * @param bukkit the Bukkit class
-     * @param <B> the type
+     * @param <B>    the type
      * @return the matching Bukkit type
      */
     protected <B extends Enum<B>> B get(EnumProperty<?> nms, Class<B> bukkit) {
@@ -66,12 +62,12 @@ public class CraftBlockData implements BlockData {
     }
 
     /**
-     * Convert all values from the given BlockStateEnum to their appropriate
+     * Convert all values from the given EnumProperty to their appropriate
      * Bukkit counterpart.
      *
-     * @param nms the NMS state to get values from
+     * @param nms    the NMS state to get values from
      * @param bukkit the bukkit class to convert the values to
-     * @param <B> the bukkit class type
+     * @param <B>    the bukkit class type
      * @return an immutable Set of values in their appropriate Bukkit type
      */
     @SuppressWarnings("unchecked")
@@ -88,10 +84,10 @@ public class CraftBlockData implements BlockData {
     /**
      * Set a given {@link EnumProperty} with the matching enum from Bukkit.
      *
-     * @param nms the NMS BlockStateEnum to set
+     * @param nms    the NMS EnumProperty to set
      * @param bukkit the matching Bukkit Enum
-     * @param <B> the Bukkit type
-     * @param <N> the NMS type
+     * @param <B>    the Bukkit type
+     * @param <N>    the NMS type
      */
     protected <B extends Enum<B>, N extends Enum<N> & StringRepresentable> void set(EnumProperty<N> nms, Enum<B> bukkit) {
         this.parsedStates = null;
@@ -107,7 +103,7 @@ public class CraftBlockData implements BlockData {
         CraftBlockData clone = (CraftBlockData) this.clone();
         clone.parsedStates = null;
 
-        for (BlockState parsed : craft.parsedStates.keySet()) {
+        for (net.minecraft.world.level.block.state.properties.Property parsed : craft.parsedStates.keySet()) {
             clone.state = clone.state.setValue(parsed, craft.state.getValue(parsed));
         }
 
@@ -142,7 +138,7 @@ public class CraftBlockData implements BlockData {
     private static final Map<Class<? extends Enum<?>>, Enum<?>[]> ENUM_VALUES = new HashMap<>();
 
     /**
-     * Convert an NMS Enum (usually a BlockStateEnum) to its appropriate Bukkit
+     * Convert an NMS Enum (usually a EnumProperty) to its appropriate Bukkit
      * enum from the given class.
      *
      * @throws IllegalStateException if the Enum could not be converted
@@ -159,7 +155,7 @@ public class CraftBlockData implements BlockData {
      * Convert a given Bukkit enum to its matching NMS enum type.
      *
      * @param bukkit the Bukkit enum to convert
-     * @param nms the NMS class
+     * @param nms    the NMS class
      * @return the matching NMS type
      * @throws IllegalStateException if the Enum could not be converted
      */
@@ -178,7 +174,7 @@ public class CraftBlockData implements BlockData {
      * @param <T> the type
      * @return the current value of the given state
      */
-    protected <T extends Comparable<T>> T get(Property<T> ibs) {
+    protected <T extends Comparable<T>> T get(net.minecraft.world.level.block.state.properties.Property<T> ibs) {
         // Straight integer or boolean getter
         return this.state.getValue(ibs);
     }
@@ -187,11 +183,11 @@ public class CraftBlockData implements BlockData {
      * Set the specified state's value.
      *
      * @param ibs the state to set
-     * @param v the new value
+     * @param v   the new value
      * @param <T> the state's type
      * @param <V> the value's type. Must match the state's type.
      */
-    public <T extends Comparable<T>, V extends T> void set(Property<T> ibs, V v) {
+    public <T extends Comparable<T>, V extends T> void set(net.minecraft.world.level.block.state.properties.Property<T> ibs, V v) {
         // Straight integer or boolean setter
         this.parsedStates = null;
         this.state = this.state.setValue(ibs, v);
@@ -222,8 +218,8 @@ public class CraftBlockData implements BlockData {
     }
 
     // Mimicked from BlockDataAbstract#toString()
-    public String toString(Map<Property<?>, Comparable<?>> states) {
-        StringBuilder stateString = new StringBuilder(Registry.BLOCK.getKey(state.getBlock()).toString());
+    public String toString(Map<net.minecraft.world.level.block.state.properties.Property<?>, Comparable<?>> states) {
+        StringBuilder stateString = new StringBuilder(net.minecraft.core.Registry.BLOCK.getKey(state.getBlock()).toString());
 
         if (!states.isEmpty()) {
             stateString.append('[');
@@ -237,8 +233,8 @@ public class CraftBlockData implements BlockData {
     public CompoundTag toStates() {
         CompoundTag compound = new CompoundTag();
 
-        for (Map.Entry<Property<?>, Comparable<?>> entry : state.getValues().entrySet()) {
-            Property iblockstate = (Property) entry.getKey();
+        for (Map.Entry<net.minecraft.world.level.block.state.properties.Property<?>, Comparable<?>> entry : state.getValues().entrySet()) {
+            net.minecraft.world.level.block.state.properties.Property iblockstate = (net.minecraft.world.level.block.state.properties.Property) entry.getKey();
 
             compound.putString(iblockstate.getName(), iblockstate.getName(entry.getValue()));
         }
@@ -281,7 +277,7 @@ public class CraftBlockData implements BlockData {
     }
 
     protected static EnumProperty<?> getEnum(Class<? extends Block> block, String name) {
-        return (EnumProperty<?>) <?>) getState(block, name, false);
+        return (EnumProperty<?>) getState(block, name, false);
     }
 
     protected static IntegerProperty getInteger(Class<? extends Block> block, String name) {
@@ -289,25 +285,25 @@ public class CraftBlockData implements BlockData {
     }
 
     /**
-     * Get a specified {@link Property} from a given block's class with a
+     * Get a specified {@link net.minecraft.world.level.block.state.properties.Property} from a given block's class with a
      * given name
      *
-     * @param block the class to retrieve the state from
-     * @param name the name of the state to retrieve
+     * @param block    the class to retrieve the state from
+     * @param name     the name of the state to retrieve
      * @param optional if the state can be null
      * @return the specified state or null
      * @throws IllegalStateException if the state is null and {@code optional}
-     * is false.
+     *                               is false.
      */
-    private static Property<?> getState(Class<? extends Block> block, String name, boolean optional) {
-        Property<?> state = null;
+    private static net.minecraft.world.level.block.state.properties.Property<?> getState(Class<? extends Block> block, String name, boolean optional) {
+        net.minecraft.world.level.block.state.properties.Property<?> state = null;
 
-        for (Block instance : Registry.BLOCK) {
+        for (Block instance : net.minecraft.core.Registry.BLOCK) {
             if (instance.getClass() == block) {
                 if (state == null) {
                     state = instance.getStateDefinition().getProperty(name);
                 } else {
-                    Property<?> newState = instance.getStateDefinition().getProperty(name);
+                    net.minecraft.world.level.block.state.properties.Property<?> newState = instance.getStateDefinition().getProperty(name);
 
                     Preconditions.checkState(state == newState, "State mistmatch %s,%s", state, newState);
                 }
@@ -320,7 +316,7 @@ public class CraftBlockData implements BlockData {
     }
 
     /**
-     * Get the minimum value allowed by the BlockStateInteger.
+     * Get the minimum value allowed by the IntegerProperty.
      *
      * @param state the state to check
      * @return the minimum value allowed
@@ -330,7 +326,7 @@ public class CraftBlockData implements BlockData {
     }
 
     /**
-     * Get the maximum value allowed by the BlockStateInteger.
+     * Get the maximum value allowed by the IntegerProperty.
      *
      * @param state the state to check
      * @return the maximum value allowed
@@ -344,151 +340,151 @@ public class CraftBlockData implements BlockData {
 
     static {
         //<editor-fold desc="CraftBlockData Registration" defaultstate="collapsed">
-        register(net.minecraft.world.level.block.AmethystClusterBlock.class, CraftAmethystCluster::new);
-        register(net.minecraft.world.level.block.BigDripleafBlock.class, CraftBigDripleaf::new);
-        register(net.minecraft.world.level.block.BigDripleafStemBlock.class, CraftBigDripleafStem::new);
-        register(net.minecraft.world.level.block.AnvilBlock.class, CraftAnvil::new);
-        register(net.minecraft.world.level.block.BambooBlock.class, CraftBamboo::new);
-        register(net.minecraft.world.level.block.BannerBlock.class, CraftBanner::new);
-        register(net.minecraft.world.level.block.WallBannerBlock.class, CraftBannerWall::new);
-        register(net.minecraft.world.level.block.BarrelBlock.class, CraftBarrel::new);
-        register(net.minecraft.world.level.block.BedBlock.class, CraftBed::new);
-        register(net.minecraft.world.level.block.BeehiveBlock.class, CraftBeehive::new);
-        register(net.minecraft.world.level.block.BeetrootBlock.class, CraftBeetroot::new);
-        register(net.minecraft.world.level.block.BellBlock.class, CraftBell::new);
-        register(net.minecraft.world.level.block.BlastFurnaceBlock.class, CraftBlastFurnace::new);
-        register(net.minecraft.world.level.block.BrewingStandBlock.class, CraftBrewingStand::new);
-        register(net.minecraft.world.level.block.BubbleColumnBlock.class, CraftBubbleColumn::new);
-        register(net.minecraft.world.level.block.CactusBlock.class, CraftCactus::new);
-        register(net.minecraft.world.level.block.CakeBlock.class, CraftCake::new);
-        register(net.minecraft.world.level.block.CampfireBlock.class, CraftCampfire::new);
-        register(net.minecraft.world.level.block.CarrotBlock.class, CraftCarrots::new);
-        register(net.minecraft.world.level.block.ChainBlock.class, CraftChain::new);
-        register(net.minecraft.world.level.block.ChestBlock.class, CraftChest::new);
-        register(net.minecraft.world.level.block.TrappedChestBlock.class, CraftChestTrapped::new);
-        register(net.minecraft.world.level.block.ChorusFlowerBlock.class, CraftChorusFlower::new);
-        register(net.minecraft.world.level.block.ChorusPlantBlock.class, CraftChorusFruit::new);
-        register(net.minecraft.world.level.block.WallBlock.class, CraftCobbleWall::new);
-        register(net.minecraft.world.level.block.CocoaBlock.class, CraftCocoa::new);
-        register(net.minecraft.world.level.block.CommandBlock.class, CraftCommand::new);
-        register(net.minecraft.world.level.block.ComposterBlock.class, CraftComposter::new);
-        register(net.minecraft.world.level.block.ConduitBlock.class, CraftConduit::new);
-        register(net.minecraft.world.level.block.BaseCoralPlantBlock.class, CraftCoralDead::new);
-        register(net.minecraft.world.level.block.CoralFanBlock.class, CraftCoralFan::new);
-        register(net.minecraft.world.level.block.BaseCoralFanBlock.class, CraftCoralFanAbstract::new);
-        register(net.minecraft.world.level.block.CoralWallFanBlock.class, CraftCoralFanWall::new);
-        register(net.minecraft.world.level.block.BaseCoralWallFanBlock.class, CraftCoralFanWallAbstract::new);
-        register(net.minecraft.world.level.block.CoralPlantBlock.class, CraftCoralPlant::new);
-        register(net.minecraft.world.level.block.CropBlock.class, CraftCrops::new);
-        register(net.minecraft.world.level.block.DaylightDetectorBlock.class, CraftDaylightDetector::new);
-        register(net.minecraft.world.level.block.SnowyDirtBlock.class, CraftDirtSnow::new);
-        register(net.minecraft.world.level.block.DispenserBlock.class, CraftDispenser::new);
-        register(net.minecraft.world.level.block.DoorBlock.class, CraftDoor::new);
-        register(net.minecraft.world.level.block.DropperBlock.class, CraftDropper::new);
-        register(net.minecraft.world.level.block.EndRodBlock.class, CraftEndRod::new);
-        register(net.minecraft.world.level.block.EnderChestBlock.class, CraftEnderChest::new);
-        register(net.minecraft.world.level.block.EndPortalFrameBlock.class, CraftEnderPortalFrame::new);
-        register(net.minecraft.world.level.block.FenceBlock.class, CraftFence::new);
-        register(net.minecraft.world.level.block.FenceGateBlock.class, CraftFenceGate::new);
-        register(net.minecraft.world.level.block.FireBlock.class, CraftFire::new);
-        register(net.minecraft.world.level.block.StandingSignBlock.class, CraftFloorSign::new);
-        register(net.minecraft.world.level.block.LiquidBlock.class, CraftFluids::new);
-        register(net.minecraft.world.level.block.FurnaceBlock.class, CraftFurnaceFurace::new);
-        register(net.minecraft.world.level.block.GlazedTerracottaBlock.class, CraftGlazedTerracotta::new);
-        register(net.minecraft.world.level.block.GrassBlock.class, CraftGrass::new);
-        register(net.minecraft.world.level.block.GrindstoneBlock.class, CraftGrindstone::new);
-        register(net.minecraft.world.level.block.HayBlock.class, CraftHay::new);
-        register(net.minecraft.world.level.block.HopperBlock.class, CraftHopper::new);
-        register(net.minecraft.world.level.block.HugeMushroomBlock.class, CraftHugeMushroom::new);
-        register(net.minecraft.world.level.block.FrostedIceBlock.class, CraftIceFrost::new);
-        register(net.minecraft.world.level.block.IronBarsBlock.class, CraftIronBars::new);
-        register(net.minecraft.world.level.block.JigsawBlock.class, CraftJigsaw::new);
-        register(net.minecraft.world.level.block.JukeboxBlock.class, CraftJukeBox::new);
-        register(net.minecraft.world.level.block.KelpBlock.class, CraftKelp::new);
-        register(net.minecraft.world.level.block.LadderBlock.class, CraftLadder::new);
-        register(net.minecraft.world.level.block.LanternBlock.class, CraftLantern::new);
-        register(net.minecraft.world.level.block.LeavesBlock.class, CraftLeaves::new);
-        register(net.minecraft.world.level.block.LecternBlock.class, CraftLectern::new);
-        register(net.minecraft.world.level.block.LeverBlock.class, CraftLever::new);
-        register(net.minecraft.world.level.block.LoomBlock.class, CraftLoom::new);
-        register(net.minecraft.world.level.block.DetectorRailBlock.class, CraftMinecartDetector::new);
-        register(net.minecraft.world.level.block.RailBlock.class, CraftMinecartTrack::new);
-        register(net.minecraft.world.level.block.MyceliumBlock.class, CraftMycel::new);
-        register(net.minecraft.world.level.block.NetherWartBlock.class, CraftNetherWart::new);
-        register(net.minecraft.world.level.block.NoteBlock.class, CraftNote::new);
-        register(net.minecraft.world.level.block.ObserverBlock.class, CraftObserver::new);
-        register(net.minecraft.world.level.block.NetherPortalBlock.class, CraftPortal::new);
-        register(net.minecraft.world.level.block.PotatoBlock.class, CraftPotatoes::new);
-        register(net.minecraft.world.level.block.PoweredRailBlock.class, CraftPoweredRail::new);
-        register(net.minecraft.world.level.block.PressurePlateBlock.class, CraftPressurePlateBinary::new);
-        register(net.minecraft.world.level.block.WeightedPressurePlateBlock.class, CraftPressurePlateWeighted::new);
-        register(net.minecraft.world.level.block.CarvedPumpkinBlock.class, CraftPumpkinCarved::new);
-        register(net.minecraft.world.level.block.ComparatorBlock.class, CraftRedstoneComparator::new);
-        register(net.minecraft.world.level.block.RedstoneLampBlock.class, CraftRedstoneLamp::new);
-        register(net.minecraft.world.level.block.RedStoneOreBlock.class, CraftRedstoneOre::new);
-        register(net.minecraft.world.level.block.RedstoneTorchBlock.class, CraftRedstoneTorch::new);
-        register(net.minecraft.world.level.block.RedstoneWallTorchBlock.class, CraftRedstoneTorchWall::new);
-        register(net.minecraft.world.level.block.RedStoneWireBlock.class, CraftRedstoneWire::new);
-        register(net.minecraft.world.level.block.SugarCaneBlock.class, CraftReed::new);
-        register(net.minecraft.world.level.block.RepeaterBlock.class, CraftRepeater::new);
-        register(net.minecraft.world.level.block.RespawnAnchorBlock.class, CraftRespawnAnchor::new);
-        register(net.minecraft.world.level.block.RotatedPillarBlock.class, CraftRotatable::new);
-        register(net.minecraft.world.level.block.SaplingBlock.class, CraftSapling::new);
-        register(net.minecraft.world.level.block.ScaffoldingBlock.class, CraftScaffolding::new);
-        register(net.minecraft.world.level.block.SeaPickleBlock.class, CraftSeaPickle::new);
-        register(net.minecraft.world.level.block.ShulkerBoxBlock.class, CraftShulkerBox::new);
-        register(net.minecraft.world.level.block.SkullBlock.class, CraftSkull::new);
-        register(net.minecraft.world.level.block.PlayerHeadBlock.class, CraftSkullPlayer::new);
-        register(net.minecraft.world.level.block.PlayerWallHeadBlock.class, CraftSkullPlayerWall::new);
-        register(net.minecraft.world.level.block.WallSkullBlock.class, CraftSkullWall::new);
-        register(net.minecraft.world.level.block.SmokerBlock.class, CraftSmoker::new);
-        register(net.minecraft.world.level.block.SnowLayerBlock.class, CraftSnow::new);
-        register(net.minecraft.world.level.block.FarmBlock.class, CraftSoil::new);
-        register(net.minecraft.world.level.block.StainedGlassPaneBlock.class, CraftStainedGlassPane::new);
-        register(net.minecraft.world.level.block.StairBlock.class, CraftStairs::new);
-        register(net.minecraft.world.level.block.StemBlock.class, CraftStem::new);
-        register(net.minecraft.world.level.block.AttachedStemBlock.class, CraftStemAttached::new);
-        register(net.minecraft.world.level.block.SlabBlock.class, CraftStepAbstract::new);
-        register(net.minecraft.world.level.block.StoneButtonBlock.class, CraftStoneButton::new);
-        register(net.minecraft.world.level.block.StonecutterBlock.class, CraftStonecutter::new);
-        register(net.minecraft.world.level.block.StructureBlock.class, CraftStructure::new);
-        register(net.minecraft.world.level.block.SweetBerryBushBlock.class, CraftSweetBerryBush::new);
-        register(net.minecraft.world.level.block.TntBlock.class, CraftTNT::new);
-        register(net.minecraft.world.level.block.DoublePlantBlock.class, CraftTallPlant::new);
-        register(net.minecraft.world.level.block.TallFlowerBlock.class, CraftTallPlantFlower::new);
-        register(net.minecraft.world.level.block.TargetBlock.class, CraftTarget::new);
-        register(net.minecraft.world.level.block.WallTorchBlock.class, CraftTorchWall::new);
-        register(net.minecraft.world.level.block.TrapDoorBlock.class, CraftTrapdoor::new);
-        register(net.minecraft.world.level.block.TripWireBlock.class, CraftTripwire::new);
-        register(net.minecraft.world.level.block.TripWireHookBlock.class, CraftTripwireHook::new);
-        register(net.minecraft.world.level.block.TurtleEggBlock.class, CraftTurtleEgg::new);
-        register(net.minecraft.world.level.block.TwistingVinesBlock.class, CraftTwistingVines::new);
-        register(net.minecraft.world.level.block.VineBlock.class, CraftVine::new);
-        register(net.minecraft.world.level.block.WallSignBlock.class, CraftWallSign::new);
-        register(net.minecraft.world.level.block.WeepingVinesBlock.class, CraftWeepingVines::new);
-        register(net.minecraft.world.level.block.WitherSkullBlock.class, CraftWitherSkull::new);
-        register(net.minecraft.world.level.block.WitherWallSkullBlock.class, CraftWitherSkullWall::new);
-        register(net.minecraft.world.level.block.WoodButtonBlock.class, CraftWoodButton::new);
-        register(net.minecraft.world.level.block.CandleBlock.class, CraftCandle::new);
-        register(net.minecraft.world.level.block.CandleCakeBlock.class, CraftCandleCake::new);
-        register(net.minecraft.world.level.block.CaveVinesBlock.class, CraftCaveVines::new);
-        register(net.minecraft.world.level.block.CaveVinesPlantBlock.class, CraftCaveVinesPlant::new);
-        register(net.minecraft.world.level.block.GlowLichenBlock.class, CraftGlowLichen::new);
-        register(net.minecraft.world.level.block.HangingRootsBlock.class, CraftHangingRoots::new);
-        register(net.minecraft.world.level.block.InfestedRotatedPillarBlock.class, CraftInfestedRotatedPillar::new);
-        register(net.minecraft.world.level.block.LayeredCauldronBlock.class, CraftLayeredCauldron::new);
-        register(net.minecraft.world.level.block.LightBlock.class, CraftLight::new);
-        register(net.minecraft.world.level.block.LightningRodBlock.class, CraftLightningRod::new);
-        register(net.minecraft.world.level.block.PointedDripstoneBlock.class, CraftPointedDripstone::new);
-        register(net.minecraft.world.level.block.PowderSnowCauldronBlock.class, CraftPowderSnowCauldron::new);
-        register(net.minecraft.world.level.block.SculkSensorBlock.class, CraftSculkSensor::new);
-        register(net.minecraft.world.level.block.SmallDripleafBlock.class, CraftSmallDripleaf::new);
-        register(net.minecraft.world.level.block.TallSeagrassBlock.class, CraftTallSeagrass::new);
-        register(net.minecraft.world.level.block.WeatheringCopperSlabBlock.class, CraftWeatheringCopperSlab::new);
-        register(net.minecraft.world.level.block.WeatheringCopperStairBlock.class, CraftWeatheringCopperStair::new);
-        register(net.minecraft.world.level.block.piston.PistonBaseBlock.class, CraftPiston::new);
-        register(net.minecraft.world.level.block.piston.PistonHeadBlock.class, CraftPistonExtension::new);
-        register(net.minecraft.world.level.block.piston.MovingPistonBlock.class, CraftPistonMoving::new);
+        register(net.minecraft.world.level.block.AmethystClusterBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftAmethystCluster::new);
+        register(net.minecraft.world.level.block.BigDripleafBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBigDripleaf::new);
+        register(net.minecraft.world.level.block.BigDripleafStemBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBigDripleafStem::new);
+        register(net.minecraft.world.level.block.AnvilBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftAnvil::new);
+        register(net.minecraft.world.level.block.BambooBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBamboo::new);
+        register(net.minecraft.world.level.block.BannerBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBanner::new);
+        register(net.minecraft.world.level.block.WallBannerBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBannerWall::new);
+        register(net.minecraft.world.level.block.BarrelBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBarrel::new);
+        register(net.minecraft.world.level.block.BedBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBed::new);
+        register(net.minecraft.world.level.block.BeehiveBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBeehive::new);
+        register(net.minecraft.world.level.block.BeetrootBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBeetroot::new);
+        register(net.minecraft.world.level.block.BellBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBell::new);
+        register(net.minecraft.world.level.block.BlastFurnaceBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBlastFurnace::new);
+        register(net.minecraft.world.level.block.BrewingStandBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBrewingStand::new);
+        register(net.minecraft.world.level.block.BubbleColumnBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftBubbleColumn::new);
+        register(net.minecraft.world.level.block.CactusBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCactus::new);
+        register(net.minecraft.world.level.block.CakeBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCake::new);
+        register(net.minecraft.world.level.block.CampfireBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCampfire::new);
+        register(net.minecraft.world.level.block.CarrotBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCarrots::new);
+        register(net.minecraft.world.level.block.ChainBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftChain::new);
+        register(net.minecraft.world.level.block.ChestBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftChest::new);
+        register(net.minecraft.world.level.block.TrappedChestBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftChestTrapped::new);
+        register(net.minecraft.world.level.block.ChorusFlowerBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftChorusFlower::new);
+        register(net.minecraft.world.level.block.ChorusPlantBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftChorusFruit::new);
+        register(net.minecraft.world.level.block.WallBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCobbleWall::new);
+        register(net.minecraft.world.level.block.CocoaBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCocoa::new);
+        register(net.minecraft.world.level.block.CommandBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCommand::new);
+        register(net.minecraft.world.level.block.ComposterBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftComposter::new);
+        register(net.minecraft.world.level.block.ConduitBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftConduit::new);
+        register(net.minecraft.world.level.block.BaseCoralPlantBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCoralDead::new);
+        register(net.minecraft.world.level.block.CoralFanBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCoralFan::new);
+        register(net.minecraft.world.level.block.BaseCoralFanBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCoralFanAbstract::new);
+        register(net.minecraft.world.level.block.CoralWallFanBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCoralFanWall::new);
+        register(net.minecraft.world.level.block.BaseCoralWallFanBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCoralFanWallAbstract::new);
+        register(net.minecraft.world.level.block.CoralPlantBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCoralPlant::new);
+        register(net.minecraft.world.level.block.CropBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCrops::new);
+        register(net.minecraft.world.level.block.DaylightDetectorBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftDaylightDetector::new);
+        register(net.minecraft.world.level.block.SnowyDirtBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftDirtSnow::new);
+        register(net.minecraft.world.level.block.DispenserBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftDispenser::new);
+        register(net.minecraft.world.level.block.DoorBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftDoor::new);
+        register(net.minecraft.world.level.block.DropperBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftDropper::new);
+        register(net.minecraft.world.level.block.EndRodBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftEndRod::new);
+        register(net.minecraft.world.level.block.EnderChestBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftEnderChest::new);
+        register(net.minecraft.world.level.block.EndPortalFrameBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftEnderPortalFrame::new);
+        register(net.minecraft.world.level.block.FenceBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftFence::new);
+        register(net.minecraft.world.level.block.FenceGateBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftFenceGate::new);
+        register(net.minecraft.world.level.block.FireBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftFire::new);
+        register(net.minecraft.world.level.block.StandingSignBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftFloorSign::new);
+        register(net.minecraft.world.level.block.LiquidBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftFluids::new);
+        register(net.minecraft.world.level.block.FurnaceBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftFurnaceFurace::new);
+        register(net.minecraft.world.level.block.GlazedTerracottaBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftGlazedTerracotta::new);
+        register(net.minecraft.world.level.block.GrassBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftGrass::new);
+        register(net.minecraft.world.level.block.GrindstoneBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftGrindstone::new);
+        register(net.minecraft.world.level.block.HayBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftHay::new);
+        register(net.minecraft.world.level.block.HopperBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftHopper::new);
+        register(net.minecraft.world.level.block.HugeMushroomBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftHugeMushroom::new);
+        register(net.minecraft.world.level.block.FrostedIceBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftIceFrost::new);
+        register(net.minecraft.world.level.block.IronBarsBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftIronBars::new);
+        register(net.minecraft.world.level.block.JigsawBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftJigsaw::new);
+        register(net.minecraft.world.level.block.JukeboxBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftJukeBox::new);
+        register(net.minecraft.world.level.block.KelpBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftKelp::new);
+        register(net.minecraft.world.level.block.LadderBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftLadder::new);
+        register(net.minecraft.world.level.block.LanternBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftLantern::new);
+        register(net.minecraft.world.level.block.LeavesBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftLeaves::new);
+        register(net.minecraft.world.level.block.LecternBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftLectern::new);
+        register(net.minecraft.world.level.block.LeverBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftLever::new);
+        register(net.minecraft.world.level.block.LoomBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftLoom::new);
+        register(net.minecraft.world.level.block.DetectorRailBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftMinecartDetector::new);
+        register(net.minecraft.world.level.block.RailBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftMinecartTrack::new);
+        register(net.minecraft.world.level.block.MyceliumBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftMycel::new);
+        register(net.minecraft.world.level.block.NetherWartBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftNetherWart::new);
+        register(net.minecraft.world.level.block.NoteBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftNote::new);
+        register(net.minecraft.world.level.block.ObserverBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftObserver::new);
+        register(net.minecraft.world.level.block.NetherPortalBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPortal::new);
+        register(net.minecraft.world.level.block.PotatoBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPotatoes::new);
+        register(net.minecraft.world.level.block.PoweredRailBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPoweredRail::new);
+        register(net.minecraft.world.level.block.PressurePlateBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPressurePlateBinary::new);
+        register(net.minecraft.world.level.block.WeightedPressurePlateBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPressurePlateWeighted::new);
+        register(net.minecraft.world.level.block.CarvedPumpkinBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPumpkinCarved::new);
+        register(net.minecraft.world.level.block.ComparatorBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftRedstoneComparator::new);
+        register(net.minecraft.world.level.block.RedstoneLampBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftRedstoneLamp::new);
+        register(net.minecraft.world.level.block.RedStoneOreBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftRedstoneOre::new);
+        register(net.minecraft.world.level.block.RedstoneTorchBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftRedstoneTorch::new);
+        register(net.minecraft.world.level.block.RedstoneWallTorchBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftRedstoneTorchWall::new);
+        register(net.minecraft.world.level.block.RedStoneWireBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftRedstoneWire::new);
+        register(net.minecraft.world.level.block.SugarCaneBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftReed::new);
+        register(net.minecraft.world.level.block.RepeaterBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftRepeater::new);
+        register(net.minecraft.world.level.block.RespawnAnchorBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftRespawnAnchor::new);
+        register(net.minecraft.world.level.block.RotatedPillarBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftRotatable::new);
+        register(net.minecraft.world.level.block.SaplingBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSapling::new);
+        register(net.minecraft.world.level.block.ScaffoldingBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftScaffolding::new);
+        register(net.minecraft.world.level.block.SeaPickleBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSeaPickle::new);
+        register(net.minecraft.world.level.block.ShulkerBoxBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftShulkerBox::new);
+        register(net.minecraft.world.level.block.SkullBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSkull::new);
+        register(net.minecraft.world.level.block.PlayerHeadBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSkullPlayer::new);
+        register(net.minecraft.world.level.block.PlayerWallHeadBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSkullPlayerWall::new);
+        register(net.minecraft.world.level.block.WallSkullBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSkullWall::new);
+        register(net.minecraft.world.level.block.SmokerBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSmoker::new);
+        register(net.minecraft.world.level.block.SnowLayerBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSnow::new);
+        register(net.minecraft.world.level.block.FarmBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSoil::new);
+        register(net.minecraft.world.level.block.StainedGlassPaneBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftStainedGlassPane::new);
+        register(net.minecraft.world.level.block.StairBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftStairs::new);
+        register(net.minecraft.world.level.block.StemBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftStem::new);
+        register(net.minecraft.world.level.block.AttachedStemBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftStemAttached::new);
+        register(net.minecraft.world.level.block.SlabBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftStepAbstract::new);
+        register(net.minecraft.world.level.block.StoneButtonBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftStoneButton::new);
+        register(net.minecraft.world.level.block.StonecutterBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftStonecutter::new);
+        register(net.minecraft.world.level.block.StructureBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftStructure::new);
+        register(net.minecraft.world.level.block.SweetBerryBushBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSweetBerryBush::new);
+        register(net.minecraft.world.level.block.TntBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTNT::new);
+        register(net.minecraft.world.level.block.DoublePlantBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTallPlant::new);
+        register(net.minecraft.world.level.block.TallFlowerBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTallPlantFlower::new);
+        register(net.minecraft.world.level.block.TargetBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTarget::new);
+        register(net.minecraft.world.level.block.WallTorchBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTorchWall::new);
+        register(net.minecraft.world.level.block.TrapDoorBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTrapdoor::new);
+        register(net.minecraft.world.level.block.TripWireBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTripwire::new);
+        register(net.minecraft.world.level.block.TripWireHookBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTripwireHook::new);
+        register(net.minecraft.world.level.block.TurtleEggBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTurtleEgg::new);
+        register(net.minecraft.world.level.block.TwistingVinesBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTwistingVines::new);
+        register(net.minecraft.world.level.block.VineBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftVine::new);
+        register(net.minecraft.world.level.block.WallSignBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftWallSign::new);
+        register(net.minecraft.world.level.block.WeepingVinesBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftWeepingVines::new);
+        register(net.minecraft.world.level.block.WitherSkullBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftWitherSkull::new);
+        register(net.minecraft.world.level.block.WitherWallSkullBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftWitherSkullWall::new);
+        register(net.minecraft.world.level.block.WoodButtonBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftWoodButton::new);
+        register(net.minecraft.world.level.block.CandleBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCandle::new);
+        register(net.minecraft.world.level.block.CandleCakeBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCandleCake::new);
+        register(net.minecraft.world.level.block.CaveVinesBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCaveVines::new);
+        register(net.minecraft.world.level.block.CaveVinesPlantBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftCaveVinesPlant::new);
+        register(net.minecraft.world.level.block.GlowLichenBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftGlowLichen::new);
+        register(net.minecraft.world.level.block.HangingRootsBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftHangingRoots::new);
+        register(net.minecraft.world.level.block.InfestedRotatedPillarBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftInfestedRotatedPillar::new);
+        register(net.minecraft.world.level.block.LayeredCauldronBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftLayeredCauldron::new);
+        register(net.minecraft.world.level.block.LightBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftLight::new);
+        register(net.minecraft.world.level.block.LightningRodBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftLightningRod::new);
+        register(net.minecraft.world.level.block.PointedDripstoneBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPointedDripstone::new);
+        register(net.minecraft.world.level.block.PowderSnowCauldronBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPowderSnowCauldron::new);
+        register(net.minecraft.world.level.block.SculkSensorBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSculkSensor::new);
+        register(net.minecraft.world.level.block.SmallDripleafBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftSmallDripleaf::new);
+        register(net.minecraft.world.level.block.TallSeagrassBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftTallSeagrass::new);
+        register(net.minecraft.world.level.block.WeatheringCopperSlabBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftWeatheringCopperSlab::new);
+        register(net.minecraft.world.level.block.WeatheringCopperStairBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftWeatheringCopperStair::new);
+        register(net.minecraft.world.level.block.piston.PistonBaseBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPiston::new);
+        register(net.minecraft.world.level.block.piston.PistonHeadBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPistonExtension::new);
+        register(net.minecraft.world.level.block.piston.MovingPistonBlock.class, org.bukkit.craftbukkit.v1_18_R2.block.impl.CraftPistonMoving::new);
         //</editor-fold>
     }
 
@@ -501,14 +497,14 @@ public class CraftBlockData implements BlockData {
 
         BlockState blockData;
         Block block = CraftMagicNumbers.getBlock(material);
-        Map<Property<?>, Comparable<?>> parsed = null;
+        Map<net.minecraft.world.level.block.state.properties.Property<?>, Comparable<?>> parsed = null;
 
         // Data provided, use it
         if (data != null) {
             try {
                 // Material provided, force that material in
                 if (block != null) {
-                    data = Registry.BLOCK.getKey(block) + data;
+                    data = net.minecraft.core.Registry.BLOCK.getKey(block) + data;
                 }
 
                 StringReader reader = new StringReader(data);

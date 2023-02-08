@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.entity.vehicle.MinecartCommandBlock;
@@ -27,10 +28,10 @@ import org.bukkit.entity.minecart.CommandMinecart;
 
 public final class VanillaCommandWrapper extends BukkitCommand {
 
-    private final CommandDispatcher dispatcher;
+    private final Commands dispatcher;
     public final CommandNode<CommandSourceStack> vanillaCommand;
 
-    public VanillaCommandWrapper(CommandDispatcher dispatcher, CommandNode<CommandSourceStack> vanillaCommand) {
+    public VanillaCommandWrapper(Commands dispatcher, CommandNode<CommandSourceStack> vanillaCommand) {
         super(vanillaCommand.getName(), "A Mojang provided command.", vanillaCommand.getUsageText(), Collections.EMPTY_LIST);
         this.dispatcher = dispatcher;
         this.vanillaCommand = vanillaCommand;
