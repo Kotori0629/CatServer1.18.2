@@ -237,9 +237,4 @@
 +        return this.getProperties().debug;
 +    }
 +
-+    @Override
-+    public CommandSender getBukkitSender(CommandListenerWrapper wrapper) {
-+        return console;
-+    }
-+    // CraftBukkit end
  }

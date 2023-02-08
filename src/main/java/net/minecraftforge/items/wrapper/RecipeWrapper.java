@@ -9,6 +9,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftHumanEntity;
+import org.bukkit.inventory.InventoryHolder;
 
 public class RecipeWrapper implements Container {
 
@@ -82,6 +85,30 @@ public class RecipeWrapper implements Container {
     public boolean canPlaceItem(int slot, ItemStack stack)
     {
         return inv.isItemValid(slot, stack);
+    }
+
+    @Override
+    public void onOpen(CraftHumanEntity who) {
+    }
+
+    @Override
+    public void onClose(CraftHumanEntity who) {
+
+    }
+
+    @Override
+    public InventoryHolder getOwner() {
+        return null;
+    }
+
+    @Override
+    public void setMaxStackSize(int size) {
+
+    }
+
+    @Override
+    public Location getLocation() {
+        return null;
     }
 
     @Override

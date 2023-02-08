@@ -1,5 +1,20 @@
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
+@@ -1,5 +_,6 @@
+ package net.minecraft.server;
+ 
++import catserver.MinecraftServerHelper;
+ import com.mojang.authlib.GameProfileRepository;
+ import com.mojang.authlib.minecraft.MinecraftSessionService;
+ import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+@@ -14,6 +_,7 @@
+ import java.nio.file.Path;
+ import java.nio.file.Paths;
+ import java.util.Optional;
++import java.util.concurrent.atomic.AtomicReference;
+ import java.util.function.BooleanSupplier;
+ import joptsimple.OptionParser;
+ import joptsimple.OptionSet;
 @@ -77,6 +_,15 @@
        OptionSpec<String> optionspec12 = optionparser.accepts("serverId").withRequiredArg();
        OptionSpec<Void> optionspec13 = optionparser.accepts("jfrProfile");
@@ -66,6 +81,29 @@
           LevelSummary levelsummary = levelstoragesource$levelstorageaccess.m_78308_();
           if (levelsummary != null) {
              if (levelsummary.m_193020_()) {
+@@ -134,6 +_,11 @@
+             f_129670_.warn("Safe mode active, only vanilla datapack will be loaded");
+          }
+ 
++         // CatServer start
++         AtomicReference<DataPackConfig> dataPackConfig = new AtomicReference<>();
++         AtomicReference<DynamicOps<Tag>>dynamicOps = new AtomicReference<>();
++         // CatServer end
++
+          PackRepository packrepository = new PackRepository(PackType.SERVER_DATA, new ServerPacksSource(), new FolderRepositorySource(levelstoragesource$levelstorageaccess.m_78283_(LevelResource.f_78180_).toFile(), PackSource.f_10529_));
+ 
+          WorldStem worldstem;
+@@ -145,6 +_,10 @@
+             }, (p_206543_, p_206544_) -> {
+                RegistryAccess.Writable registryaccess$writable = RegistryAccess.m_206197_();
+                DynamicOps<Tag> dynamicops = RegistryOps.m_206813_(NbtOps.f_128958_, registryaccess$writable, p_206543_);
++               // CatServer start
++               dataPackConfig.set(p_206544_);
++               dynamicOps.set(dynamicops);
++               // CatServer end
+                WorldData worlddata1 = levelstoragesource$levelstorageaccess.m_211747_(dynamicops, p_206544_, registryaccess$writable.m_211816_());
+                if (worlddata1 != null) {
+                   return Pair.of(worlddata1, registryaccess$writable.m_203557_());
 @@ -160,6 +_,8 @@
                       worldgensettings = optionset.has(optionspec3) ? dedicatedserverproperties.m_180927_(registryaccess$writable).m_64671_() : dedicatedserverproperties.m_180927_(registryaccess$writable);
                    }
@@ -75,13 +113,14 @@
                    PrimaryLevelData primaryleveldata = new PrimaryLevelData(levelsettings, worldgensettings, Lifecycle.stable());
                    return Pair.of(primaryleveldata, registryaccess$writable.m_203557_());
                 }
-@@ -181,22 +_,33 @@
+@@ -181,22 +_,34 @@
           }
  
           levelstoragesource$levelstorageaccess.m_78287_(registryaccess$frozen, worlddata);
 -         final DedicatedServer dedicatedserver = MinecraftServer.m_129872_((p_206536_) -> {
 -            DedicatedServer dedicatedserver1 = new DedicatedServer(p_206536_, levelstoragesource$levelstorageaccess, packrepository, worldstem, dedicatedserversettings, DataFixers.m_14512_(), minecraftsessionservice, gameprofilerepository, gameprofilecache, LoggerChunkProgressListener::new);
 +         final MinecraftServer dedicatedserver = MinecraftServer.m_129872_((p_129697_) -> {
++            MinecraftServerHelper.getInstance().load(optionset, dataPackConfig.get(), dynamicOps.get()); // CatServer
 +            MinecraftServer dedicatedserver1;
 +            if (gametestEnabled) {
 +               net.minecraftforge.gametest.ForgeGameTestHooks.registerGametests();
@@ -113,3 +152,12 @@
              }
           };
           thread.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(f_129670_));
+@@ -207,7 +_,7 @@
+ 
+    }
+ 
+-   private static void m_195488_(LevelStorageSource.LevelStorageAccess p_195489_, DataFixer p_195490_, boolean p_195491_, BooleanSupplier p_195492_, WorldGenSettings p_195493_) {
++   public static void m_195488_(LevelStorageSource.LevelStorageAccess p_195489_, DataFixer p_195490_, boolean p_195491_, BooleanSupplier p_195492_, WorldGenSettings p_195493_) {
+       f_129670_.info("Forcing world upgrade!");
+       WorldUpgrader worldupgrader = new WorldUpgrader(p_195489_, p_195490_, p_195493_, p_195491_);
+       Component component = null;

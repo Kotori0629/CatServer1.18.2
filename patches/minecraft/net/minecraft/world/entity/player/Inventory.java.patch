@@ -1,5 +1,104 @@
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
+@@ -1,6 +_,8 @@
+ package net.minecraft.world.entity.player;
+ 
+ import com.google.common.collect.ImmutableList;
++
++import java.util.ArrayList;
+ import java.util.List;
+ import java.util.function.Predicate;
+ import net.minecraft.CrashReport;
+@@ -23,6 +_,9 @@
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.level.block.state.BlockState;
++import org.bukkit.Location;
++import org.bukkit.craftbukkit.v1_18_R2.entity.CraftHumanEntity;
++import org.bukkit.entity.HumanEntity;
+ 
+ public class Inventory implements Container, Nameable {
+    public static final int f_150064_ = 5;
+@@ -44,6 +_,52 @@
+       this.f_35978_ = p_35983_;
+    }
+ 
++   // CraftBukkit start - add fields and methods
++   public List<HumanEntity> transaction = new java.util.ArrayList<HumanEntity>();
++   private int maxStack = MAX_STACK;
++
++   public List<ItemStack> getContents() {
++      List<ItemStack> combined = new ArrayList<ItemStack>(f_35974_.size() + f_35975_.size() + f_35976_.size());
++      for (List<net.minecraft.world.item.ItemStack> sub : this.f_35979_) {
++         combined.addAll(sub);
++      }
++      return combined;
++   }
++
++   public List<ItemStack> getArmorContents() {
++      return this.f_35975_;
++   }
++
++   public void onOpen(CraftHumanEntity who) {
++      transaction.add(who);
++   }
++
++   public void onClose(CraftHumanEntity who) {
++      transaction.remove(who);
++   }
++
++   public List<HumanEntity> getViewers() {
++      return transaction;
++   }
++
++   public org.bukkit.inventory.InventoryHolder getOwner() {
++      return this.f_35978_.getBukkitEntity();
++   }
++
++   @Override
++   public int m_6893_() {
++      return maxStack;
++   }
++
++   public void setMaxStackSize(int size) {
++      maxStack = size;
++   }
++
++   @Override
++   public Location getLocation() {
++      return f_35978_.getBukkitEntity().getLocation();
++   }    // CraftBukkit end
++
+    public ItemStack m_36056_() {
+       return m_36045_(this.f_35977_) ? this.f_35974_.get(this.f_35977_) : ItemStack.f_41583_;
+    }
+@@ -56,6 +_,26 @@
+       return !p_36015_.m_41619_() && ItemStack.m_150942_(p_36015_, p_36016_) && p_36015_.m_41753_() && p_36015_.m_41613_() < p_36015_.m_41741_() && p_36015_.m_41613_() < this.m_6893_();
+    }
+ 
++   // CraftBukkit start - Watch method above! :D
++   public int canHold(ItemStack itemstack) {
++      int remains = itemstack.m_41613_();
++      for (int i = 0; i < this.f_35974_.size(); ++i) {
++         ItemStack itemstack1 = this.m_8020_(i);
++         if (itemstack1.m_41619_()) return itemstack.m_41613_();
++         if (this.m_36014_(itemstack1, itemstack)) {
++            remains -= (itemstack1.m_41741_() < this.m_6893_() ? itemstack1.m_41741_() : this.m_6893_()) - itemstack1.m_41613_();
++         }
++         if (remains <= 0) return itemstack.m_41613_();
++      }
++      ItemStack offhandItemStack = this.m_8020_(this.f_35974_.size() + this.f_35975_.size());
++      if (this.m_36014_(offhandItemStack, itemstack)) {
++         remains -= (offhandItemStack.m_41741_() < this.m_6893_() ? offhandItemStack.m_41741_() : this.m_6893_()) - offhandItemStack.m_41613_();
++      }
++      if (remains <= 0) return itemstack.m_41613_();
++      return itemstack.m_41613_() - remains;
++   }
++   // CraftBukkit end
++
+    public int m_36062_() {
+       for(int i = 0; i < this.f_35974_.size(); ++i) {
+          if (this.f_35974_.get(i).m_41619_()) {
 @@ -178,7 +_,8 @@
        int i = p_36049_.m_41613_();
        ItemStack itemstack = this.m_8020_(p_36048_);

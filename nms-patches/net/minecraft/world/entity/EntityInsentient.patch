@@ -165,16 +165,8 @@
 @@ -1199,12 +1293,19 @@
          return this.restrictRadius != -1.0F;
      }
- 
-+    // CraftBukkit start
-     @Nullable
+      @Nullable
      public <T extends EntityInsentient> T convertTo(EntityTypes<T> entitytypes, boolean flag) {
-+        return this.convertTo(entitytypes, flag, EntityTransformEvent.TransformReason.UNKNOWN, CreatureSpawnEvent.SpawnReason.DEFAULT);
-+    }
-+
-+    @Nullable
-+    public <T extends EntityInsentient> T convertTo(EntityTypes<T> entitytypes, boolean flag, EntityTransformEvent.TransformReason transformReason, CreatureSpawnEvent.SpawnReason spawnReason) {
-+        // CraftBukkit end
          if (this.isRemoved()) {
              return null;
          } else {
@@ -186,14 +178,6 @@
 @@ -1236,7 +1337,12 @@
                  }
              }
- 
--            this.level.addFreshEntity(t0);
-+            // CraftBukkit start
-+            if (CraftEventFactory.callEntityTransformEvent(this, t0, transformReason).isCancelled()) {
-+                return null;
-+            }
-+            this.level.addFreshEntity(t0, spawnReason);
-+            // CraftBukkit end
              if (this.isPassenger()) {
                  Entity entity = this.getVehicle();
  

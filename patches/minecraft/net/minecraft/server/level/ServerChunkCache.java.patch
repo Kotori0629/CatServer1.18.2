@@ -1,5 +1,53 @@
 --- a/net/minecraft/server/level/ServerChunkCache.java
 +++ b/net/minecraft/server/level/ServerChunkCache.java
+@@ -12,6 +_,7 @@
+ import java.util.Optional;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.concurrent.Executor;
++import java.util.concurrent.atomic.AtomicBoolean;
+ import java.util.function.BooleanSupplier;
+ import java.util.function.Consumer;
+ import java.util.function.Supplier;
+@@ -55,8 +_,8 @@
+    public final ChunkMap f_8325_;
+    private final DimensionDataStorage f_8333_;
+    private long f_8334_;
+-   private boolean f_8335_ = true;
+-   private boolean f_8336_ = true;
++   public boolean f_8335_ = true;
++   public boolean f_8336_ = true;
+    private static final int f_143226_ = 4;
+    private final long[] f_8337_ = new long[4];
+    private final ChunkStatus[] f_8338_ = new ChunkStatus[4];
+@@ -83,6 +_,28 @@
+       return this.f_8331_;
+    }
+ 
++   // CraftBukkit start - properly implement isChunkLoaded
++   public boolean isChunkLoaded(int chunkX, int chunkZ) {
++      ChunkHolder chunk = this.f_8325_.m_140174_(ChunkPos.m_45589_(chunkX, chunkZ));
++      if (chunk == null) {
++         return false;
++      }
++      return chunk.getFullChunkNow() != null;
++   }
++   // CraftBukkit end
++
++   // CraftBukkit start - modelled on below
++   public void purgeUnload() {
++      this.f_8329_.m_46473_().m_6180_("purge");
++      this.f_8327_.m_140776_();
++      this.m_8489_();
++      this.f_8329_.m_46473_().m_6182_("unload");
++      this.f_8325_.m_140280_(() -> true);
++      this.f_8329_.m_46473_().m_7238_();
++      this.m_8488_();
++   }
++   // CraftBukkit end
++
+    @Nullable
+    private ChunkHolder m_8364_(long p_8365_) {
+       return this.f_8325_.m_140327_(p_8365_);
 @@ -160,6 +_,7 @@
           if (chunkholder == null) {
              return null;
@@ -8,6 +56,30 @@
              Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure> either = chunkholder.m_140080_(ChunkStatus.f_62326_).getNow((Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>)null);
              if (either == null) {
                 return null;
+@@ -293,11 +_,22 @@
+       this.f_8325_.m_140318_(p_8420_);
+    }
+ 
++   // CatServer start
++   private AtomicBoolean catserver$isSave = new AtomicBoolean(true);
++   public void close(boolean save) throws IOException {
++      this.catserver$isSave.set(save);
++      this.close();
++   }
++
+    public void close() throws IOException {
+-      this.m_8419_(true);
++      var save = this.catserver$isSave.getAndSet(true); // CatServer
++      if (save) {
++         this.m_8419_(true);
++      }
+       this.f_8331_.close();
+       this.f_8325_.close();
+    }
++   // CatServer end
+ 
+    public void m_201698_(BooleanSupplier p_201913_, boolean p_201914_) {
+       this.f_8329_.m_46473_().m_6180_("purge");
 @@ -348,7 +_,7 @@
           for(ServerChunkCache.ChunkAndHolder serverchunkcache$chunkandholder : list) {
              LevelChunk levelchunk1 = serverchunkcache$chunkandholder.f_184028_;

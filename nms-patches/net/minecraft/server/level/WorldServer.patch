@@ -327,24 +327,6 @@
          this.entityManager.addNewEntity(entityplayer);
      }
  
--    private boolean addEntity(Entity entity) {
-+    // CraftBukkit start
-+    private boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason spawnReason) {
-         if (entity.isRemoved()) {
--            WorldServer.LOGGER.warn("Tried to add entity {} but it was marked as removed already", EntityTypes.getKey(entity.getType()));
-+            // WorldServer.LOGGER.warn("Tried to add entity {} but it was marked as removed already", EntityTypes.getKey(entity.getType())); // CraftBukkit
-             return false;
-         } else {
-+            // SPIGOT-6415: Don't call spawn event when reason is null. For example when an entity teleports to a new world.
-+            if (spawnReason != null && !CraftEventFactory.doEntityAddEventCalling(this, entity, spawnReason)) {
-+                return false;
-+            }
-+            // CraftBukkit end
-+
-             return this.entityManager.addNewEntity(entity);
-         }
-     }
- 
      public boolean tryAddFreshEntityWithPassengers(Entity entity) {
 -        Stream stream = entity.getSelfAndPassengers().map(Entity::getUUID);
 +        // CraftBukkit start

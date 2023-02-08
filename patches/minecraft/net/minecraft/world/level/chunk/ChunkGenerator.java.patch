@@ -1,0 +1,22 @@
+--- a/net/minecraft/world/level/chunk/ChunkGenerator.java
++++ b/net/minecraft/world/level/chunk/ChunkGenerator.java
+@@ -88,16 +_,16 @@
+ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
+    private static final Logger f_211627_;
+    public static final Codec<ChunkGenerator> f_62136_;
+-   protected final Registry<StructureSet> f_207955_;
++   public final Registry<StructureSet> f_207955_;
+    protected final BiomeSource f_62137_;
+    protected final BiomeSource f_62138_;
+-   protected final Optional<HolderSet<StructureSet>> f_207956_;
++   public final Optional<HolderSet<StructureSet>> f_207956_;
+    private final Map<ConfiguredStructureFeature<?, ?>, List<StructurePlacement>> f_207957_ = new Object2ObjectOpenHashMap<>();
+    private final Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>> f_204350_ = new Object2ObjectArrayMap<>();
+    private boolean f_207958_;
+    /** @deprecated */
+    @Deprecated
+-   private final long f_212255_;
++   public final long f_212255_;
+ 
+    protected static final <T extends ChunkGenerator> P1<Mu<T>, Registry<StructureSet>> m_208005_(Instance<T> p_208006_) {
+       return p_208006_.group(RegistryOps.m_206832_(Registry.f_211073_).forGetter((p_208008_) -> {

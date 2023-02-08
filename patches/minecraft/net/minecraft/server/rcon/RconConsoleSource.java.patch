@@ -1,5 +1,13 @@
 --- a/net/minecraft/server/rcon/RconConsoleSource.java
 +++ b/net/minecraft/server/rcon/RconConsoleSource.java
+@@ -10,6 +_,7 @@
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.phys.Vec2;
+ import net.minecraft.world.phys.Vec3;
++import org.bukkit.command.CommandSender;
+ 
+ public class RconConsoleSource implements CommandSource {
+    private static final String f_144022_ = "Rcon";
 @@ -35,7 +_,7 @@
     }
  
@@ -9,3 +17,19 @@
     }
  
     public boolean m_6999_() {
+@@ -49,4 +_,15 @@
+    public boolean m_6102_() {
+       return this.f_11502_.m_6983_();
+    }
++
++   // CraftBukkit start - Send a String
++   public void sendMessage(String message) {
++      this.f_11501_.append(message);
++   }
++
++   @Override
++   public org.bukkit.command.CommandSender getBukkitSender(CommandSourceStack wrapper) {
++      return f_11502_.remoteConsole;
++   }
++   // CraftBukkit end
+ }

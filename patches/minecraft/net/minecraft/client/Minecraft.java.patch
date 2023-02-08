@@ -1,5 +1,12 @@
 --- a/net/minecraft/client/Minecraft.java
 +++ b/net/minecraft/client/Minecraft.java
+@@ -1,5 +_,6 @@
+ package net.minecraft.client;
+ 
++import catserver.MinecraftServerHelper;
+ import com.google.common.collect.ImmutableList;
+ import com.google.common.collect.ImmutableMap;
+ import com.google.common.collect.Queues;
 @@ -252,7 +_,7 @@
  import org.slf4j.Logger;
  
@@ -393,11 +400,12 @@
              worldstem.m_206901_();
              YggdrasilAuthenticationService yggdrasilauthenticationservice = new YggdrasilAuthenticationService(this.f_91030_);
              MinecraftSessionService minecraftsessionservice = yggdrasilauthenticationservice.createMinecraftSessionService();
-@@ -1885,7 +_,7 @@
+@@ -1885,7 +_,8 @@
              SkullBlockEntity.m_196700_(gameprofilecache, minecraftsessionservice, this);
              GameProfileCache.m_11004_(false);
              this.f_91007_ = MinecraftServer.m_129872_((p_210695_) -> {
 -               return new IntegratedServer(p_210695_, this, levelstoragesource$levelstorageaccess, packrepository, worldstem, minecraftsessionservice, gameprofilerepository, gameprofilecache, (p_210795_) -> {
++               MinecraftServerHelper.getInstance().load(null, null, null); // CatServer
 +               return new IntegratedServer(p_210695_, this, levelstoragesource$levelstorageaccess, packrepository, worldstem, minecraftsessionservice, gameprofilerepository, gameprofilecache, (p_210795_) -> { //TODO-PATCHING: Handle the registry freeze delay again.
                    StoringChunkProgressListener storingchunkprogresslistener = new StoringChunkProgressListener(p_210795_ + 0);
                    this.f_90999_.set(storingchunkprogresslistener);

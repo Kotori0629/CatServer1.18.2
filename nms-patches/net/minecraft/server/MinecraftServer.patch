@@ -502,30 +502,8 @@
 @@ -630,8 +868,29 @@
          this.stopServer();
      }
- 
-+    // CraftBukkit start
-+    private boolean hasStopped = false;
-+    private final Object stopLock = new Object();
-+    public final boolean hasStopped() {
-+        synchronized (stopLock) {
-+            return hasStopped;
-+        }
-+    }
-+    // CraftBukkit end
-+
      public void stopServer() {
-+        // CraftBukkit start - prevent double stopping on multiple threads
-+        synchronized(stopLock) {
-+            if (hasStopped) return;
-+            hasStopped = true;
-+        }
-+        // CraftBukkit end
          MinecraftServer.LOGGER.info("Stopping server");
-+        // CraftBukkit start
-+        if (this.server != null) {
-+            this.server.disablePlugins();
-+        }
-+        // CraftBukkit end
          if (this.getConnection() != null) {
              this.getConnection().stop();
          }
@@ -533,7 +511,6 @@
              MinecraftServer.LOGGER.info("Saving players");
              this.playerList.saveAll();
              this.playerList.removeAll();
-+            try { Thread.sleep(100); } catch (InterruptedException ex) {} // CraftBukkit - SPIGOT-625 - give server at least a chance to send packets
          }
  
          MinecraftServer.LOGGER.info("Saving worlds");
@@ -695,9 +672,6 @@
 +        return super.isSameThread() || this.isStopped(); // CraftBukkit - MC-142590
 +    }
 +
-+    public boolean isDebugging() {
-+        return false;
-+    }
      private void startMetricsRecordingTick() {
          if (this.willStartRecordingMetrics) {
              this.metricsRecorder = ActiveMetricsRecorder.createStarted(new ServerMetricsSamplersProvider(SystemUtils.timeSource, this.isDedicatedServer()), SystemUtils.timeSource, SystemUtils.ioPool(), new MetricsPersister("server"), this.onMetricsRecordingStopped, (path) -> {

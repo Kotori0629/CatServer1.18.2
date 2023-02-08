@@ -1,5 +1,121 @@
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
+@@ -82,6 +_,7 @@
+ import net.minecraft.world.Container;
+ import net.minecraft.world.InteractionHand;
+ import net.minecraft.world.MenuProvider;
++import net.minecraft.world.damagesource.CombatTracker;
+ import net.minecraft.world.damagesource.DamageSource;
+ import net.minecraft.world.damagesource.EntityDamageSource;
+ import net.minecraft.world.effect.MobEffectInstance;
+@@ -99,6 +_,7 @@
+ import net.minecraft.world.entity.player.Inventory;
+ import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.entity.projectile.AbstractArrow;
++import net.minecraft.world.food.FoodData;
+ import net.minecraft.world.inventory.AbstractContainerMenu;
+ import net.minecraft.world.inventory.ContainerListener;
+ import net.minecraft.world.inventory.ContainerSynchronizer;
+@@ -132,8 +_,11 @@
+ import net.minecraft.world.phys.Vec3;
+ import net.minecraft.world.scores.PlayerTeam;
+ import net.minecraft.world.scores.Score;
++import net.minecraft.world.scores.Scoreboard;
+ import net.minecraft.world.scores.Team;
+ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
++import org.bukkit.WeatherType;
++import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+ import org.slf4j.Logger;
+ 
+ public class ServerPlayer extends Player {
+@@ -154,8 +_,8 @@
+    private float f_8917_ = -1.0E8F;
+    private int f_8918_ = -99999999;
+    private boolean f_8919_ = true;
+-   private int f_8920_ = -99999999;
+-   private int f_8921_ = 60;
++   public int f_8920_ = -99999999;
++   public int f_8921_ = 60;
+    private ChatVisiblity f_8922_ = ChatVisiblity.FULL;
+    private boolean f_8923_ = true;
+    private long f_8925_ = Util.m_137550_();
+@@ -183,6 +_,22 @@
+    private final TextFilter f_8939_;
+    private boolean f_143378_;
+    private boolean f_184127_ = true;
++
++   // CraftBukkit start
++   public String displayName;
++   public Component listName;
++   public org.bukkit.Location compassTarget;
++   public int newExp = 0;
++   public int newLevel = 0;
++   public int newTotalExp = 0;
++   public boolean keepLevel = false;
++   public double maxHealthCache;
++   public boolean joining = true;
++   public boolean sentListPacket = false;
++   public Integer clientViewDistance;
++   public String kickLeaveMessage = null; // SPIGOT-3034: Forward leave message to PlayerQuitEvent
++   // CraftBukkit end
++
+    private final ContainerSynchronizer f_143379_ = new ContainerSynchronizer() {
+       public void m_142589_(AbstractContainerMenu p_143448_, NonNullList<ItemStack> p_143449_, ItemStack p_143450_, int[] p_143451_) {
+          ServerPlayer.this.f_8906_.m_141995_(new ClientboundContainerSetContentPacket(p_143448_.f_38840_, p_143448_.m_182425_(), p_143449_, p_143450_));
+@@ -232,11 +_,51 @@
+       this.f_8939_ = p_143384_.m_7950_(this);
+       this.f_8941_ = p_143384_.m_177933_(this);
+       this.f_8924_ = p_143384_;
+-      this.f_8910_ = p_143384_.m_6846_().m_11239_(this);
++      this.f_8910_ = p_143384_.m_6846_().getPlayerStats(this);
+       this.f_8909_ = p_143384_.m_6846_().m_11296_(this);
+       this.f_19793_ = 1.0F;
+       this.m_9201_(p_143385_);
+-   }
++      this.displayName = this.m_6302_();
++      this.bukkitPickUpLoot = true;
++      this.maxHealthCache = this.m_21233_();
++   }
++
++   @Override
++   public CraftPlayer getBukkitEntity() {
++      return (CraftPlayer) super.getBukkitEntity();
++   }
++
++   // Yes, this doesn't match Vanilla, but it's the best we can do for now.
++   // If this is an issue, PRs are welcome
++   public final BlockPos getSpawnPoint(ServerLevel worldserver) {
++      BlockPos blockposition = worldserver.m_8900_();
++      if (worldserver.m_6042_().m_63935_() && worldserver.f_8549_.m_5464_() != GameType.ADVENTURE) {
++         int i = Math.max(0, this.f_8924_.m_129803_(worldserver));
++         int j = Mth.m_14107_(worldserver.m_6857_().m_61941_((double) blockposition.m_123341_(), (double) blockposition.m_123343_()));
++         if (j < i) {
++            i = j;
++         }
++         if (j <= 1) {
++            i = 1;
++         }
++         long k = (long) (i * 2 + 1);
++         long l = k * k;
++         int i1 = l > 2147483647L ? Integer.MAX_VALUE : (int) l;
++         int j1 = this.m_9237_(i1);
++         int k1 = (new Random()).nextInt(i1);
++         for (int l1 = 0; l1 < i1; ++l1) {
++            int i2 = (k1 + j1 * l1) % i1;
++            int j2 = i2 % (i * 2 + 1);
++            int k2 = i2 / (i * 2 + 1);
++            BlockPos blockposition1 = PlayerRespawnLogic.m_183928_(worldserver, blockposition.m_123341_() + j2 - i, blockposition.m_123343_() + k2 - i);
++            if (blockposition1 != null) {
++               return blockposition1;
++            }
++         }
++      }
++      return blockposition;
++   }
++   // CraftBukkit end
+ 
+    private void m_9201_(ServerLevel p_9202_) {
+       BlockPos blockpos = p_9202_.m_8900_();
 @@ -541,6 +_,7 @@
     }
  
@@ -64,6 +180,15 @@
           }
  
           return this;
+@@ -771,7 +_,7 @@
+       }
+    }
+ 
+-   private void m_9209_(ServerLevel p_9210_) {
++   public void m_9209_(ServerLevel p_9210_) {
+       ResourceKey<Level> resourcekey = p_9210_.m_46472_();
+       ResourceKey<Level> resourcekey1 = this.f_19853_.m_46472_();
+       CriteriaTriggers.f_10588_.m_19757_(this, resourcekey, resourcekey1);
 @@ -799,6 +_,9 @@
     }
  
@@ -91,6 +216,18 @@
        return this.m_9222_(p_9117_) || this.m_9222_(p_9117_.m_142300_(p_9118_.m_122424_()));
     }
  
+@@ -931,6 +_,11 @@
+       this.f_8906_.m_141995_(new ClientboundOpenSignEditorPacket(p_9101_.m_58899_()));
+    }
+ 
++   public int cBNextContainerCounter() {
++      this.f_8940_ = this.f_8940_ % 100 + 1;
++      return f_8940_;
++   }
++
+    public void m_9217_() {
+       this.f_8940_ = this.f_8940_ % 100 + 1;
+    }
 @@ -955,6 +_,7 @@
              this.f_8906_.m_141995_(new ClientboundOpenScreenPacket(abstractcontainermenu.f_38840_, abstractcontainermenu.m_6772_(), p_9033_.m_5446_()));
              this.m_143399_(abstractcontainermenu);
@@ -138,6 +275,14 @@
        if (!this.f_8941_.m_143473_(p_143404_)) {
           return false;
        } else {
+@@ -1230,6 +_,7 @@
+       return s.substring(0, s.indexOf(":"));
+    }
+ 
++   public String locale = "en_us"; // CraftBukkit - add, lowercase
+    public void m_9156_(ServerboundClientInformationPacket p_9157_) {
+       this.f_8922_ = p_9157_.f_133865_();
+       this.f_8923_ = p_9157_.f_133866_();
 @@ -1237,6 +_,7 @@
        this.f_184127_ = p_9157_.f_195812_();
        this.m_20088_().m_135381_(f_36089_, (byte)p_9157_.f_133867_());
@@ -240,7 +385,7 @@
     public TextFilter m_8967_() {
        return this.f_8939_;
     }
-@@ -1511,11 +_,13 @@
+@@ -1511,14 +_,131 @@
  
     public boolean m_182294_(boolean p_182295_) {
        Inventory inventory = this.m_150109_();
@@ -255,3 +400,121 @@
     }
  
     public boolean m_184128_() {
+       return this.f_184127_;
++   }
++
++   // CraftBukkit start - Add per-player time and weather.
++   public long timeOffset = 0;
++   public boolean relativeTime = true;
++   public long getPlayerTime() {
++      if (this.relativeTime) {
++         // Adds timeOffset to the current server time.
++         return this.f_19853_.m_46468_() + this.timeOffset;
++      } else {
++         // Adds timeOffset to the beginning of this day.
++         return this.f_19853_.m_46468_() - (this.f_19853_.m_46468_() % 24000) + this.timeOffset;
++      }
++   }
++   public WeatherType weather = null;
++   public WeatherType getPlayerWeather() {
++      return this.weather;
++   }
++   public void setPlayerWeather(WeatherType type, boolean plugin) {
++      if (!plugin && this.weather != null) {
++         return;
++      }
++      if (plugin) {
++         this.weather = type;
++      }
++      if (type == WeatherType.DOWNFALL) {
++         this.f_8906_.m_141995_(new ClientboundGameEventPacket(ClientboundGameEventPacket.f_132155_, 0));
++      } else {
++         this.f_8906_.m_141995_(new ClientboundGameEventPacket(ClientboundGameEventPacket.f_132154_, 0));
++      }
++   }
++   private float pluginRainPosition;private float pluginRainPositionPrevious;
++   public void updateWeather(float oldRain, float newRain, float oldThunder, float newThunder) {
++      if (this.weather == null) {
++         // Vanilla
++         if (oldRain != newRain) {
++            this.f_8906_.m_141995_(new ClientboundGameEventPacket(ClientboundGameEventPacket.f_132160_, newRain));
++         }
++      } else {
++         // Plugin
++         if (pluginRainPositionPrevious != pluginRainPosition) {
++            this.f_8906_.m_141995_(new ClientboundGameEventPacket(ClientboundGameEventPacket.f_132160_, pluginRainPosition));
++         }
++      }
++      if (oldThunder != newThunder) {
++         if (weather == WeatherType.DOWNFALL || weather == null) {
++            this.f_8906_.m_141995_(new ClientboundGameEventPacket(ClientboundGameEventPacket.f_132161_, newThunder));
++         } else {
++            this.f_8906_.m_141995_(new ClientboundGameEventPacket(ClientboundGameEventPacket.f_132161_, 0));
++         }
++      }
++   }
++   public void tickWeather() {
++      if (this.weather == null) return;
++      pluginRainPositionPrevious = pluginRainPosition;
++      if (weather == WeatherType.DOWNFALL) {
++         pluginRainPosition += 0.01;
++      } else {
++         pluginRainPosition -= 0.01;
++      }
++      pluginRainPosition = Mth.m_14036_(pluginRainPosition, 0.0F, 1.0F);
++   }
++   public void resetPlayerWeather() {
++      this.weather = null;
++      this.setPlayerWeather(this.f_19853_.m_6106_().m_6533_() ? WeatherType.DOWNFALL : WeatherType.CLEAR, false);
++   }
++   @Override public String toString() {
++      return super.toString() + "(" + this.m_6302_() + " at " + this.m_20185_() + "," + this.m_20186_() + "," + this.m_20189_() + ")";
++   }
++   // SPIGOT-1903, MC-98153
++   public void forceSetPositionRotation(double x, double y, double z, float yaw, float pitch) {
++      this.m_7678_(x, y, z, yaw, pitch);
++      this.f_8906_.m_9953_();
++   }
++   @Override
++   public boolean m_6107_() {
++      return super.m_6107_() || !getBukkitEntity().isOnline();
++   }
++   @Override
++   public Scoreboard m_36329_() {
++      return getBukkitEntity().getScoreboard().getHandle();
++   }
++
++   public void reset() {
++      float exp = 0;
++      boolean keepInventory = this.f_19853_.m_46469_().m_46207_(GameRules.f_46133_);
++      if (this.keepLevel) { // CraftBukkit - SPIGOT-6687: Only use keepLevel (was pre-set with RULE_KEEPINVENTORY value in PlayerDeathEvent)
++         exp = this.f_36080_;
++         this.newTotalExp = this.f_36079_;
++         this.newLevel = this.f_36078_;
++      }
++      this.m_21153_(this.m_21233_());
++      this.m_5810_(); // CraftBukkit - SPIGOT-6682: Clear active item on reset
++      this.f_19831_ = 0;
++      this.f_19789_ = 0;
++      this.f_36097_ = new FoodData(this);
++      this.f_36078_ = this.newLevel;
++      this.f_36079_ = this.newTotalExp;
++      this.f_36080_ = 0;
++      this.f_20919_ = 0;
++      this.setArrowCount(0, true); // CraftBukkit - ArrowBodyCountChangeEvent
++      this.removeAllEffects(org.bukkit.event.entity.EntityPotionEffectEvent.Cause.DEATH);
++      this.f_20948_ = true;
++      this.f_36096_ = this.f_36095_;
++      this.f_20888_ = null;
++      this.f_20949_ = null;
++      this.f_20944_ = new CombatTracker(this);
++      this.f_8920_ = -1;
++      if (this.keepLevel) { // CraftBukkit - SPIGOT-6687: Only use keepLevel (was pre-set with RULE_KEEPINVENTORY value in PlayerDeathEvent)
++         this.f_36080_ = exp;
++      } else {
++         this.m_6756_(this.newExp);
++      }
++      this.keepLevel = false;
++      this.m_20334_(0, 0, 0); // CraftBukkit - SPIGOT-6948: Reset velocity on death
+    }
+ }

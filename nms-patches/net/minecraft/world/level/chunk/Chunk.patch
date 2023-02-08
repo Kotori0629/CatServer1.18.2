@@ -22,20 +22,8 @@
          this.postLoad = chunk_c;
          this.blockTicks = levelchunkticks;
          this.fluidTicks = levelchunkticks1;
-+        // CraftBukkit start
-+        this.bukkitChunk = new org.bukkit.craftbukkit.CraftChunk(this);
      }
  
-+    public org.bukkit.Chunk bukkitChunk;
-+    public org.bukkit.Chunk getBukkitChunk() {
-+        return bukkitChunk;
-+    }
-+
-+    public boolean mustNotSave;
-+    public boolean needsDecoration;
-+
-+    // CraftBukkit end
-+
      public Chunk(WorldServer worldserver, ProtoChunk protochunk, @Nullable Chunk.c chunk_c) {
          this(worldserver, protochunk.getPos(), protochunk.getUpgradeData(), protochunk.unpackBlockTicks(), protochunk.unpackFluidTicks(), protochunk.getInhabitedTime(), protochunk.getSections(), chunk_c, protochunk.getBlendingData());
          Iterator iterator = protochunk.getBlockEntities().values().iterator();
@@ -43,10 +31,6 @@
  
          this.setLightCorrect(protochunk.isLightCorrect());
          this.unsaved = true;
-+        this.needsDecoration = true; // CraftBukkit
-+        // CraftBukkit start
-+        this.persistentDataContainer = protochunk.persistentDataContainer; // SPIGOT-6814: copy PDC to account for 1.17 to 1.18 chunk upgrading.
-+        // CraftBukkit end
      }
  
      @Override

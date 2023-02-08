@@ -325,7 +325,7 @@ public final class CraftLegacy {
                 for (byte data = 0; data < 16; data++) {
                     MaterialData matData = new MaterialData(material, data);
                     Dynamic blockTag = BlockStateData.getTag(material.getId() << 4 | data);
-                    blockTag = BlockStateData.getDataFixer().update(References.BLOCK_STATE, blockTag, 100, CraftMagicNumbers.INSTANCE.getDataVersion());
+                    blockTag = DataFixers.getDataFixer().update(References.BLOCK_STATE, blockTag, 100, CraftMagicNumbers.INSTANCE.getDataVersion());
                     // TODO: better skull conversion, chests
                     if (blockTag.get("Name").asString("").contains("%%FILTER_ME%%")) {
                         continue;
@@ -343,7 +343,7 @@ public final class CraftLegacy {
                     if (propMap.isPresent()) {
                         CompoundTag properties = propMap.get();
                         for (String dataKey : properties.getAllKeys()) {
-                            BlockState state = states.getProperty(dataKey);
+                            net.minecraft.world.level.block.state.properties.Property state = states.getProperty(dataKey);
 
                             if (state == null) {
                                 if (whitelistedStates.contains(dataKey)) {

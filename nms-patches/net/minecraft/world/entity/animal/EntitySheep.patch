@@ -63,13 +63,6 @@
              public boolean stillValid(EntityHuman entityhuman) {
                  return false;
              }
-+
-+            // CraftBukkit start
-+            @Override
-+            public InventoryView getBukkitView() {
-+                return null; // TODO: O.O
-+            }
-+            // CraftBukkit end
          }, 2, 1);
  
          inventorycrafting.setItem(0, new ItemStack(ItemDye.byColor(enumcolor)));

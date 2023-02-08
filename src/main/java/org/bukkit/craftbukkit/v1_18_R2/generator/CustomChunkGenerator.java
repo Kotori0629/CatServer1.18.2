@@ -285,7 +285,7 @@ public class CustomChunkGenerator extends InternalChunkGenerator {
 
     @Override
     public void applyBiomeDecoration(WorldGenLevel generatoraccessseed, ChunkAccess ichunkaccess, StructureFeatureManager structuremanager) {
-        super.applyBiomeDecoration(generatoraccessseed, ichunkaccess, structuremanager, generator.shouldGenerateDecorations());
+        super.applyBiomeDecoration(generatoraccessseed, ichunkaccess, structuremanager/*, generator.shouldGenerateDecorations()*/); // CatServer TODO
     }
 
     @Override

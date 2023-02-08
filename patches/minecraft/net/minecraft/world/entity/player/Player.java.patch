@@ -1,8 +1,21 @@
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -111,7 +_,8 @@
+@@ -12,6 +_,8 @@
+ import java.util.Optional;
+ import java.util.OptionalInt;
+ import java.util.UUID;
++import java.util.concurrent.atomic.AtomicBoolean;
++import java.util.concurrent.atomic.AtomicReference;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
+ import net.minecraft.SharedConstants;
+@@ -110,8 +_,12 @@
+ import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Scoreboard;
  import net.minecraft.world.scores.Team;
++import org.bukkit.craftbukkit.v1_18_R2.entity.CraftHumanEntity;
++import org.bukkit.craftbukkit.v1_18_R2.event.CraftEventFactory;
++import org.bukkit.event.entity.EntityExhaustionEvent;
  
 -public abstract class Player extends LivingEntity {
 +public abstract class Player extends LivingEntity implements net.minecraftforge.common.extensions.IForgePlayer {
@@ -10,6 +23,18 @@
     public static final String f_150081_ = "OfflinePlayer:";
     public static final int f_150082_ = 16;
     public static final int f_150083_ = 20;
+@@ -147,9 +_,9 @@
+    public double f_36105_;
+    public double f_36106_;
+    public double f_36075_;
+-   private int f_36110_;
++   public int f_36110_;
+    protected boolean f_36076_;
+-   private final Abilities f_36077_ = new Abilities();
++   public final Abilities f_36077_ = new Abilities();
+    public int f_36078_;
+    public int f_36079_;
+    public float f_36080_;
 @@ -162,6 +_,9 @@
     private final ItemCooldowns f_36087_ = this.m_7478_();
     @Nullable
@@ -65,6 +90,15 @@
        if (this.m_20175_(Pose.SWIMMING)) {
           Pose pose;
           if (this.m_21255_()) {
+@@ -408,7 +_,7 @@
+       return SoundSource.PLAYERS;
+    }
+ 
+-   protected int m_6101_() {
++   public int m_6101_() {
+       return 20;
+    }
+ 
 @@ -569,6 +_,7 @@
     }
  
@@ -285,8 +319,21 @@
           this.m_5810_();
           this.f_19853_.m_7605_(this, (byte)30);
        }
-@@ -1260,6 +_,7 @@
+@@ -1253,13 +_,20 @@
+    public void m_141945_(ItemStack p_150098_, ItemStack p_150099_, ClickAction p_150100_) {
     }
+ 
++   // CraftBukkit start
+    public Either<Player.BedSleepingProblem, Unit> m_7720_(BlockPos p_36203_) {
++      return this.startSleepInBed(p_36203_, false);
++   }
++
++   public Either<Player.BedSleepingProblem, Unit> startSleepInBed(BlockPos p_36203_, boolean force) {
+       this.m_5802_(p_36203_);
+       this.f_36110_ = 0;
+       return Either.right(Unit.INSTANCE);
+    }
++   // CraftBukkit end
  
     public void m_6145_(boolean p_36226_, boolean p_36227_) {
 +      net.minecraftforge.event.ForgeEventFactory.onPlayerWakeup(this, p_36226_, p_36227_);
@@ -350,6 +397,36 @@
        this.f_36078_ += p_36276_;
        if (this.f_36078_ < 0) {
           this.f_36078_ = 0;
+@@ -1581,14 +_,27 @@
+       }
+    }
+ 
++   // CatServer start
++   private AtomicReference<EntityExhaustionEvent.ExhaustionReason> catserver$causeFoodReason = new AtomicReference<>(EntityExhaustionEvent.ExhaustionReason.UNKNOWN);
++   public void causeFoodExhaustion(float p_36400_, EntityExhaustionEvent.ExhaustionReason reason) {
++      this.catserver$causeFoodReason.set(reason);
++      this.m_36399_(p_36400_);
++   }
++
+    public void m_36399_(float p_36400_) {
+       if (!this.f_36077_.f_35934_) {
+          if (!this.f_19853_.f_46443_) {
+-            this.f_36097_.m_38703_(p_36400_);
++            var reason = this.catserver$causeFoodReason.getAndSet(EntityExhaustionEvent.ExhaustionReason.UNKNOWN);
++            // CraftBukkit start
++            EntityExhaustionEvent event = CraftEventFactory.callPlayerExhaustionEvent(this, reason, p_36400_);
++            if (!event.isCancelled()) {
++               this.f_36097_.m_38703_(event.getExhaustion());
++            }
++            // CraftBukkit end
+          }
+-
+       }
+    }
++   // CatServer end
+ 
+    public FoodData m_36324_() {
+       return this.f_36097_;
 @@ -1745,7 +_,11 @@
     }
  
@@ -361,6 +438,24 @@
 +      mutablecomponent = mutablecomponent.m_7220_(PlayerTeam.m_83348_(this.m_5647_(), this.displayname));
 +      mutablecomponent = suffixes.stream().reduce(mutablecomponent, MutableComponent::m_7220_);
        return this.m_36218_(mutablecomponent);
+    }
+ 
+@@ -1835,7 +_,7 @@
+       return this.f_19804_.m_135370_(f_36091_);
+    }
+ 
+-   protected void m_36362_(CompoundTag p_36363_) {
++   public void m_36362_(CompoundTag p_36363_) {
+       this.f_19804_.m_135381_(f_36091_, p_36363_);
+    }
+ 
+@@ -1843,7 +_,7 @@
+       return this.f_19804_.m_135370_(f_36092_);
+    }
+ 
+-   protected void m_36364_(CompoundTag p_36365_) {
++   public void m_36364_(CompoundTag p_36365_) {
+       this.f_19804_.m_135381_(f_36092_, p_36365_);
     }
  
 @@ -1895,24 +_,24 @@
@@ -392,6 +487,22 @@
        this.m_36246_(Stats.f_12982_.m_12902_(p_36186_.m_41720_()));
        p_36185_.m_6263_((Player)null, this.m_20185_(), this.m_20186_(), this.m_20189_(), SoundEvents.f_12321_, SoundSource.PLAYERS, 0.5F, p_36185_.f_46441_.nextFloat() * 0.1F + 0.9F);
        if (this instanceof ServerPlayer) {
+@@ -1968,7 +_,14 @@
+       return false;
+    }
+ 
+-   public static enum BedSleepingProblem {
++   public boolean fauxSleeping;
++   public int oldLevel = -1;
++
++    public CraftHumanEntity getBukkitEntity() {
++       return (CraftHumanEntity) super.getBukkitEntity();
++    }
++
++    public static enum BedSleepingProblem {
+       NOT_POSSIBLE_HERE,
+       NOT_POSSIBLE_NOW(new TranslatableComponent("block.minecraft.bed.no_sleep")),
+       TOO_FAR_AWAY(new TranslatableComponent("block.minecraft.bed.too_far_away")),
 @@ -1991,5 +_,63 @@
        public Component m_36423_() {
           return this.f_36413_;

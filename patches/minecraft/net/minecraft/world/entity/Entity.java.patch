@@ -1,7 +1,20 @@
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -116,7 +_,7 @@
+@@ -17,6 +_,7 @@
+ import java.util.Random;
+ import java.util.Set;
+ import java.util.UUID;
++import java.util.concurrent.atomic.AtomicBoolean;
+ import java.util.concurrent.atomic.AtomicInteger;
+ import java.util.function.Predicate;
+ import java.util.stream.Stream;
+@@ -114,9 +_,12 @@
+ import net.minecraft.world.phys.shapes.VoxelShape;
+ import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Team;
++import org.bukkit.command.CommandSender;
++import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
++import org.bukkit.event.entity.EntityCombustEvent;
  import org.slf4j.Logger;
  
 -public abstract class Entity implements Nameable, EntityAccess, CommandSource {
@@ -17,7 +30,7 @@
     private final EntityType<?> f_19847_;
     private int f_19848_ = f_19843_.incrementAndGet();
     public boolean f_19850_;
-@@ -175,6 +_,7 @@
+@@ -175,11 +_,12 @@
     public double f_19790_;
     public double f_19791_;
     public double f_19792_;
@@ -25,8 +38,67 @@
     public float f_19793_;
     public boolean f_19794_;
     protected final Random f_19796_ = new Random();
-@@ -229,6 +_,7 @@
+    public int f_19797_;
+-   private int f_19831_ = -this.m_6101_();
++   public int f_19831_ = -this.m_6101_();
+    protected boolean f_19798_;
+    protected Object2DoubleMap<TagKey<Fluid>> f_19799_ = new Object2DoubleArrayMap<>(2);
+    protected boolean f_19800_;
+@@ -206,7 +_,7 @@
+    private Vec3 f_19838_;
+    public boolean f_19811_;
+    public boolean f_19812_;
+-   private int f_19839_;
++   public int f_19839_;
+    protected boolean f_19817_;
+    protected int f_19818_;
+    protected BlockPos f_19819_;
+@@ -224,11 +_,50 @@
+    public boolean f_146810_;
+    private float f_146803_;
+    private int f_146804_;
+-   private boolean f_146813_;
++   public boolean f_146813_;
+    @Nullable
     private BlockState f_185934_ = null;
++   // CraftBukkit start
++   private static final int CURRENT_LEVEL = 2;
++   static boolean isLevelAtLeast(CompoundTag tag, int level) {
++      return tag.m_128441_("Bukkit.updateLevel") && tag.m_128451_("Bukkit.updateLevel") >= level;
++   }
++   private CraftEntity bukkitEntity;
++   public CraftEntity getBukkitEntity() {
++      if (bukkitEntity == null) {
++         bukkitEntity = CraftEntity.getEntity(f_19853_.getCraftServer(), this);
++      }
++      return bukkitEntity;
++   }
++   @Override
++   public CommandSender getBukkitSender(CommandSourceStack wrapper) {
++      return getBukkitEntity();
++   }
++   // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
++   public int getDefaultMaxAirSupply() {
++      return f_146818_;
++   }
++   public boolean persist = true;
++   public boolean valid;
++   public boolean generation;
++   public int maxAirTicks = getDefaultMaxAirSupply(); // CraftBukkit - SPIGOT-6907: re-implement LivingEntity#setMaximumAir()
++   public org.bukkit.projectiles.ProjectileSource projectileSource; // For projectiles only
++   public boolean lastDamageCancelled; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
++   public boolean persistentInvisibility = false;
++   public BlockPos lastLavaContact;
++   public float getBukkitYaw() {
++      return this.f_19857_;
++   }
++   public boolean isChunkLoaded() {
++      return f_19853_.m_7232_((int) Math.floor(this.m_20185_()) >> 4, (int) Math.floor(this.m_20189_()) >> 4);
++   }
++   public boolean canCollideWithBukkit(Entity entity) {
++      return m_6094_();
++   }
++   // CraftBukkit end
  
     public Entity(EntityType<?> p_19870_, Level p_19871_) {
 +      super(Entity.class);
@@ -54,6 +126,31 @@
  
     }
  
+@@ -505,7 +_,24 @@
+       }
+    }
+ 
++   // CatServer start
++   private AtomicBoolean catserver$isCallEvent = new AtomicBoolean(true);
++   public void setSecondsOnFire(int p_20255_, boolean callEvent) {
++      this.catserver$isCallEvent.set(callEvent);
++      this.m_20254_(p_20255_);
++   }
++
+    public void m_20254_(int p_20255_) {
++      var callEvent = this.catserver$isCallEvent.getAndSet(true);
++      if (callEvent) {
++         EntityCombustEvent event = new EntityCombustEvent(this.getBukkitEntity(), p_20255_);
++         this.f_19853_.getCraftServer().getPluginManager().callEvent(event);
++         if (event.isCancelled()) {
++            return;
++         }
++         p_20255_ = event.getDuration();
++      }
++      // CraftBukkit end
+       int i = p_20255_ * 20;
+       if (this instanceof LivingEntity) {
+          i = ProtectionEnchantment.m_45138_((LivingEntity)this, i);
 @@ -621,7 +_,7 @@
                 double d1 = vec3.f_82479_;
                 double d2 = vec3.f_82480_;
@@ -223,6 +320,20 @@
     public boolean m_6146_() {
        return true;
     }
+@@ -2040,11 +_,11 @@
+       this.m_20115_(5, p_20304_);
+    }
+ 
+-   protected boolean m_20291_(int p_20292_) {
++   public boolean m_20291_(int p_20292_) {
+       return (this.f_19804_.m_135370_(f_19805_) & 1 << p_20292_) != 0;
+    }
+ 
+-   protected void m_20115_(int p_20116_, boolean p_20117_) {
++   public void m_20115_(int p_20116_, boolean p_20117_) {
+       byte b0 = this.f_19804_.m_135370_(f_19805_);
+       if (p_20117_) {
+          this.f_19804_.m_135381_(f_19805_, (byte)(b0 | 1 << p_20116_));
 @@ -2093,7 +_,7 @@
           this.m_20254_(8);
        }
@@ -308,6 +419,15 @@
           });
        }
  
+@@ -2703,7 +_,7 @@
+       return SoundSource.NEUTRAL;
+    }
+ 
+-   protected int m_6101_() {
++   public int m_6101_() {
+       return 1;
+    }
+ 
 @@ -2950,6 +_,7 @@
              gameeventlistenerregistrar.m_157862_(this.f_19853_);
           }
@@ -316,11 +436,19 @@
  
     }
  
-@@ -3061,6 +_,76 @@
-    public boolean m_142265_(Level p_146843_, BlockPos p_146844_) {
+@@ -3036,7 +_,7 @@
+       this.f_146801_.m_142472_(p_146876_);
+    }
+ 
+-   protected void m_146912_() {
++   public void m_146912_() {
+       this.f_146795_ = null;
+    }
+ 
+@@ -3062,8 +_,81 @@
        return true;
     }
-+
+ 
 +   /* ================================== Forge Start =====================================*/
 +
 +   private boolean canUpdate = true;
@@ -390,6 +518,12 @@
 +
 +   /* ================================== Forge End =====================================*/
 +
- 
++
     public Level m_183503_() {
        return this.f_19853_;
++   }
++
++   public void teleportTo(ServerLevel handle, BlockPos blockPos) {
+    }
+ 
+    @FunctionalInterface

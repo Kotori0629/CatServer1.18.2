@@ -11,7 +11,6 @@
 +
  public class DedicatedServerProperties extends PropertyManager<DedicatedServerProperties> {
  
-+    public final boolean debug = this.get("debug", false); // CraftBukkit
      public final boolean onlineMode = this.get("online-mode", true);
      public final boolean preventProxyConnections = this.get("prevent-proxy-connections", false);
      public final String serverIp = this.get("server-ip", "");

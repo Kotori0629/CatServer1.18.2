@@ -38,16 +38,6 @@
  
 -    protected World(WorldDataMutable worlddatamutable, ResourceKey<World> resourcekey, Holder<DimensionManager> holder, Supplier<GameProfilerFiller> supplier, boolean flag, boolean flag1, long i) {
 +    protected World(WorldDataMutable worlddatamutable, ResourceKey<World> resourcekey, Holder<DimensionManager> holder, Supplier<GameProfilerFiller> supplier, boolean flag, boolean flag1, long i, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env) {
-+        this.generator = gen;
-+
-+        // CraftBukkit Ticks things
-+        for (SpawnCategory spawnCategory : SpawnCategory.values()) {
-+            if (CraftSpawnCategory.isValidForLimits(spawnCategory)) {
-+                this.ticksPerSpawnCategory.put(spawnCategory, (long) this.getCraftServer().getTicksPerSpawns(spawnCategory));
-+            }
-+        }
-+
-+        // CraftBukkit end
          this.profiler = supplier;
          this.levelData = worlddatamutable;
          this.dimensionTypeRegistration = holder;

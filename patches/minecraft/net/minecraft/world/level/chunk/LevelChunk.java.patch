@@ -9,14 +9,47 @@
     static final Logger f_62771_ = LogUtils.getLogger();
     private static final TickingBlockEntity f_156361_ = new TickingBlockEntity() {
        public void m_142224_() {
-@@ -97,6 +_,7 @@
+@@ -70,7 +_,7 @@
+    private final Map<BlockPos, LevelChunk.RebindableTickingBlockEntityWrapper> f_156362_ = Maps.newHashMap();
+    private boolean f_62775_;
+    private boolean f_196848_ = false;
+-   final Level f_62776_;
++   public final Level f_62776_;
+    @Nullable
+    private Supplier<ChunkHolder.FullChunkStatus> f_62790_;
+    @Nullable
+@@ -78,6 +_,13 @@
+    private final Int2ObjectMap<GameEventDispatcher> f_156363_;
+    private final LevelChunkTicks<Block> f_62784_;
+    private final LevelChunkTicks<Fluid> f_187943_;
++   public org.bukkit.Chunk bukkitChunk;
++   public org.bukkit.Chunk getBukkitChunk() {
++      return bukkitChunk;
++   }
++
++   public boolean mustNotSave;
++   public boolean needsDecoration;
+ 
+    public LevelChunk(Level p_187945_, ChunkPos p_187946_) {
+       this(p_187945_, p_187946_, UpgradeData.f_63320_, new LevelChunkTicks<>(), new LevelChunkTicks<>(), 0L, (LevelChunkSection[])null, (LevelChunk.PostLoadProcessor)null, (BlendingData)null);
+@@ -97,6 +_,8 @@
        this.f_62791_ = p_196861_;
        this.f_62784_ = p_196857_;
        this.f_187943_ = p_196858_;
++      this.bukkitChunk = new org.bukkit.craftbukkit.v1_18_R2.CraftChunk(this);
 +      this.capProvider.initInternal();
     }
  
     public LevelChunk(ServerLevel p_196850_, ProtoChunk p_196851_, @Nullable LevelChunk.PostLoadProcessor p_196852_) {
+@@ -123,6 +_,8 @@
+ 
+       this.m_8094_(p_196851_.m_6332_());
+       this.f_187603_ = true;
++      this.needsDecoration = true; // CraftBukkit
++      this.persistentDataContainer = p_196851_.persistentDataContainer; // SPIGOT-6814: copy PDC to account for 1.17 to 1.18 chunk upgrading.
+    }
+ 
+    public TickContainerAccess<Block> m_183531_() {
 @@ -233,14 +_,14 @@
              boolean flag2 = blockstate.m_155947_();
              if (!this.f_62776_.f_46443_) {

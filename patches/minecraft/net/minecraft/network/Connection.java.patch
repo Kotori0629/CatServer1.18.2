@@ -1,6 +1,6 @@
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
-@@ -87,6 +_,7 @@
+@@ -87,15 +_,21 @@
     private float f_129477_;
     private int f_129478_;
     private boolean f_129479_;
@@ -8,7 +8,13 @@
  
     public Connection(PacketFlow p_129482_) {
        this.f_129466_ = p_129482_;
-@@ -96,6 +_,7 @@
+    }
+ 
++   public SocketAddress getRawAddress() {
++      return this.f_129468_.remoteAddress();
++   }
++
+    public void channelActive(ChannelHandlerContext p_129525_) throws Exception {
        super.channelActive(p_129525_);
        this.f_129468_ = p_129525_.channel();
        this.f_129469_ = this.f_129468_.remoteAddress();

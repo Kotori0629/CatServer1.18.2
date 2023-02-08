@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.v1_18_R2.scoreboard;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import net.minecraft.world.scores.PlayerTeam;
@@ -15,7 +16,6 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 public final class CraftScoreboard implements org.bukkit.scoreboard.Scoreboard {
     final Scoreboard board;
@@ -72,7 +72,7 @@ public final class CraftScoreboard implements org.bukkit.scoreboard.Scoreboard {
 
     @Override
     public ImmutableSet<Objective> getObjectives() {
-        return ImmutableSet.copyOf(Iterables.transform((Collection<net.minecraft.world.scores.Objective>) this.board.getObjectives(), new Function<net.minecraft.world.scores.Objective, Objective>() {
+        return ImmutableSet.copyOf(Iterables.transform((Collection<net.minecraft.world.scores.Objective>) this.board.getObjectives(), new com.google.common.base.Function<net.minecraft.world.scores.Objective, Objective>() {
 
             @Override
             public Objective apply(net.minecraft.world.scores.Objective input) {

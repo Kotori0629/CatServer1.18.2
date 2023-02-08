@@ -1,8 +1,16 @@
 --- a/net/minecraft/network/syncher/SynchedEntityData.java
 +++ b/net/minecraft/network/syncher/SynchedEntityData.java
-@@ -37,11 +_,13 @@
+@@ -36,12 +_,21 @@
+       this.f_135344_ = p_135351_;
     }
  
++   // CraftBukkit start - add method from above
++   public <T> void markDirty(EntityDataAccessor<T> datawatcherobject) {
++      this.m_135379_(datawatcherobject).m_135401_(true);
++      this.f_135348_ = true;
++   }
++   // CraftBukkit end
++
     public static <T> EntityDataAccessor<T> m_135353_(Class<? extends Entity> p_135354_, EntityDataSerializer<T> p_135355_) {
 -      if (f_135342_.isDebugEnabled()) {
 +      if (true || f_135342_.isDebugEnabled()) { // Forge: This is very useful for mods that register keys on classes that are not their own

@@ -67,10 +67,6 @@
      private long keepAliveTime;
      private boolean keepAlivePending;
      private long keepAliveChallenge;
--    private int chatSpamTickCount;
-+    // CraftBukkit start - multithreaded fields
-+    private final AtomicInteger chatSpamTickCount = new AtomicInteger();
-+    // CraftBukkit end
      private int dropSpamTickCount;
      private double firstGoodX;
      private double firstGoodY;
@@ -94,14 +90,6 @@
          }
  
          this.server.getProfiler().pop();
-+        // CraftBukkit start
-+        for (int spam; (spam = this.chatSpamTickCount.get()) > 0 && !chatSpamTickCount.compareAndSet(spam, spam - 1); ) ;
-+        /* Use thread-safe field access instead
-         if (this.chatSpamTickCount > 0) {
-             --this.chatSpamTickCount;
-         }
-+        */
-+        // CraftBukkit end
  
          if (this.dropSpamTickCount > 0) {
              --this.dropSpamTickCount;
@@ -114,50 +102,6 @@
  
 @@ -296,16 +384,47 @@
          return this.server.isSingleplayerOwner(this.player.getGameProfile());
-     }
- 
-+    // CraftBukkit start
-+    @Deprecated
-     public void disconnect(IChatBaseComponent ichatbasecomponent) {
-+        disconnect(CraftChatMessage.fromComponent(ichatbasecomponent));
-+    }
-+    // CraftBukkit end
-+
-+    public void disconnect(String s) {
-+        // CraftBukkit start - fire PlayerKickEvent
-+        if (this.processedDisconnect) {
-+            return;
-+        }
-+        String leaveMessage = EnumChatFormat.YELLOW + this.player.getScoreboardName() + " left the game.";
-+
-+        PlayerKickEvent event = new PlayerKickEvent(this.player.getBukkitEntity(), s, leaveMessage);
-+
-+        if (this.cserver.getServer().isRunning()) {
-+            this.cserver.getPluginManager().callEvent(event);
-+        }
-+
-+        if (event.isCancelled()) {
-+            // Do not kick the player
-+            return;
-+        }
-+        this.player.kickLeaveMessage = event.getLeaveMessage(); // CraftBukkit - SPIGOT-3034: Forward leave message to PlayerQuitEvent
-+        // Send the possibly modified leave message
-+        s = event.getReason();
-+        final IChatBaseComponent ichatbasecomponent = CraftChatMessage.fromString(s, true)[0];
-+        // CraftBukkit end
-+
-         this.connection.send(new PacketPlayOutKickDisconnect(ichatbasecomponent), (future) -> {
-             this.connection.disconnect(ichatbasecomponent);
-         });
-+        this.onDisconnect(ichatbasecomponent); // CraftBukkit - fire quit instantly
-         this.connection.setReadOnly();
-         MinecraftServer minecraftserver = this.server;
-         NetworkManager networkmanager = this.connection;
- 
-         Objects.requireNonNull(this.connection);
--        minecraftserver.executeBlocking(networkmanager::handleDisconnection);
-+        // CraftBukkit - Don't wait
-+        minecraftserver.wrapRunnable(networkmanager::handleDisconnection);
      }
  
      private <T, R> void filterTextPacket(T t0, Consumer<R> consumer, BiFunction<ITextFilter, T, CompletableFuture<R>> bifunction) {
