@@ -1,6 +1,22 @@
 --- a/net/minecraft/server/network/ServerHandshakePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerHandshakePacketListenerImpl.java
-@@ -22,6 +_,7 @@
+@@ -11,10 +_,15 @@
+ import net.minecraft.network.protocol.login.ClientboundLoginDisconnectPacket;
+ import net.minecraft.server.MinecraftServer;
+ 
++import java.net.InetAddress;
++import java.util.HashMap;
++
+ public class ServerHandshakePacketListenerImpl implements ServerHandshakePacketListener {
+    private static final Component f_9964_ = new TextComponent("Ignoring status request");
+    private final MinecraftServer f_9965_;
+    private final Connection f_9966_;
++   private static final HashMap<InetAddress, Long> throttleTracker = new HashMap<InetAddress, Long>();
++   private static int throttleCounter = 0;
+ 
+    public ServerHandshakePacketListenerImpl(MinecraftServer p_9969_, Connection p_9970_) {
+       this.f_9965_ = p_9969_;
+@@ -22,9 +_,41 @@
     }
  
     public void m_7322_(ClientIntentionPacket p_9975_) {
@@ -8,3 +24,45 @@
        switch(p_9975_.m_134735_()) {
        case LOGIN:
           this.f_9966_.m_129498_(ConnectionProtocol.LOGIN);
++         // CraftBukkit start - Connection throttle
++         try {
++            long currentTime = System.currentTimeMillis();
++            long connectionThrottle = this.f_9965_.server.getConnectionThrottle();
++            InetAddress address = ((java.net.InetSocketAddress) this.f_9966_.m_129523_()).getAddress();
++            synchronized (throttleTracker) {
++               if (throttleTracker.containsKey(address) && !"127.0.0.1".equals(address.getHostAddress()) && currentTime - throttleTracker.get(address) < connectionThrottle) {
++                  throttleTracker.put(address, currentTime);
++                  TranslatableComponent chatmessage = new TranslatableComponent("Connection throttled! Please wait before reconnecting.");
++                  this.f_9966_.m_129512_(new ClientboundLoginDisconnectPacket(chatmessage));
++                  this.f_9966_.m_129507_(chatmessage);
++                  return;
++               }
++               throttleTracker.put(address, currentTime);
++               throttleCounter++;
++               if (throttleCounter > 200) {
++                  throttleCounter = 0;
++                  // Cleanup stale entries
++                  java.util.Iterator iter = throttleTracker.entrySet().iterator();
++                  while (iter.hasNext()) {
++                     java.util.Map.Entry<InetAddress, Long> entry = (java.util.Map.Entry) iter.next();
++                     if (entry.getValue() > connectionThrottle) {
++                        iter.remove();
++                     }
++                  }
++               }
++            }
++         } catch (Throwable t) {
++            org.apache.logging.log4j.LogManager.getLogger().debug("Failed to check connection throttle", t);
++         }
++         // CraftBukkit end
+          if (p_9975_.m_134738_() != SharedConstants.m_183709_().getProtocolVersion()) {
+             Component component;
+             if (p_9975_.m_134738_() < 754) {
+@@ -37,6 +_,7 @@
+             this.f_9966_.m_129507_(component);
+          } else {
+             this.f_9966_.m_129505_(new ServerLoginPacketListenerImpl(this.f_9965_, this.f_9966_));
++            ((ServerLoginPacketListenerImpl) this.f_9966_.m_129538_()).hostname = p_9975_.f_134721_ + ":" + p_9975_.f_134722_; // CraftBukkit - set hostname
+          }
+          break;
+       case STATUS:
