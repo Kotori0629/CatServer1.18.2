@@ -81,18 +81,37 @@
           LevelSummary levelsummary = levelstoragesource$levelstorageaccess.m_78308_();
           if (levelsummary != null) {
              if (levelsummary.m_193020_()) {
-@@ -134,6 +_,11 @@
+@@ -134,7 +_,30 @@
              f_129670_.warn("Safe mode active, only vanilla datapack will be loaded");
           }
  
 +         // CatServer start
-+         AtomicReference<DataPackConfig> dataPackConfig = new AtomicReference<>();
-+         AtomicReference<DynamicOps<Tag>>dynamicOps = new AtomicReference<>();
++
 +         // CatServer end
 +
           PackRepository packrepository = new PackRepository(PackType.SERVER_DATA, new ServerPacksSource(), new FolderRepositorySource(levelstoragesource$levelstorageaccess.m_78283_(LevelResource.f_78180_).toFile(), PackSource.f_10529_));
++         // CraftBukkit start
++         File bukkitDataPackFolder = new File(levelstoragesource$levelstorageaccess.m_78283_(LevelResource.f_78180_).toFile(), "bukkit");
++         if (!bukkitDataPackFolder.exists()) {
++            bukkitDataPackFolder.mkdirs();
++         }
++         File mcMeta = new File(bukkitDataPackFolder, "pack.mcmeta");
++         try {
++            com.google.common.io.Files.write("{\n"
++                    + "    \"pack\": {\n"
++                    + "        \"description\": \"Data pack for resources provided by Bukkit plugins\",\n"
++                    + "        \"pack_format\": " + SharedConstants.m_183709_().getPackVersion() + "\n"
++                    + "    }\n"
++                    + "}\n", mcMeta, com.google.common.base.Charsets.UTF_8);
++         } catch (java.io.IOException ex) {
++            throw new RuntimeException("Could not initialize Bukkit datapack", ex);
++         }
++         AtomicReference<DataPackConfig> dataPackConfig = new AtomicReference<>();
++         AtomicReference<DynamicOps<Tag>>dynamicOps = new AtomicReference<>();
++         // CraftBukkit end
  
           WorldStem worldstem;
+          try {
 @@ -145,6 +_,10 @@
              }, (p_206543_, p_206544_) -> {
                 RegistryAccess.Writable registryaccess$writable = RegistryAccess.m_206197_();
@@ -152,12 +171,14 @@
              }
           };
           thread.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(f_129670_));
-@@ -207,7 +_,7 @@
+@@ -207,8 +_,8 @@
  
     }
  
 -   private static void m_195488_(LevelStorageSource.LevelStorageAccess p_195489_, DataFixer p_195490_, boolean p_195491_, BooleanSupplier p_195492_, WorldGenSettings p_195493_) {
+-      f_129670_.info("Forcing world upgrade!");
 +   public static void m_195488_(LevelStorageSource.LevelStorageAccess p_195489_, DataFixer p_195490_, boolean p_195491_, BooleanSupplier p_195492_, WorldGenSettings p_195493_) {
-       f_129670_.info("Forcing world upgrade!");
++      f_129670_.info("Forcing world upgrade! {}", p_195489_.m_78277_()); // CraftBukkit
        WorldUpgrader worldupgrader = new WorldUpgrader(p_195489_, p_195490_, p_195493_, p_195491_);
        Component component = null;
+ 
