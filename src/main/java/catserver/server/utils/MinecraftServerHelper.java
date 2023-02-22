@@ -1,4 +1,4 @@
-package catserver;
+package catserver.server.utils;
 
 import com.mojang.serialization.DynamicOps;
 import joptsimple.OptionSet;

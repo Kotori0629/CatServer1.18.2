@@ -3,7 +3,7 @@
 @@ -1,5 +_,6 @@
  package net.minecraft.world.level.border;
  
-+import catserver.CatServer;
++import catserver.server.CatServer;
  import com.google.common.collect.Lists;
  import com.mojang.serialization.DynamicLike;
  import java.util.List;

@@ -1,4 +1,4 @@
-package catserver;
+package catserver.server.utils;
 
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;

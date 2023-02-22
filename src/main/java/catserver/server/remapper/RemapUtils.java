@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import catserver.CatServer;
+import catserver.server.CatServer;
 import org.objectweb.asm.Type;
 
 import net.md_5.specialsource.JarRemapper;

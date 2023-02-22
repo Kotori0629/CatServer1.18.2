@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 
-import catserver.CatServer;
+import catserver.server.CatServer;
 import net.md_5.specialsource.JarMapping;
 
 public class MappingLoader {

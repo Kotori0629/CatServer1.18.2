@@ -3,15 +3,12 @@
 @@ -1,5 +_,6 @@
  package net.minecraft.server;
  
-+import catserver.MinecraftServerHelper;
++import catserver.server.utils.MinecraftServerHelper;
  import com.google.common.base.Splitter;
  import com.google.common.collect.ImmutableList;
  import com.google.common.collect.Lists;
-@@ -8,8 +_,10 @@
- import com.mojang.authlib.GameProfile;
- import com.mojang.authlib.GameProfileRepository;
+@@ -10,6 +_,7 @@
  import com.mojang.authlib.minecraft.MinecraftSessionService;
-+import com.mojang.brigadier.CommandDispatcher;
  import com.mojang.datafixers.DataFixer;
  import com.mojang.logging.LogUtils;
 +import com.mojang.serialization.DynamicOps;

@@ -3,7 +3,7 @@
 @@ -1,5 +_,7 @@
  package net.minecraft.commands;
  
-+import catserver.CommandNodeHelper;
++import catserver.server.utils.CommandNodeHelper;
 +import com.google.common.base.Joiner;
  import com.google.common.collect.Maps;
  import com.mojang.brigadier.CommandDispatcher;

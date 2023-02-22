@@ -1,4 +1,4 @@
-package catserver;
+package catserver.server.level;
 
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.BlockPos;
