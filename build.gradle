@@ -40,6 +40,7 @@ plugins {
 }
 
 Util.init() //Init all our extension methods!
+def gitVersion = 'git rev-parse --short HEAD'.execute().text.trim()
 
 ext {
     JAR_SIGNER = null
@@ -67,9 +68,10 @@ ext {
     JARJAR_VERSION = '0.3.0'
 
     GIT_INFO = gradleutils.gitInfo
-    VERSION = gradleutils.getFilteredMCTagOffsetBranchVersion(true, '[0-9]', MC_VERSION)
+    FORGE_VERSION = "40.2.1"
+    VERSION = "1.18.2-$FORGE_VERSION"
+    CATSERVER_VERSION = "1.18.2-$FORGE_VERSION" + "-" + gitVersion
     // FML_VERSION = gradleutils.getFilteredMCTagOffsetBranchVersion(true, 'FML', MC_VERSION)
-    FORGE_VERSION = VERSION.substring(MC_VERSION.length() + 1)
 
     SPECIAL_SOURCE = 'net.md-5:SpecialSource:1.10.0'
     BINPATCH_TOOL = 'net.minecraftforge:binarypatcher:1.0.12:fatjar'

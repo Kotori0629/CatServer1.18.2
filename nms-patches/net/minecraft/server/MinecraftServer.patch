@@ -38,62 +38,6 @@
              thread.setPriority(8);
          }
  
--        S s0 = (MinecraftServer) function.apply(thread);
-+        S s0 = function.apply(thread); // CraftBukkit - decompile error
- 
-         atomicreference.set(s0);
-         thread.start();
-         return s0;
-     }
- 
--    public MinecraftServer(Thread thread, Convertable.ConversionSession convertable_conversionsession, ResourcePackRepository resourcepackrepository, WorldStem worldstem, Proxy proxy, DataFixer datafixer, @Nullable MinecraftSessionService minecraftsessionservice, @Nullable GameProfileRepository gameprofilerepository, @Nullable UserCache usercache, WorldLoadListenerFactory worldloadlistenerfactory) {
-+    public MinecraftServer(OptionSet options, DataPackConfiguration datapackconfiguration, DynamicOps<NBTBase> registryreadops, Thread thread, Convertable.ConversionSession convertable_conversionsession, ResourcePackRepository resourcepackrepository, WorldStem worldstem, Proxy proxy, DataFixer datafixer, @Nullable MinecraftSessionService minecraftsessionservice, @Nullable GameProfileRepository gameprofilerepository, @Nullable UserCache usercache, WorldLoadListenerFactory worldloadlistenerfactory) {
-         super("Server");
-         this.metricsRecorder = InactiveMetricsRecorder.INSTANCE;
-         this.profiler = this.metricsRecorder.getProfiler();
-@@ -287,7 +322,7 @@
-         this.status = new ServerPing();
-         this.random = new Random();
-         this.port = -1;
--        this.levels = Maps.newLinkedHashMap();
-+        this.levels = Maps.newLinkedHashMap(); // CraftBukkit - keep order, k+v already use identity methods
-         this.running = true;
-         this.tickTimes = new long[100];
-         this.resourcePack = "";
-@@ -317,13 +352,41 @@
-         this.structureManager = new DefinedStructureManager(worldstem.resourceManager(), convertable_conversionsession, datafixer);
-         this.serverThread = thread;
-         this.executor = SystemUtils.backgroundExecutor();
-+        // CraftBukkit start
-+        this.options = options;
-+        this.datapackconfiguration = datapackconfiguration;
-+        this.registryreadops = registryreadops;
-+        this.vanillaCommandDispatcher = worldstem.dataPackResources().commands; // CraftBukkit
-+        // Try to see if we're actually running in a terminal, disable jline if not
-+        if (System.console() == null && System.getProperty("jline.terminal") == null) {
-+            System.setProperty("jline.terminal", "jline.UnsupportedTerminal");
-+            Main.useJline = false;
-+        }
-+
-+        try {
-+            reader = new ConsoleReader(System.in, System.out);
-+            reader.setExpandEvents(false); // Avoid parsing exceptions for uncommonly used event designators
-+        } catch (Throwable e) {
-+            try {
-+                // Try again with jline disabled for Windows users without C++ 2008 Redistributable
-+                System.setProperty("jline.terminal", "jline.UnsupportedTerminal");
-+                System.setProperty("user.language", "en");
-+                Main.useJline = false;
-+                reader = new ConsoleReader(System.in, System.out);
-+                reader.setExpandEvents(false);
-+            } catch (IOException ex) {
-+                LOGGER.warn((String) null, ex);
-+            }
-+        }
-+        Runtime.getRuntime().addShutdownHook(new org.bukkit.craftbukkit.util.ServerShutdownThread(this));
-     }
-+    // CraftBukkit end
- 
      private void readScoreboard(WorldPersistentData worldpersistentdata) {
          ScoreboardServer scoreboardserver = this.getScoreboard();
  

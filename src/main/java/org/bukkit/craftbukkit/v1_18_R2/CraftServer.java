@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.v1_18_R2;
 
+import catserver.server.remapper.ReflectionTransformer;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -310,6 +311,7 @@ public final class CraftServer implements Server {
     }
 
     public void loadPlugins() {
+        ReflectionTransformer.init();
         pluginManager.registerInterface(JavaPluginLoader.class);
 
         File pluginFolder = (File) console.options.valueOf("plugins");
