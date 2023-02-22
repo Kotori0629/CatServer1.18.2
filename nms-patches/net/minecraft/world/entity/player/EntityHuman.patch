@@ -34,12 +34,8 @@
      protected static final DataWatcherObject<NBTTagCompound> DATA_SHOULDER_RIGHT = DataWatcher.defineId(EntityHuman.class, DataWatcherRegistry.COMPOUND_TAG);
      private long timeEntitySatOnShoulder;
      private final PlayerInventory inventory = new PlayerInventory(this);
--    protected InventoryEnderChest enderChestInventory = new InventoryEnderChest();
-+    protected InventoryEnderChest enderChestInventory = new InventoryEnderChest(this); // CraftBukkit - add "this" to constructor
      public final ContainerPlayer inventoryMenu;
      public Container containerMenu;
--    protected FoodMetaData foodData = new FoodMetaData();
-+    protected FoodMetaData foodData = new FoodMetaData(this); // CraftBukkit - add "this" to constructor
      protected int jumpTriggerTime;
      public float oBob;
      public float bob;

@@ -23,6 +23,19 @@
     public static final String f_150081_ = "OfflinePlayer:";
     public static final int f_150082_ = 16;
     public static final int f_150083_ = 20;
+@@ -133,10 +_,10 @@
+    protected static final EntityDataAccessor<CompoundTag> f_36092_ = SynchedEntityData.m_135353_(Player.class, EntityDataSerializers.f_135042_);
+    private long f_36109_;
+    private final Inventory f_36093_ = new Inventory(this);
+-   protected PlayerEnderChestContainer f_36094_ = new PlayerEnderChestContainer();
++   protected PlayerEnderChestContainer f_36094_ = new PlayerEnderChestContainer(this); // CraftBukkit - add "this" to constructor
+    public final InventoryMenu f_36095_;
+    public AbstractContainerMenu f_36096_;
+-   protected FoodData f_36097_ = new FoodData();
++   protected FoodData f_36097_ = new FoodData(this); // CraftBukkit - add "this" to constructor
+    protected int f_36098_;
+    public float f_36099_;
+    public float f_36100_;
 @@ -147,9 +_,9 @@
     public double f_36105_;
     public double f_36106_;
