@@ -15,10 +15,10 @@ public class CommandNodeHelper {
     static {
         try {
             CHILDREN = CommandNode.class.getDeclaredField("children");
-            LITERALS = CommandNode.class.getDeclaredField("literals");
-            ARGUMENTS = CommandNode.class.getDeclaredField("arguments");
             CHILDREN.setAccessible(true);
+            LITERALS = CommandNode.class.getDeclaredField("literals");
             LITERALS.setAccessible(true);
+            ARGUMENTS = CommandNode.class.getDeclaredField("arguments");
             ARGUMENTS.setAccessible(true);
         } catch (Throwable t) {
             throw new RuntimeException(t);

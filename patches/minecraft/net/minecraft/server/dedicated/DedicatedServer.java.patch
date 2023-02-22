@@ -1,10 +1,14 @@
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -57,6 +_,7 @@
+@@ -57,6 +_,11 @@
  import net.minecraft.world.level.Level;
  import net.minecraft.world.level.block.entity.SkullBlockEntity;
  import net.minecraft.world.level.storage.LevelStorageSource;
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.io.IoBuilder;
 +import org.bukkit.command.CommandSender;
++import org.bukkit.event.server.RemoteServerCommandEvent;
++import org.bukkit.event.server.ServerCommandEvent;
  import org.slf4j.Logger;
  
  public class DedicatedServer extends MinecraftServer implements ServerInterface {
@@ -21,15 +25,97 @@
     @Nullable
     private MinecraftServerGui f_139605_;
     @Nullable
-@@ -89,6 +_,7 @@
+@@ -89,19 +_,60 @@
     public boolean m_7038_() throws IOException {
        Thread thread = new Thread("Server console handler") {
           public void run() {
+-            BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+-
 +            if (net.minecraftforge.server.console.TerminalHandler.handleCommands(DedicatedServer.this)) return;
-             BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
- 
++            jline.console.ConsoleReader bufferedreader = reader;
++            // CraftBukkit start
++            // MC-33041, SPIGOT-5538: if System.in is not valid due to javaw, then return
++            try {
++               System.in.available();
++            } catch (IOException exception) {
++               return;
++            }
++            // CraftBukkit end
              String s1;
-@@ -167,11 +_,13 @@
+             try {
+-               while(!DedicatedServer.this.m_129918_() && DedicatedServer.this.m_130010_() && (s1 = bufferedreader.readLine()) != null) {
+-                  DedicatedServer.this.m_139645_(s1, DedicatedServer.this.m_129893_());
++               // CraftBukkit start - JLine disabling compatibility
++               while (!DedicatedServer.this.m_129918_() && DedicatedServer.this.m_130010_()) {
++                  s1 = bufferedreader.readLine();
++
++                  // SPIGOT-5220: Throttle if EOF (ctrl^d) or stdin is /dev/null
++                  if (s1 == null) {
++                     try {
++                        Thread.sleep(50L);
++                     } catch (InterruptedException ex) {
++                        Thread.currentThread().interrupt();
++                     }
++                     continue;
++                  }
++                  if (s1.trim().length() > 0) { // Trim to filter lines which are just spaces
++                     DedicatedServer.this.m_139645_(s1, DedicatedServer.this.m_129893_());
++                  }
++                  // CraftBukkit end
+                }
+             } catch (IOException ioexception1) {
+                DedicatedServer.f_139598_.error("Exception handling console input", (Throwable)ioexception1);
+             }
+-
+          }
+       };
++
++      // CraftBukkit start - TODO: handle command-line logging arguments
++      java.util.logging.Logger global = java.util.logging.Logger.getLogger("");
++      global.setUseParentHandlers(false);
++      for (java.util.logging.Handler handler : global.getHandlers()) {
++         global.removeHandler(handler);
++      }
++      global.addHandler(new org.bukkit.craftbukkit.v1_18_R2.util.ForwardLogHandler());
++      final org.apache.logging.log4j.core.Logger logger = ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger());
++      for (org.apache.logging.log4j.core.Appender appender : logger.getAppenders().values()) {
++         if (appender instanceof org.apache.logging.log4j.core.appender.ConsoleAppender) {
++            logger.removeAppender(appender);
++         }
++      }
++      new org.bukkit.craftbukkit.v1_18_R2.util.TerminalConsoleWriterThread(System.out, this.reader).start();
++      System.setOut(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.INFO).buildPrintStream());
++      System.setErr(IoBuilder.forLogger(logger).setLevel(org.apache.logging.log4j.Level.INFO).buildPrintStream());
++      // CraftBukkit end
++
+       thread.setDaemon(true);
+       thread.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(f_139598_));
+       thread.start();
+@@ -119,6 +_,7 @@
+          this.m_129993_(dedicatedserverproperties.f_139729_);
+          this.m_129913_(dedicatedserverproperties.f_139730_);
+       }
++      this.m_129823_(new DedicatedPlayerList(this, this.f_129746_, this.f_129745_));
+ 
+       this.m_129997_(dedicatedserverproperties.f_139733_);
+       this.m_129999_(dedicatedserverproperties.f_139734_);
+@@ -149,6 +_,11 @@
+          return false;
+       }
+ 
++      // CraftBukkit start
++      server.loadPlugins();
++      server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.STARTUP);
++      // CraftBukkit end
++
+       if (!this.m_129797_()) {
+          f_139598_.warn("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
+          f_139598_.warn("The server will make no attempt to authenticate usernames. Beware.");
+@@ -163,15 +_,16 @@
+       if (!OldUsersConverter.m_11106_(this)) {
+          return false;
+       } else {
+-         this.m_129823_(new DedicatedPlayerList(this, this.m_206579_(), this.f_129745_));
           long i = Util.m_137569_();
           SkullBlockEntity.m_196700_(this.m_129927_(), this.m_129925_(), this);
           GameProfileCache.m_11004_(this.m_129797_());
@@ -43,6 +129,14 @@
           if (dedicatedserverproperties.f_139744_ != null) {
              this.m_129900_().m_46170_(GameRules.f_46153_).m_46246_(dedicatedserverproperties.f_139744_, this);
           }
+@@ -184,6 +_,7 @@
+          if (dedicatedserverproperties.f_139747_) {
+             f_139598_.info("Starting remote control listener");
+             this.f_139603_ = RconThread.m_11615_(this);
++            this.remoteConsole = new org.bukkit.craftbukkit.v1_18_R2.command.CraftRemoteConsoleCommandSender(this.f_139602_); // CraftBukkit
+          }
+ 
+          if (this.m_139669_() > 0L) {
 @@ -195,12 +_,13 @@
           }
  
@@ -58,6 +152,31 @@
        }
     }
  
+@@ -316,6 +_,7 @@
+          this.f_139601_.m_7530_();
+       }
+ 
++      Runtime.getRuntime().halt(0);
+    }
+ 
+    public void m_5703_(BooleanSupplier p_139661_) {
+@@ -334,9 +_,14 @@
+    public void m_139665_() {
+       while(!this.f_139600_.isEmpty()) {
+          ConsoleInput consoleinput = this.f_139600_.remove(0);
+-         this.m_129892_().m_82117_(consoleinput.f_135929_, consoleinput.f_135928_);
++         // CraftBukkit start - ServerCommand for preprocessing
++         ServerCommandEvent event = new ServerCommandEvent(console, consoleinput.f_135928_);
++         server.getPluginManager().callEvent(event);
++         if (event.isCancelled()) continue;
++         consoleinput = new ConsoleInput(event.getCommand(), consoleinput.f_135929_);
++         server.dispatchServerCommand(console, consoleinput);
++         // CraftBukkit end
+       }
+-
+    }
+ 
+    public boolean m_6982_() {
 @@ -439,6 +_,15 @@
        return this.m_7913_().f_139718_;
     }
@@ -73,6 +192,48 @@
 +
     public int m_6329_() {
        return this.m_7913_().f_139719_;
+    }
+@@ -518,13 +_,39 @@
+    }
+ 
+    public String m_7138_() {
+-      return "";
++      // CraftBukkit start - Whole method
++      StringBuilder result = new StringBuilder();
++      org.bukkit.plugin.Plugin[] plugins = server.getPluginManager().getPlugins();
++      result.append(server.getName());
++      result.append(" on Bukkit ");
++      result.append(server.getBukkitVersion());
++      if (plugins.length > 0 && server.getQueryPlugins()) {
++         result.append(": ");
++         for (int i = 0; i < plugins.length; i++) {
++            if (i > 0) {
++               result.append("; ");
++            }
++            result.append(plugins[i].getDescription().getName());
++            result.append(" ");
++            result.append(plugins[i].getDescription().getVersion().replaceAll(";", ","));
++         }
++      }
++      return result.toString();
++      // CraftBukkit end
+    }
+ 
+    public String m_7261_(String p_139644_) {
+       this.f_139602_.m_11512_();
+       this.m_18709_(() -> {
+-         this.m_129892_().m_82117_(this.f_139602_.m_11514_(), p_139644_);
++         // CraftBukkit start - fire RemoteServerCommandEvent
++         RemoteServerCommandEvent event = new RemoteServerCommandEvent(remoteConsole, p_139644_);
++         server.getPluginManager().callEvent(event);
++         if (event.isCancelled()) {
++            return;
++         }
++         ConsoleInput serverCommand = new ConsoleInput(event.getCommand(), f_139602_.m_11514_());
++         server.dispatchServerCommand(remoteConsole, serverCommand);
++         // CraftBukkit end
+       });
+       return this.f_139602_.m_11513_();
     }
 @@ -543,6 +_,11 @@
  
