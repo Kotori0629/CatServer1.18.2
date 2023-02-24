@@ -941,9 +941,23 @@ public class CraftEventFactory {
                 cause = DamageCause.DRAGON_BREATH;
             } else if (source == DamageSource.MAGIC) {
                 cause = DamageCause.MAGIC;
+            // CatServer - handle more damageSource
+            } else if (source == DamageSource.CACTUS) {
+                cause = DamageCause.CONTACT;
+            } else if (source == DamageSource.IN_FIRE) {
+                cause = DamageCause.FIRE;
+            } else if (source == DamageSource.ON_FIRE) {
+                cause = DamageCause.FIRE_TICK;
+            } else if (source == DamageSource.LAVA) {
+                cause = DamageCause.LAVA;
+            } else if (source == MELTING) {
+                cause = DamageCause.MELTING;
+            } else if (source == POISON) {
+                cause = DamageCause.POISON;
             } else {
-                throw new IllegalStateException(String.format("Unhandled damage of %s by %s from %s", entity, damager.getHandle(), source.msgId));
+                cause = DamageCause.CUSTOM; // CatServer - do not throw exception
             }
+            // CatServer end
             EntityDamageEvent event = new EntityDamageByEntityEvent(damager, entity.getBukkitEntity(), cause, modifiers, modifierFunctions);
             event.setCancelled(cancelled);
             callEvent(event);
@@ -990,9 +1004,10 @@ public class CraftEventFactory {
 
         if (cause != null) {
             return callEntityDamageEvent(null, entity, cause, modifiers, modifierFunctions, cancelled);
+        } else {
+            // CatServer - handle custom DamageCause
+            return new EntityDamageEvent(entity.getBukkitEntity(), DamageCause.CUSTOM, modifiers, modifierFunctions);
         }
-
-        throw new IllegalStateException(String.format("Unhandled damage of %s from %s", entity, source.msgId));
     }
 
     private static EntityDamageEvent callEntityDamageEvent(Entity damager, Entity damagee, DamageCause cause, Map<DamageModifier, Double> modifiers, Map<DamageModifier, Function<? super Double, Double>> modifierFunctions) {
