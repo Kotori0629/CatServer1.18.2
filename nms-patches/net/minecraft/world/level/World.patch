@@ -61,7 +61,6 @@
          this.biomeManager = new BiomeManager(this, i);
          this.isDebug = flag1;
 +        // CraftBukkit start
-+        getWorldBorder().world = (WorldServer) this;
 +        // From PlayerList.setPlayerFileData
 +        getWorldBorder().addListener(new IWorldBorderListener() {
 +            @Override

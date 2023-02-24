@@ -92,7 +92,6 @@
          }
  
          this.sleepStatus = new SleepStatus();
-+        this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
      }
  
      public void setWeatherParameters(int i, int j, boolean flag, boolean flag1) {
