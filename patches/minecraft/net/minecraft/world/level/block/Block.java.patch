@@ -1,5 +1,14 @@
 --- a/net/minecraft/world/level/block/Block.java
 +++ b/net/minecraft/world/level/block/Block.java
+@@ -40,6 +_,8 @@
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.item.TooltipFlag;
+ import net.minecraft.world.item.context.BlockPlaceContext;
++import net.minecraft.world.item.enchantment.EnchantmentHelper;
++import net.minecraft.world.item.enchantment.Enchantments;
+ import net.minecraft.world.level.BlockGetter;
+ import net.minecraft.world.level.Explosion;
+ import net.minecraft.world.level.GameRules;
 @@ -62,10 +_,11 @@
  import net.minecraft.world.phys.shapes.VoxelShape;
  import org.slf4j.Logger;
@@ -101,11 +110,10 @@
     }
  
     public void m_5871_(ItemStack p_49816_, @Nullable BlockGetter p_49817_, List<Component> p_49818_, TooltipFlag p_49819_) {
-@@ -487,6 +_,76 @@
-    protected ImmutableMap<BlockState, VoxelShape> m_152458_(Function<BlockState, VoxelShape> p_152459_) {
+@@ -488,11 +_,87 @@
        return this.f_49792_.m_61056_().stream().collect(ImmutableMap.toImmutableMap(Function.identity(), p_152459_));
     }
-+
+ 
 +   /* ======================================== FORGE START =====================================*/
 +   protected Random RANDOM = new Random();
 +   private Object renderProperties;
@@ -175,6 +183,18 @@
 +   }
 +
 +   /* ========================================= FORGE END ======================================*/
- 
++
     /** @deprecated */
     @Deprecated
+    public Holder.Reference<Block> m_204297_() {
+       return this.f_204296_;
+    }
++
++   // CraftBukkit start
++   public int getExpDrop(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, ItemStack itemstack) {
++      return this.getExpDrop(blockState, serverLevel, blockPos, EnchantmentHelper.m_44843_(Enchantments.f_44987_, itemstack), EnchantmentHelper.m_44843_(Enchantments.f_44985_, itemstack));
++   }
++   // CraftBukkit end
+ 
+    public static final class BlockStatePairKey {
+       private final BlockState f_49980_;

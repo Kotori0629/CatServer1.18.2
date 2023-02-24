@@ -16,13 +16,14 @@
  import net.minecraft.world.inventory.AbstractContainerMenu;
  import net.minecraft.world.inventory.ContainerListener;
  import net.minecraft.world.inventory.ContainerSynchronizer;
-@@ -132,8 +_,11 @@
+@@ -132,8 +_,12 @@
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Score;
 +import net.minecraft.world.scores.Scoreboard;
  import net.minecraft.world.scores.Team;
  import net.minecraft.world.scores.criteria.ObjectiveCriteria;
++import org.bukkit.Location;
 +import org.bukkit.WeatherType;
 +import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
  import org.slf4j.Logger;
@@ -312,7 +313,18 @@
     }
  
     public void m_6674_(InteractionHand p_9031_) {
-@@ -1350,21 +_,23 @@
+@@ -1345,28 +_,37 @@
+       return this.f_8909_;
+    }
+ 
++   // CraftBukkit start
+    public void m_8999_(ServerLevel p_9000_, double p_9001_, double p_9002_, double p_9003_, float p_9004_, float p_9005_) {
++      this.teleportTo(p_9000_, p_9001_, p_9002_, p_9003_, p_9004_, p_9005_, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.UNKNOWN);
++   }
++
++   public void teleportTo(ServerLevel p_9000_, double p_9001_, double p_9002_, double p_9003_, float p_9004_, float p_9005_, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause) {
++      // CraftBukkit end
+       this.m_9213_(this);
        this.m_8127_();
        if (p_9000_ == this.f_19853_) {
           this.f_8906_.m_9774_(p_9001_, p_9002_, p_9003_, p_9004_, p_9005_);
@@ -335,9 +347,13 @@
           this.f_8924_.m_6846_().m_11229_(this, p_9000_);
           this.f_8924_.m_6846_().m_11292_(this);
 +         net.minecraftforge.event.ForgeEventFactory.firePlayerChangedDimensionEvent(this, serverlevel.m_46472_(), p_9000_.m_46472_());
++         this.getBukkitEntity().teleport(new Location(p_9000_.getWorld(), p_9001_, p_9002_, p_9003_, p_9004_, p_9005_), cause);
        }
- 
+-
++      // CraftBukkit end
     }
+ 
+    @Nullable
 @@ -1387,6 +_,7 @@
     }
  
