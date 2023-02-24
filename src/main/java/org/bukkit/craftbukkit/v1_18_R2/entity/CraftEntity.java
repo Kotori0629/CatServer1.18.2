@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.v1_18_R2.entity;
 
+import catserver.server.entity.*;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
@@ -135,9 +136,11 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
                             else if (entity instanceof Mule) { return new CraftMule(server, (Mule) entity); }
                             else if (entity instanceof TraderLlama) { return new CraftTraderLlama(server, (TraderLlama) entity); }
                             else if (entity instanceof Llama) { return new CraftLlama(server, (Llama) entity); }
+                            else return new CraftCustomChestHorse(server, (AbstractChestedHorse) entity); // CatServer
                         } else if (entity instanceof Horse) { return new CraftHorse(server, (Horse) entity); }
                         else if (entity instanceof SkeletonHorse) { return new CraftSkeletonHorse(server, (SkeletonHorse) entity); }
                         else if (entity instanceof ZombieHorse) { return new CraftZombieHorse(server, (ZombieHorse) entity); }
+                        else return new CraftCustomHorse(server, (AbstractHorse) entity); // CatServer
                     }
                     else if (entity instanceof Rabbit) { return new CraftRabbit(server, (Rabbit) entity); }
                     else if (entity instanceof PolarBear) { return new CraftPolarBear(server, (PolarBear) entity); }
@@ -256,6 +259,10 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
             else if (entity instanceof ThrownPotion) { return new CraftThrownPotion(server, (ThrownPotion) entity); }
             else if (entity instanceof ThrownEnderpearl) { return new CraftEnderPearl(server, (ThrownEnderpearl) entity); }
             else if (entity instanceof ThrownExperienceBottle) { return new CraftThrownExpBottle(server, (ThrownExperienceBottle) entity); }
+            // CatServer start
+            else if (entity instanceof ThrowableItemProjectile) { return new CraftCustomProjectile(server, entity); }
+            else return new CraftCustomEntity(server, entity);
+            // CatServer end
         }
         else if (entity instanceof FallingBlockEntity) { return new CraftFallingBlock(server, (FallingBlockEntity) entity); }
         else if (entity instanceof AbstractHurtingProjectile) {
@@ -278,6 +285,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
             else if (entity instanceof MinecartSpawner) { return new CraftMinecartMobSpawner(server, (MinecartSpawner) entity); }
             else if (entity instanceof Minecart) { return new CraftMinecartRideable(server, (Minecart) entity); }
             else if (entity instanceof MinecartCommandBlock) { return new CraftMinecartCommand(server, (MinecartCommandBlock) entity); }
+            else return new CraftCustomMinecart(server, (AbstractMinecart) entity); // CatServer
         } else if (entity instanceof HangingEntity) {
             if (entity instanceof Painting) { return new CraftPainting(server, (Painting) entity); }
             else if (entity instanceof ItemFrame) {
@@ -294,6 +302,10 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
         else if (entity instanceof EvokerFangs) { return new CraftEvokerFangs(server, (EvokerFangs) entity); }
         else if (entity instanceof LlamaSpit) { return new CraftLlamaSpit(server, (LlamaSpit) entity); }
         else if (entity instanceof Marker) { return new CraftMarker(server, (Marker) entity); }
+        // CatServer start
+        else if (entity instanceof Projectile) { return new CraftCustomProjectile(server, entity); }
+        else return new CraftCustomEntity(server, entity);
+        // CatServer end
         // CHECKSTYLE:ON
 
         throw new AssertionError("Unknown entity " + (entity == null ? null : entity.getClass()));

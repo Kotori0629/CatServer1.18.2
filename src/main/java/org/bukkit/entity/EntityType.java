@@ -1,5 +1,6 @@
 package org.bukkit.entity;
 
+import catserver.server.entity.CraftCustomEntity;
 import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,10 @@ public enum EntityType implements Keyed {
      * Spawn with {@link World#dropItem(Location, ItemStack)} or {@link
      * World#dropItemNaturally(Location, ItemStack)}
      */
+    /**
+     * Mod Custom
+     */
+    MOD_CUSTOM("mod_custom", CraftCustomEntity.class, -1, false),
     DROPPED_ITEM("item", Item.class, 1, false),
     /**
      * An experience orb.
