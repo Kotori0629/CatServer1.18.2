@@ -17,18 +17,18 @@ public class Util {
 			}
 			return md.digest().collect {String.format "%02x", it}.join()
 		}
-        File.metaClass.getSha1 = { !delegate.exists() ? null : delegate.sha1() }
-
+		File.metaClass.getSha1 = { !delegate.exists() ? null : delegate.sha1() }
+	
 		File.metaClass.json = { -> new JsonSlurper().parseText(delegate.text) }
-        File.metaClass.getJson = { return delegate.exists() ? new JsonSlurper().parse(delegate) : [:] }
-        File.metaClass.setJson = { json -> delegate.text = new JsonBuilder(json).toPrettyString() }
-
+		File.metaClass.getJson = { return delegate.exists() ? new JsonSlurper().parse(delegate) : [:] }
+		File.metaClass.setJson = { json -> delegate.text = new JsonBuilder(json).toPrettyString() }
+		
 		Date.metaClass.iso8601 = { ->
 			def format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 			def result = format.format(delegate)
 			return result[0..21] + ':' + result[22..-1]
 		}
-
+        
         String.metaClass.rsplit = { String del, int limit = -1 ->
             def lst = new ArrayList()
             def x = 0, idx
@@ -41,7 +41,7 @@ public class Util {
             return lst
         }
 	}
-
+	
 	public static String[] getClasspath(project, libs, artifact) {
 		def ret = []
 		artifactTree(project, artifact).each { key, lib ->
@@ -52,6 +52,48 @@ public class Util {
 		return ret
 	}
 
+	public static def getArtifactsOffline(project, config, classifiers) {
+		def ret = [:]
+		config.resolvedConfiguration.resolvedArtifacts.each {
+			def art = [
+					group: it.moduleVersion.id.group,
+					name: it.moduleVersion.id.name,
+					version: it.moduleVersion.id.version,
+					classifier: it.classifier,
+					extension: it.extension,
+					file: it.file
+			]
+			def key = art.group + ':' + art.name
+			def folder = "${art.group.replace('.', '/')}/${art.name}/${art.version}/"
+			def filename = "${art.name}-${art.version}"
+			if (art.classifier != null)
+				filename += "-${art.classifier}"
+			filename += ".${art.extension}"
+			def path = "${folder}${filename}"
+			def url = "http://127.0.0.1/${path}"
+			//TODO remove when Mojang launcher is updated
+			if (!classifiers && art.classifier != null) {
+				//Mojang launcher doesn't currently support classifiers, so... move it to part of the version, and force the extension to 'jar'
+				// However, keep the path normal so that our mirror system works.
+				art.version = "${art.version}-${art.classifier}"
+				art.classifier = null
+				art.extension = 'jar'
+			}
+			ret[key] = [
+					name: "${art.group}:${art.name}:${art.version}" + (art.classifier == null ? '' : ":${art.classifier}") + (art.extension == 'jar' ? '' : "@${art.extension}"),
+					downloads: [
+							artifact: [
+									path: path,
+									url: url,
+									sha1: sha1(art.file),
+									size: art.file.length()
+							]
+					]
+			]
+		}
+		return ret
+	}
+	
 	public static def getArtifacts(project, config, classifiers) {
 		def ret = [:]
 		config.resolvedConfiguration.resolvedArtifacts.each {
@@ -73,9 +115,12 @@ public class Util {
 			def url = "https://libraries.minecraft.net/${path}"
 			if (!checkExists(url)) {
 				url = "https://maven.minecraftforge.net/${path}"
+				if (!checkExists(url)) {
+					url = "https://hub.spigotmc.org/nexus/content/groups/public/${path}"
+				}
 			}
 			//TODO remove when Mojang launcher is updated
-			if (!classifiers && art.classifier != null) {
+			if (!classifiers && art.classifier != null) { 
 				//Mojang launcher doesn't currently support classifiers, so... move it to part of the version, and force the extension to 'jar'
 				// However, keep the path normal so that our mirror system works.
 				art.version = "${art.version}-${art.classifier}"
@@ -96,14 +141,14 @@ public class Util {
 		}
 		return ret
 	}
-
-    public static def getMavenPath(task) {
+    
+    public static def getMavenPath(task) {        
         def classifier = task.archiveClassifier.get()
         def dep = "${task.project.group}:${task.project.name}:${task.project.version}" + (classifier == '' ? '' : ':' + classifier)
         return "${task.project.group.replace('.', '/')}/${task.project.name}/${task.project.version}/${task.project.name}-${task.project.version}".toString() + (classifier == '' ? '' : '-' + classifier) + '.jar'
     }
-
-    public static def getMavenDep(task) {
+    
+    public static def getMavenDep(task) {        
         def classifier = task.archiveClassifier.get()
         return "${task.project.group}:${task.project.name}:${task.project.version}" + (classifier == '' ? '' : ':' + classifier)
     }
@@ -127,7 +172,7 @@ public class Util {
 		def files = cfg.resolve()
 		return getArtifacts(project, cfg, true)
 	}
-
+	
 	private static boolean checkExists(url) {
 		try {
 			def code = new URL(url).openConnection().with {
@@ -142,9 +187,4 @@ public class Util {
 			throw e
 		}
 	}
-
-    public static String getLatestForgeVersion(mcVersion) {
-        def json = new JsonSlurper().parseText(new URL("https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json").getText("UTF-8"))
-        return json.promos["$mcVersion-latest"]
-    }
 }

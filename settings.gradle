@@ -7,6 +7,7 @@ pluginManagement {
 
 rootProject.name = 'CatServer'
 
+include 'foxlaunch'
 include 'fmlloader'
 include 'fmlcore'
 include 'mclanguage'
