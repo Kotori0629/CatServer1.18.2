@@ -325,27 +325,6 @@
 @@ -853,24 +969,37 @@
          this.entityManager.addNewEntity(entityplayer);
      }
- 
-     public boolean tryAddFreshEntityWithPassengers(Entity entity) {
--        Stream stream = entity.getSelfAndPassengers().map(Entity::getUUID);
-+        // CraftBukkit start
-+        return this.tryAddFreshEntityWithPassengers(entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.DEFAULT);
-+    }
-+
-+    public boolean tryAddFreshEntityWithPassengers(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
-+        // CraftBukkit end
-+        Stream<UUID> stream = entity.getSelfAndPassengers().map(Entity::getUUID); // CraftBukkit - decompile error
-         PersistentEntitySectionManager persistententitysectionmanager = this.entityManager;
- 
-         Objects.requireNonNull(this.entityManager);
-         if (stream.anyMatch(persistententitysectionmanager::isLoaded)) {
-             return false;
-         } else {
--            this.addFreshEntityWithPassengers(entity);
-+            this.addFreshEntityWithPassengers(entity, reason); // CraftBukkit
-             return true;
-         }
-     }
 @@ -884,10 +1013,32 @@
          entityplayer.remove(entity_removalreason);
      }

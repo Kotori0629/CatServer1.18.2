@@ -372,7 +372,7 @@
        Entity entity = this.m_142646_().m_142694_(p_8854_.m_142081_());
        if (entity != null) {
           f_8566_.warn("Force-added player with duplicate UUID {}", (Object)p_8854_.m_142081_().toString());
-@@ -775,17 +_,36 @@
+@@ -775,26 +_,55 @@
           this.m_143261_((ServerPlayer)entity, Entity.RemovalReason.DISCARDED);
        }
  
@@ -407,11 +407,31 @@
 +            return false;
 +         }
        }
-    }
++   }
 +   // CatServer end
++
++   // CatServer start
++   private CreatureSpawnEvent.SpawnReason catserver$bukkitReason = CreatureSpawnEvent.SpawnReason.DEFAULT;
++   public boolean tryAddFreshEntityWithPassengers(Entity p_8861_, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason reason) {
++      this.catserver$bukkitReason = reason;
++      return m_8860_(p_8861_);
+    }
  
     public boolean m_8860_(Entity p_8861_) {
        if (p_8861_.m_142428_().map(Entity::m_142081_).anyMatch(this.f_143244_::m_157550_)) {
+          return false;
+       } else {
+-         this.m_47205_(p_8861_);
++         var reason = this.catserver$bukkitReason;
++         this.catserver$bukkitReason = null; // CatServer - reset
++         this.addFreshEntityWithPassengers(p_8861_, reason); // CraftBukkit
+          return true;
+       }
+    }
++   // CatServer end
+ 
+    public void m_8712_(LevelChunk p_8713_) {
+       p_8713_.m_187957_();
 @@ -805,6 +_,20 @@
        p_143262_.m_142687_(p_143263_);
     }
