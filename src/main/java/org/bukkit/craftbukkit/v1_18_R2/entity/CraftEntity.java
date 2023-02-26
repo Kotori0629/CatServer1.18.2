@@ -128,6 +128,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
                         if (entity instanceof Wolf) { return new CraftWolf(server, (Wolf) entity); }
                         else if (entity instanceof Cat) { return new CraftCat(server, (Cat) entity); }
                         else if (entity instanceof Parrot) { return new CraftParrot(server, (Parrot) entity); }
+                        else return new CraftTameableAnimal(server, (TamableAnimal) entity); // CatServer
                     }
                     else if (entity instanceof Sheep) { return new CraftSheep(server, (Sheep) entity); }
                     else if (entity instanceof AbstractHorse) {
