@@ -2,16 +2,15 @@ package catserver.server;
 
 import catserver.server.bukkit.CraftCustomEnchantment;
 import catserver.server.bukkit.CraftCustomPotionEffect;
+import catserver.server.entity.CraftCustomEntity;
 import catserver.server.utils.EnumHelper;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import com.google.common.collect.*;
 import io.izzel.arclight.api.Unsafe;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Item;
@@ -22,13 +21,17 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Statistic;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_18_R2.CraftStatistic;
 import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_18_R2.potion.CraftPotionUtil;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.Contract;
@@ -39,19 +42,15 @@ import java.util.*;
 public class BukkitInjector {
 
     public static BiMap<ResourceKey<LevelStem>, World.Environment> environments = HashBiMap.create(ImmutableMap.<ResourceKey<LevelStem>, World.Environment>builder().put(LevelStem.OVERWORLD, World.Environment.NORMAL).put(LevelStem.NETHER, World.Environment.NETHER).put(LevelStem.END, World.Environment.THE_END).build());
-    private static final Map<Block, Material> BLOCK_MATERIAL = Unsafe.getStatic(CraftMagicNumbers.class, "BLOCK_MATERIAL");
-    private static final Map<Item, Material> ITEM_MATERIAL = Unsafe.getStatic(CraftMagicNumbers.class, "ITEM_MATERIAL");
-    private static final Map<Material, Item> MATERIAL_ITEM = Unsafe.getStatic(CraftMagicNumbers.class, "MATERIAL_ITEM");
-    private static final Map<Material, Block> MATERIAL_BLOCK = Unsafe.getStatic(CraftMagicNumbers.class, "MATERIAL_BLOCK");
 
     public static void registerAll() {
         registerMaterials();
         registerEnchantments();
         registerPotionEffects();
-        registerBiomes(); // TODO
-        registerEntities(); // TODO
-        registerVillagerProfessions(); // TODO
-        registerStatistics(); // TODO
+        registerBiomes();
+        registerEntities();
+        registerVillagerProfessions();
+        registerStatistics();
         try {
             for (var field : org.bukkit.Registry.class.getFields()) {
                 if (Modifier.isStatic(field.getModifiers()) && field.get(null) instanceof org.bukkit.Registry.SimpleRegistry<?> registry) {
@@ -63,23 +62,112 @@ public class BukkitInjector {
     }
 
     public static void registerEnvironments(Registry<LevelStem> registry) {
-
+        int i = World.Environment.values().length;
+        List<World.Environment> worldTypes = Lists.newArrayList();
+        for (var entry : registry.entrySet()) {
+            ResourceKey<LevelStem> resourceKey = entry.getKey();
+            World.Environment environment = environments.get(resourceKey);
+            if (environment == null) {
+                String name = standardize(resourceKey.location());
+                environment = EnumHelper.makeEnum(World.Environment.class, name, i++, ImmutableList.of(Integer.TYPE), List.of(i - 1));
+                worldTypes.add(environment);
+                environments.put(resourceKey, environment);
+                CatServer.LOGGER.debug("Registered new Forge DimensionType {}", environment);
+            }
+        }
+        EnumHelper.addEnums(World.Environment.class, worldTypes);
     }
 
     private static void registerStatistics() {
+        BiMap<ResourceLocation, Statistic> STATS = HashBiMap.create(CraftStatistic.statistics);
 
+        int i = Statistic.values().length;
+        List<Statistic> statistics = Lists.newArrayList();
+        for (var stat : ForgeRegistries.STAT_TYPES) {
+            if (stat == Stats.CUSTOM) continue;
+            Statistic statistic = STATS.get(stat.getRegistryName());
+            if (statistic != null) {
+                String statName = standardize(stat.getRegistryName());
+                Statistic.Type type;
+                if (stat.getRegistry() == Registry.ENTITY_TYPE) {
+                    type = Statistic.Type.ENTITY;
+                } else if (stat.getRegistry() == Registry.BLOCK) {
+                    type = Statistic.Type.BLOCK;
+                } else if (stat.getRegistry() == Registry.ITEM) {
+                    type = Statistic.Type.ITEM;
+                } else {
+                    type = Statistic.Type.UNTYPED;
+                }
+                statistic = EnumHelper.makeEnum(Statistic.class, statName, i++, ImmutableList.of(Statistic.Type.class), ImmutableList.of(type));
+                statistics.add(statistic);
+                STATS.put(stat.getRegistryName(), statistic);
+                CatServer.LOGGER.debug("Save-Stats: {}", statistic.name());
+            }
+        }
+        // Custom Stats
+        for (var location : Registry.CUSTOM_STAT) {
+            Statistic statistic = STATS.get(location);
+            if (statistic == null) {
+                String statName = standardize(location);
+                statistic = EnumHelper.makeEnum(Statistic.class, statName, i++, ImmutableList.of(), ImmutableList.of());
+                statistics.add(statistic);
+                STATS.put(location, statistic);
+                CatServer.LOGGER.debug("Save-CustomStats: {}", statistic.name());
+            }
+        }
+        EnumHelper.addEnums(Statistic.class, statistics);
+        CraftStatistic.statistics = STATS;
+        CatServer.LOGGER.info("Registered {} statistic and custom statistic into Bukkit", statistics.size());
     }
 
     private static void registerVillagerProfessions() {
-
+        int i = Villager.Profession.values().length;
+        List<Villager.Profession> professions = Lists.newArrayList();
+        for (var forgeProfessions: ForgeRegistries.PROFESSIONS.getEntries()) {
+            ResourceLocation location = forgeProfessions.getKey().location();
+            if (!location.getNamespace().equals(NamespacedKey.MINECRAFT)) {
+                var newPfName = standardize(location);
+                var bukkitProfessions = EnumHelper.makeEnum(Villager.Profession.class, newPfName, i++, ImmutableList.of(), ImmutableList.of());
+                professions.add(bukkitProfessions);
+                CatServer.LOGGER.debug("Save-VillagerProfessions: {}", bukkitProfessions.name());
+            }
+        }
+        EnumHelper.addEnums(Villager.Profession.class, professions);
+        CatServer.LOGGER.info("Registered {} villager professions into Bukkit", professions.size());
     }
 
     private static void registerEntities() {
+        Map<String, EntityType> NAME_MAP = Unsafe.getStatic(EntityType.class, "NAME_MAP");
+        Map<Short, EntityType> ID_MAP = Unsafe.getStatic(EntityType.class, "ID_MAP");
 
+        int i = EntityType.values().length;
+        List<EntityType> entityTypes = Lists.newArrayList();
+        for (var entry : ForgeRegistries.ENTITIES.getEntries()) {
+            ResourceLocation location = entry.getValue().getRegistryName();
+            String entityName = standardize(location);
+            int typeId = entityName.hashCode();
+            EntityType entityType = EnumHelper.makeEnum(EntityType.class, entityName, i++, List.of(String.class, Class.class, Integer.TYPE, Boolean.TYPE), List.of(entityName.toLowerCase(), CraftCustomEntity.class, typeId, false));
+            NAME_MAP.put(entityName.toLowerCase(), entityType);
+            ID_MAP.put((short) typeId, entityType);
+            entityTypes.add(entityType);
+            CatServer.LOGGER.debug("Save-EntityType: {} - {}", location, entityType);
+        }
+        EnumHelper.addEnums(EntityType.class, entityTypes);
+        CatServer.LOGGER.info("Registered {} entityTypes into Bukkit", entityTypes.size());
     }
 
     private static void registerBiomes() {
-
+        int i = Biome.values().length;
+        List<Biome> enumBiomes = Lists.newArrayList();
+        for (var biome : ForgeRegistries.BIOMES.getEntries()) {
+            ResourceLocation location = biome.getKey().location();
+            String biomeName = standardize(location);
+            Biome bukkitBiome = EnumHelper.makeEnum(Biome.class, biomeName, i++, ImmutableList.of(), ImmutableList.of());
+            enumBiomes.add(bukkitBiome);
+            CatServer.LOGGER.debug("Save-Biome: {}", bukkitBiome.name());
+        }
+        EnumHelper.addEnums(Biome.class, enumBiomes);
+        CatServer.LOGGER.info("Registered {} biomes into Bukkit", enumBiomes.size());
     }
 
     private static void registerPotionEffects() {
@@ -107,8 +195,8 @@ public class BukkitInjector {
                 CatServer.LOGGER.debug("Save-PotionType: {}", type);
             }
         }
-        CatServer.LOGGER.info("Registered {} new potion type into Bukkit", regularMap.size());
         EnumHelper.addEnums(PotionType.class, potionTypes);
+        CatServer.LOGGER.info("Registered {} new potion type into Bukkit", regularMap.size());
     }
 
     private static void registerEnchantments() {
@@ -125,6 +213,11 @@ public class BukkitInjector {
     }
 
     private static void registerMaterials() {
+        Map<Block, Material> BLOCK_MATERIAL = Unsafe.getStatic(CraftMagicNumbers.class, "BLOCK_MATERIAL");
+        Map<Item, Material> ITEM_MATERIAL = Unsafe.getStatic(CraftMagicNumbers.class, "ITEM_MATERIAL");
+        Map<Material, Item> MATERIAL_ITEM = Unsafe.getStatic(CraftMagicNumbers.class, "MATERIAL_ITEM");
+        Map<Material, Block> MATERIAL_BLOCK = Unsafe.getStatic(CraftMagicNumbers.class, "MATERIAL_BLOCK");
+
         int length = Material.values().length;
         List<Material> values = Lists.newArrayList();
         int blocks = 0, items = 0;
@@ -157,7 +250,6 @@ public class BukkitInjector {
                 e.printStackTrace();
             }
         }
-        CatServer.LOGGER.info("Registered {} blocks into Bukkit", blocks);
 
         for (var entry : ForgeRegistries.ITEMS.getEntries()) {
             var location = entry.getKey().location();
@@ -186,6 +278,7 @@ public class BukkitInjector {
             MATERIAL_ITEM.put(material, item);
         }
         EnumHelper.addEnums(Material.class, values);
+        CatServer.LOGGER.info("Registered {} blocks into Bukkit", blocks);
         CatServer.LOGGER.info("Registered {} items into Bukkit", items);
     }
 

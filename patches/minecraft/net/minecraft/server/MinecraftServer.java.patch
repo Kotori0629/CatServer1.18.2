@@ -1,8 +1,9 @@
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1,5 +_,6 @@
+@@ -1,5 +_,7 @@
  package net.minecraft.server;
  
++import catserver.server.BukkitInjector;
 +import catserver.server.utils.MinecraftServerHelper;
  import com.google.common.base.Splitter;
  import com.google.common.collect.ImmutableList;
@@ -35,7 +36,7 @@
  import net.minecraft.network.chat.Component;
  import net.minecraft.network.chat.TextComponent;
  import net.minecraft.network.chat.TranslatableComponent;
-@@ -144,1693 +_,1970 @@
+@@ -144,1693 +_,1971 @@
  import net.minecraft.world.level.levelgen.WorldGenSettings;
  import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
  import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
@@ -526,6 +527,7 @@
 +        }
 +
 +        ServerLevel serverlevel = new ServerLevel(this, this.f_129738_, this.f_129744_, serverleveldata, Level.f_46428_, holder, p_129816_, chunkgenerator, flag, j, list, true);
++        BukkitInjector.registerEnvironments(this.f_129749_.m_5961_().m_204655_()); // CatServer
 +        this.f_129762_.put(Level.f_46428_, this.worldInit(serverlevel)); // CatServer
 +        DimensionDataStorage dimensiondatastorage = serverlevel.m_8895_();
 +        this.m_129841_(dimensiondatastorage);
