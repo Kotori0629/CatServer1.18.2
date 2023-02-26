@@ -1,8 +1,10 @@
 package org.bukkit;
 
+import catserver.server.utils.EnumHelper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -3925,12 +3927,13 @@ public enum Material implements Keyed {
 
     private final int id;
     private final Constructor<? extends MaterialData> ctor;
-    private static final Map<String, Material> BY_NAME = Maps.newHashMap();
+    public static final Map<String, Material> BY_NAME = Maps.newHashMap();
     private final int maxStack;
     private final short durability;
     public final Class<?> data;
     private final boolean legacy;
     private final NamespacedKey key;
+    private boolean isModed, isBlock, isItem; // CatServer
 
     private Material(final int id) {
         this(id, 64);
@@ -3953,12 +3956,25 @@ public enum Material implements Keyed {
     }
 
     private Material(final int id, final int stack, final int durability, /*@NotNull*/ final Class<?> data) {
+        // CatServer start
+        this(id, stack, durability, data, null, false, false);
+    }
+
+    private Material(final int id, NamespacedKey key, boolean block, boolean item) {
+        this(id, 64, 0, MaterialData.class, key, block, item);
+    }
+
+    private Material(final int id, final int stack, final int durability, /*@NotNull*/ final Class<?> data, NamespacedKey key, boolean block, boolean item) {
         this.id = id;
         this.durability = (short) durability;
         this.maxStack = stack;
         this.data = data;
         this.legacy = this.name().startsWith(LEGACY_PREFIX);
-        this.key = NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT));
+        this.key = key == null ? NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT)) : key;
+        this.isModed = key != null;
+        this.isBlock = block;
+        this.isItem = item;
+        // CatServer end
         // try to cache the constructor for this material
         try {
             if (MaterialData.class.isAssignableFrom(data)) {
@@ -4102,6 +4118,7 @@ public enum Material implements Keyed {
      * @return true if this material is a block
      */
     public boolean isBlock() {
+        if (this.isModed) return this.isBlock; // CatServer
         switch (this) {
             //<editor-fold defaultstate="collapsed" desc="isBlock">
             case ACACIA_BUTTON:
@@ -7571,6 +7588,7 @@ public enum Material implements Keyed {
      * @return true if this material is an item
      */
     public boolean isItem() {
+        if (this.isModed) return this.isItem; // CatServer
         switch (this) {
             //<editor-fold defaultstate="collapsed" desc="isItem">
             case ACACIA_WALL_SIGN:
@@ -9792,4 +9810,25 @@ public enum Material implements Keyed {
         return Bukkit.getUnsafe().getCreativeCategory(this);
     }
 
+    public static Material addMaterial(String name, int id, NamespacedKey key, boolean block, boolean item) {
+        try {
+            var material = EnumHelper.makeEnum(Material.class, name, id, List.of(Integer.TYPE, NamespacedKey.class, Boolean.TYPE, Boolean.TYPE), List.of(id, key, block, item));
+            BY_NAME.put(name, material);
+            return material;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Material addMaterial(String name, int id, Class<?> data, NamespacedKey key, boolean block, boolean item) {
+        try {
+            var material = EnumHelper.makeEnum(Material.class, name, id, List.of(Integer.TYPE, Integer.TYPE, Integer.TYPE, Class.class, NamespacedKey.class, Boolean.TYPE, Boolean.TYPE), List.of(id, 64, 0, data, key, block, item));
+            BY_NAME.put(name, material);
+            return material;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
