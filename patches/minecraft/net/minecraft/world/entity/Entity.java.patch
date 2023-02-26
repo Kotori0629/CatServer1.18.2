@@ -454,7 +454,7 @@
        this.f_146795_ = null;
     }
  
-@@ -3062,8 +_,81 @@
+@@ -3062,9 +_,91 @@
        return true;
     }
  
@@ -530,9 +530,19 @@
 +
     public Level m_183503_() {
        return this.f_19853_;
-+   }
+    }
 +
 +   public void teleportTo(ServerLevel handle, BlockPos blockPos) {
-    }
++   }
++
++   // CraftBukkit start
++   public void postTick() {
++      // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
++      if (!(this instanceof ServerPlayer)) {
++         this.m_20157_();
++      }
++   }
++   // CraftBukkit end
  
     @FunctionalInterface
+    public interface MoveFunction {

@@ -95,16 +95,7 @@
 @@ -426,6 +533,15 @@
          this.baseTick();
      }
- 
-+    // CraftBukkit start
-+    public void postTick() {
-+        // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
-+        if (!(this instanceof EntityPlayer)) {
-+            this.handleNetherPortal();
-+        }
-+    }
-+    // CraftBukkit end
-+
+     
      public void baseTick() {
          this.level.getProfiler().push("entityBaseTick");
          this.feetBlockState = null;

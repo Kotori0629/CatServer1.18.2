@@ -1,8 +1,9 @@
 --- a/net/minecraft/world/entity/item/FallingBlockEntity.java
 +++ b/net/minecraft/world/entity/item/FallingBlockEntity.java
-@@ -1,6 +_,8 @@
+@@ -1,6 +_,9 @@
  package net.minecraft.world.entity.item;
  
++import catserver.server.CatServerCaptures;
  import com.mojang.logging.LogUtils;
 +
 +import java.util.concurrent.atomic.AtomicReference;
@@ -27,19 +28,18 @@
     private int f_31940_ = 40;
     private float f_149641_;
     @Nullable
-@@ -72,10 +_,19 @@
+@@ -72,10 +_,18 @@
        this.m_31959_(this.m_142538_());
     }
  
 +   // CatServer start
-+   private static AtomicReference<CreatureSpawnEvent.SpawnReason> catserver$fallReason = new AtomicReference<>();
 +   public static FallingBlockEntity fall(Level p_201972_, BlockPos p_201973_, BlockState p_201974_, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason spawnReason) {
-+      FallingBlockEntity.catserver$fallReason.set(spawnReason);
++      CatServerCaptures.getCatServerCaptures().captureSpawnReason(spawnReason);
 +      return FallingBlockEntity.m_201971_(p_201972_, p_201973_, p_201974_);
 +   }
 +
     public static FallingBlockEntity m_201971_(Level p_201972_, BlockPos p_201973_, BlockState p_201974_) {
-+      var spawnReason = FallingBlockEntity.catserver$fallReason.getAndSet(null);
++      var spawnReason = CatServerCaptures.getCatServerCaptures().getCaptureSpawnReason() == null ? CreatureSpawnEvent.SpawnReason.DEFAULT : CatServerCaptures.getCatServerCaptures().getCaptureSpawnReason();
        FallingBlockEntity fallingblockentity = new FallingBlockEntity(p_201972_, (double)p_201973_.m_123341_() + 0.5D, (double)p_201973_.m_123342_(), (double)p_201973_.m_123343_() + 0.5D, p_201974_.m_61138_(BlockStateProperties.f_61362_) ? p_201974_.m_61124_(BlockStateProperties.f_61362_, Boolean.valueOf(false)) : p_201974_);
 +      if (CraftEventFactory.callEntityChangeBlockEvent(fallingblockentity, p_201973_, p_201974_.m_60819_().m_76188_()).isCancelled()) return fallingblockentity; // CraftBukkit
        p_201972_.m_7731_(p_201973_, p_201974_.m_60819_().m_76188_(), 3);
