@@ -37,30 +37,6 @@
 @@ -238,9 +254,16 @@
          }
      }
- 
-+    // CraftBukkit start
-     @Nullable
-     @Override
-     public IBlockData setBlockState(BlockPosition blockposition, IBlockData iblockdata, boolean flag) {
-+        return this.setBlockState(blockposition, iblockdata, flag, true);
-+    }
-+
-+    @Nullable
-+    public IBlockData setBlockState(BlockPosition blockposition, IBlockData iblockdata, boolean flag, boolean doPlace) {
-+        // CraftBukkit end
-         int i = blockposition.getY();
-         ChunkSection chunksection = this.getSection(this.getSectionIndex(i));
-         boolean flag1 = chunksection.hasOnlyAir();
-@@ -279,7 +302,8 @@
-                 if (!chunksection.getBlockState(j, k, l).is(block)) {
-                     return null;
-                 } else {
--                    if (!this.level.isClientSide) {
-+                    // CraftBukkit - Don't place while processing the BlockPlaceEvent, unless it's a BlockContainer. Prevents blocks such as TNT from activating when cancelled.
-+                    if (!this.level.isClientSide && doPlace && (!this.level.captureBlockStates || block instanceof net.minecraft.world.level.block.BlockTileEntity)) {
-                         iblockdata.onPlace(this.level, blockposition, iblockdata1, flag);
-                     }
- 
 @@ -324,7 +348,12 @@
  
      @Nullable
