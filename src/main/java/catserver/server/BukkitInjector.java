@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potions;
@@ -29,8 +30,10 @@ import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_18_R2.potion.CraftPotionUtil;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_18_R2.util.CraftSpawnCategory;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.SpawnCategory;
 import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -51,6 +54,7 @@ public class BukkitInjector {
         registerEntities();
         registerVillagerProfessions();
         registerStatistics();
+        registerSpawnCategory();
         try {
             for (var field : org.bukkit.Registry.class.getFields()) {
                 if (Modifier.isStatic(field.getModifiers()) && field.get(null) instanceof org.bukkit.Registry.SimpleRegistry<?> registry) {
@@ -59,6 +63,23 @@ public class BukkitInjector {
             }
         } catch (Throwable ignored) {
         }
+    }
+
+    private static void registerSpawnCategory() {
+        int i = SpawnCategory.values().length;
+        List<SpawnCategory> categories = Lists.newArrayList();
+        for (var category : MobCategory.values()) {
+            try {
+                CraftSpawnCategory.toBukkit(category);
+            } catch (Exception e) {
+                String name = category.name();
+                SpawnCategory spawnCategory = EnumHelper.makeEnum(SpawnCategory.class, name, i++, ImmutableList.of(), ImmutableList.of());
+                categories.add(spawnCategory);
+                CatServer.LOGGER.debug("Save-SpawnCategory: {}", name);
+            }
+        }
+        EnumHelper.addEnums(SpawnCategory.class, categories);
+        CatServer.LOGGER.info("Registered {} spawn categories into Bukkit", categories.size());
     }
 
     public static void registerEnvironments(Registry<LevelStem> registry) {
