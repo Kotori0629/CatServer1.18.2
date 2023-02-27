@@ -1089,6 +1089,26 @@ project(':forge') {
                     'Implementation-Timestamp': '2022-01-18T01:39:57.247731535Z',
                     'Git-Commit':               '26de0917',
                     'Git-Branch':               'main'
+            ] as LinkedHashMap,
+            'catserver/': [
+                    'Specification-Title'   : MCP_VERSION,
+                    'Specification-Vendor'  : 'CatServerMC',
+                    'Specification-Version':  project.version.substring(MC_VERSION.length() + 1),
+                    'Implementation-Title'  : 'CatServer',
+                    'Implementation-Version': '1.18.2-' + gitVersion,
+                    'Implementation-Vendor' : 'CatServerMC'
+            ] as LinkedHashMap,
+            'org/bukkit/craftbukkit/v1_18_R2/': [
+                    'Specification-Title'   : MCP_VERSION,
+                    'Specification-Vendor'  : 'SpigotMC',
+                    'Specification-Version':  '1.18.2',
+                    'Implementation-Title'  : 'Spigot',
+                    'Implementation-Version': '1.18.2-' + gitVersion,
+                    'Implementation-Vendor' : 'SpigotMC'
+            ] as LinkedHashMap,
+            'io/izzel/arclight/': [
+                    'Implementation-Title'  : "Arclight",
+                    'Implementation-Vendor' : 'Arclight Team',
             ] as LinkedHashMap
         ]
     }
