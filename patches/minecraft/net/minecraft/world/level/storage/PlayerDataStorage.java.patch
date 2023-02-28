@@ -18,14 +18,17 @@
  import org.slf4j.Logger;
  
  public class PlayerDataStorage {
-@@ -31,6 +_,7 @@
+@@ -31,8 +_,10 @@
           File file2 = new File(this.f_78427_, p_78434_.m_20149_() + ".dat");
           File file3 = new File(this.f_78427_, p_78434_.m_20149_() + ".dat_old");
           Util.m_137462_(file2, file1, file3);
 +         net.minecraftforge.event.ForgeEventFactory.firePlayerSavingEvent(p_78434_, f_78427_, p_78434_.m_20149_());
        } catch (Exception exception) {
           f_78426_.warn("Failed to save player data for {}", (Object)p_78434_.m_7755_().getString());
++         exception.printStackTrace();
        }
+ 
+    }
 @@ -51,13 +_,44 @@
        }
  
