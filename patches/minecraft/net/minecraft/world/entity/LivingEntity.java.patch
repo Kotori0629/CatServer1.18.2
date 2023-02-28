@@ -1,8 +1,9 @@
 --- a/net/minecraft/world/entity/LivingEntity.java
 +++ b/net/minecraft/world/entity/LivingEntity.java
-@@ -1,5 +_,6 @@
+@@ -1,5 +_,7 @@
  package net.minecraft.world.entity;
  
++import catserver.server.CatServerCaptures;
 +import com.google.common.base.Function;
  import com.google.common.base.Objects;
  import com.google.common.collect.ImmutableList;
@@ -198,19 +199,18 @@
                 this.m_8127_();
              }
           } else if (this.m_20146_() < this.m_6062_()) {
-@@ -618,13 +_,23 @@
+@@ -618,13 +_,22 @@
        this.f_147183_ = p_147245_;
     }
  
 +   // CatServer start
-+   protected AtomicBoolean catserver$isSlient = new AtomicBoolean(false);
-+   protected void equipEventAndSound(ItemStack p_147219_, boolean slient) {
-+      this.catserver$isSlient.set(slient);
++   protected void equipEventAndSound(ItemStack p_147219_, boolean silent) {
++      CatServerCaptures.getCatServerCaptures().captureIsSlient(silent);
 +      this.m_147218_(p_147219_);
 +   }
 +
     protected void m_147218_(ItemStack p_147219_) {
-+      var slient = this.catserver$isSlient.getAndSet(false);
++      var slient = CatServerCaptures.getCatServerCaptures().getCaptureIsSlient();
        SoundEvent soundevent = p_147219_.m_150920_();
 -      if (!p_147219_.m_41619_() && soundevent != null && !this.m_5833_()) {
 +      if (!p_147219_.m_41619_() && soundevent != null && !this.m_5833_() && !slient) {
