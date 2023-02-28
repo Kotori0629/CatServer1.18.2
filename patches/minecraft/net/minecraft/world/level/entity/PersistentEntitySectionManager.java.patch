@@ -42,6 +42,15 @@
     void m_157509_(long p_157510_, EntitySection<T> p_157511_) {
        if (p_157511_.m_156833_()) {
           this.f_157495_.m_156897_(p_157510_);
+@@ -61,7 +_,7 @@
+ 
+    private boolean m_157557_(T p_157558_) {
+       if (!this.f_157491_.add(p_157558_.m_142081_())) {
+-         f_157490_.warn("UUID of added entity already exists: {}", (Object)p_157558_);
++         f_157490_.debug("UUID of added entity already exists: {}", (Object)p_157558_); // CatServer - warn -> debug
+          return false;
+       } else {
+          return true;
 @@ -72,7 +_,16 @@
        return this.m_157538_(p_157534_, false);
     }
