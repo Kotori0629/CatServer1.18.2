@@ -1,7 +1,9 @@
 package catserver.server;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -16,13 +18,15 @@ public class CatServerCaptures {
     private AtomicBoolean doPlace = new AtomicBoolean(true);
     private AtomicInteger spawnerLimit = new AtomicInteger();
     private AtomicInteger createPortalRadius = new AtomicInteger();
-    private AtomicReference<BlockPos> teleportToPos = new AtomicReference<>();
+    private AtomicReference<BlockPos> blockPos = new AtomicReference<>();
+    private AtomicReference<ItemStack> itemstack = new AtomicReference<>();
     private AtomicReference<PlayerTeleportEvent.TeleportCause> changeDimCause = new AtomicReference<>();
     private AtomicInteger searchPortalRadius = new AtomicInteger();
     private AtomicBoolean canCreatePortal = new AtomicBoolean();
     private AtomicBoolean isForceSleep = new AtomicBoolean(false);
     private AtomicBoolean isCallEvent = new AtomicBoolean(true);
     private AtomicBoolean isSilent = new AtomicBoolean(false);
+    private AtomicReference<Direction> direction = new AtomicReference<>();
 
     public void captureEntity(Entity entity) {
         this.entity.set(entity);
@@ -44,8 +48,14 @@ public class CatServerCaptures {
         this.createPortalRadius.set(i);
     }
 
-    public void captureTeleportToPos(BlockPos pos) {
-        this.teleportToPos.set(pos);
+    public void captureBlockPos(BlockPos pos) {
+        this.blockPos.set(pos);
+    }
+    public void captureItemStack(ItemStack itemstack) {
+        this.itemstack.set(itemstack);
+    }
+    public void captureDirection(Direction direction) {
+        this.direction.set(direction);
     }
 
     public void captureChangeDimCause(PlayerTeleportEvent.TeleportCause cause) {
@@ -89,8 +99,16 @@ public class CatServerCaptures {
         return this.createPortalRadius.getAndSet(0);
     }
 
-    public BlockPos getCaptureTeleportPos() {
-        return this.teleportToPos.getAndSet(null);
+    public BlockPos getCaptureBlockPos() {
+        return this.blockPos.getAndSet(null);
+    }
+
+    public ItemStack getCaptureItemStack() {
+        return this.itemstack.getAndSet(null);
+    }
+
+    public Direction getCaptureDirection() {
+        return this.direction.getAndSet(null);
     }
 
     public PlayerTeleportEvent.TeleportCause getCaptureChangeDimCause() {

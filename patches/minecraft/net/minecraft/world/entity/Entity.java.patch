@@ -827,7 +827,7 @@
 +
 +   @Nullable
 +   public Entity teleportTo(ServerLevel p_20118_, BlockPos blockPosition) {
-+      CatServerCaptures.getCatServerCaptures().captureTeleportToPos(blockPosition);
++      CatServerCaptures.getCatServerCaptures().captureBlockPos(blockPosition);
 +      return this.changeDimension(p_20118_, p_20118_.m_8871_());
 +   }
 +
@@ -844,7 +844,7 @@
 +         // CraftBukkit end
           this.f_19853_.m_46473_().m_6180_("reposition");
 -         PortalInfo portalinfo = this.m_7937_(p_20118_);
-+         var bukkitPos = CatServerCaptures.getCatServerCaptures().getCaptureTeleportPos();
++         var bukkitPos = CatServerCaptures.getCatServerCaptures().getCaptureBlockPos();
 +         PortalInfo portalinfo = bukkitPos == null ? teleporter.getPortalInfo(this, p_20118_, this::m_7937_) : new PortalInfo(new Vec3(bukkitPos.m_123341_(), bukkitPos.m_123342_(), bukkitPos.m_123343_()), Vec3.f_82478_, this.f_19857_, this.f_19858_).putCB(p_20118_, null); // CatServer
           if (portalinfo == null) {
              return null;
