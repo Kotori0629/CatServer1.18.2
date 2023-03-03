@@ -124,7 +124,7 @@
     protected boolean f_20899_;
     public float f_20900_;
     public float f_20901_;
-@@ -204,9 +_,9 @@
+@@ -204,10 +_,10 @@
     protected double f_20908_;
     protected double f_20933_;
     protected int f_20934_;
@@ -132,10 +132,12 @@
 +   public boolean f_20948_ = true;
     @Nullable
 -   private LivingEntity f_20949_;
+-   private int f_20950_;
 +   public LivingEntity f_20949_;
-    private int f_20950_;
++   public int f_20950_;
     private LivingEntity f_20951_;
     private int f_20952_;
+    private float f_20953_;
 @@ -225,11 +_,27 @@
     private float f_20931_;
     private float f_20932_;
