@@ -29,7 +29,7 @@
  import net.minecraft.server.level.ServerPlayer;
  import net.minecraft.util.Mth;
  import net.minecraft.world.Container;
-@@ -28,6 +_,12 @@
+@@ -28,6 +_,13 @@
  import net.minecraft.world.item.ItemStack;
  import net.minecraft.world.level.block.Block;
  import net.minecraft.world.level.block.entity.BlockEntity;
@@ -39,6 +39,7 @@
 +import org.bukkit.event.inventory.InventoryDragEvent;
 +import org.bukkit.event.inventory.InventoryType;
 +import org.bukkit.inventory.InventoryView;
++import org.bukkit.inventory.PlayerInventory;
  import org.slf4j.Logger;
  
  public abstract class AbstractContainerMenu {
@@ -57,29 +58,91 @@
     private final IntList f_150395_ = new IntArrayList();
     private ItemStack f_150396_ = ItemStack.f_41583_;
     private int f_182405_;
-@@ -58,6 +_,32 @@
+@@ -58,6 +_,94 @@
     @Nullable
     private ContainerSynchronizer f_150397_;
     private boolean f_150398_;
 +   // CraftBukkit start
 +   public boolean checkReachable = true;
-+   public abstract InventoryView getBukkitView();
++
++   // CatServer start
++   private boolean isBukkitViewCreated;
++
++   public InventoryView bukkitView;
++
++   public InventoryView getBukkitView() {
++      if (!isBukkitViewCreated) {
++         isBukkitViewCreated = true;
++         bukkitView = computeBukkitView();
++         return bukkitView;
++      }
++      return bukkitView;
++   }
++
++   public void setBukkitView(InventoryView iv) {
++      bukkitView = iv;
++      isBukkitViewCreated = true;
++   }
++
++   @Nullable
++   public InventoryView computeBukkitView() {
++      Set<Container> uniqueInventorySet = new java.util.HashSet<>();
++      for(Slot slot : f_38839_) {
++         if (slot.f_40218_ != null) {
++            uniqueInventorySet.add(slot.f_40218_);
++         }
++      }
++      List<Container> inventories = new java.util.ArrayList<>(uniqueInventorySet);
++      Inventory playerInv = null;
++
++      for(java.util.Iterator<Container> it = inventories.iterator(); it.hasNext();) {
++         Container inv = it.next();
++         if(inv instanceof Inventory) {
++            playerInv = (Inventory) inv;
++            it.remove();
++            break;
++         } else if (inv instanceof net.minecraftforge.items.wrapper.PlayerInvWrapper) {
++            playerInv = catserver.server.inventory.CatCustomInventory.getPlayerInv((net.minecraftforge.items.wrapper.PlayerInvWrapper) inv);
++            it.remove();
++            break;
++         }
++      }
++      if(playerInv == null) return null;
++      org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer bukkitPlayer = (org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer) playerInv.f_35978_.getBukkitEntity();
++      org.bukkit.inventory.Inventory craftInv;
++      if(inventories.size() != 1)
++         craftInv = org.bukkit.Bukkit.getServer().createInventory(bukkitPlayer, InventoryType.CHEST);
++      else
++         craftInv = new CraftInventory(inventories.get(0));
++
++      return new org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryView(bukkitPlayer, craftInv, this);
++   }
++
 +   public void transferTo(AbstractContainerMenu other, org.bukkit.craftbukkit.v1_18_R2.entity.CraftHumanEntity player) {
 +      InventoryView source = this.getBukkitView(), destination = other.getBukkitView();
-+      ((CraftInventory) source.getTopInventory()).getInventory().onClose(player);
-+      ((CraftInventory) source.getBottomInventory()).getInventory().onClose(player);
-+      ((CraftInventory) destination.getTopInventory()).getInventory().onOpen(player);
-+      ((CraftInventory) destination.getBottomInventory()).getInventory().onOpen(player);
++      if (source != null) {
++         ((CraftInventory) source.getTopInventory()).getInventory().onClose(player);
++         ((CraftInventory) source.getBottomInventory()).getInventory().onClose(player);
++      }
++      if (destination != null) {
++         ((CraftInventory) destination.getTopInventory()).getInventory().onOpen(player);
++         ((CraftInventory) destination.getBottomInventory()).getInventory().onOpen(player);
++      }
 +   }
++   // CatServer end
++
 +   private Component title;
++
 +   public final Component getTitle() {
 +      Preconditions.checkState(this.title != null, "Title not set");
 +      return this.title;
 +   }
++
 +   public final void setTitle(Component title) {
 +      Preconditions.checkState(this.title == null, "Title already set");
 +      this.title = title;
 +   }
++
 +   public void broadcastCarriedItem() {
 +      this.f_150396_ = this.m_142621_().m_41777_();
 +      if (this.f_150397_ != null) {

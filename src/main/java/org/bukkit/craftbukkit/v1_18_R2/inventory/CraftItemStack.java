@@ -1,6 +1,8 @@
 package org.bukkit.craftbukkit.v1_18_R2.inventory;
 
 import static org.bukkit.craftbukkit.v1_18_R2.inventory.CraftMetaItem.*;
+
+import catserver.server.inventory.CatForgeItemCap;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
@@ -39,7 +41,7 @@ public final class CraftItemStack extends ItemStack {
             return net.minecraft.world.item.ItemStack.EMPTY;
         }
 
-        net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(item, original.getAmount());
+        net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(item, original.getAmount(), original.hasForgeItemCap() ? original.getForgeItemCap().getItemCap() : null); // CatServer
         if (original.hasItemMeta()) {
             setItemMeta(stack, original.getItemMeta());
         }
@@ -63,6 +65,7 @@ public final class CraftItemStack extends ItemStack {
         if (hasItemMeta(original)) {
             stack.setItemMeta(getItemMeta(original));
         }
+        CatForgeItemCap.setItemCap(original, stack); // CatServer
         return stack;
     }
 
@@ -93,6 +96,7 @@ public final class CraftItemStack extends ItemStack {
      */
     private CraftItemStack(net.minecraft.world.item.ItemStack item) {
         this.handle = item;
+        CatForgeItemCap.setItemCap(item, this); // CatServer
     }
 
     private CraftItemStack(ItemStack item) {

@@ -1,6 +1,15 @@
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -11,15 +_,13 @@
+@@ -5,21 +_,22 @@
+ import java.util.stream.Collectors;
+ import java.util.stream.IntStream;
+ import javax.annotation.Nullable;
++
++import catserver.server.inventory.CatCustomInventory;
++import catserver.server.inventory.CatInventoryUtils;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
+ import net.minecraft.core.NonNullList;
  import net.minecraft.nbt.CompoundTag;
  import net.minecraft.network.chat.Component;
  import net.minecraft.network.chat.TranslatableComponent;
@@ -18,7 +27,7 @@
  import net.minecraft.world.inventory.AbstractContainerMenu;
  import net.minecraft.world.inventory.HopperMenu;
  import net.minecraft.world.item.ItemStack;
-@@ -31,6 +_,12 @@
+@@ -31,6 +_,13 @@
  import net.minecraft.world.phys.AABB;
  import net.minecraft.world.phys.shapes.BooleanOp;
  import net.minecraft.world.phys.shapes.Shapes;
@@ -28,6 +37,7 @@
 +import org.bukkit.entity.HumanEntity;
 +import org.bukkit.event.inventory.InventoryMoveItemEvent;
 +import org.bukkit.event.inventory.InventoryPickupItemEvent;
++import org.bukkit.inventory.InventoryHolder;
  
  public class HopperBlockEntity extends RandomizableContainerBlockEntity implements Hopper {
     public static final int f_155547_ = 8;
@@ -82,12 +92,11 @@
        Container container = m_155592_(p_155563_, p_155564_, p_155565_);
        if (container == null) {
           return false;
-@@ -143,7 +_,25 @@
+@@ -143,7 +_,29 @@
              for(int i = 0; i < p_155566_.m_6643_(); ++i) {
                 if (!p_155566_.m_8020_(i).m_41619_()) {
                    ItemStack itemstack = p_155566_.m_8020_(i).m_41777_();
 -                  ItemStack itemstack1 = m_59326_(p_155566_, container, p_155566_.m_7407_(i, 1), direction);
-+                  //ItemStack itemstack1 = addItem(p_155566_, container, p_155566_.removeItem(i, 1), direction);
 +                  // CraftBukkit start - Call event when pushing items into other inventories
 +                  CraftItemStack oitemstack = CraftItemStack.asCraftMirror(p_155566_.m_7407_(i, 1));
 +                  org.bukkit.inventory.Inventory destinationInventory;
@@ -95,9 +104,14 @@
 +                  if (container instanceof CompoundContainer) {
 +                     destinationInventory = new org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryDoubleChest((CompoundContainer) container);
 +                  } else {
-+                     destinationInventory = container.getOwner().getInventory();
++                     // CatServer start
++                     destinationInventory = CatInventoryUtils.getBukkitInventory(container);
 +                  }
-+                  InventoryMoveItemEvent event = new InventoryMoveItemEvent(p_155566_.getOwner().getInventory(), oitemstack.clone(), destinationInventory, true);
++                  InventoryHolder owner = CatInventoryUtils.getOwner((BlockEntity) p_155566_); // TODO : p_155566_
++                  org.bukkit.inventory.Inventory hopperOwner = (owner != null ? owner.getInventory() : new CatCustomInventory(p_155566_).getInventory()); // TODO : p_155566_
++
++                  InventoryMoveItemEvent event = new InventoryMoveItemEvent(hopperOwner, oitemstack.clone(), destinationInventory, true);
++                  // CatServer end
 +                  p_155563_.getCraftServer().getPluginManager().callEvent(event);
 +                  if (event.isCancelled()) {
 +                     p_155566_.m_6836_(i, itemstack);
@@ -118,7 +132,7 @@
        Container container = m_155596_(p_155553_, p_155554_);
        if (container != null) {
           Direction direction = Direction.DOWN;
-@@ -197,7 +_,28 @@
+@@ -197,7 +_,32 @@
        ItemStack itemstack = p_59356_.m_8020_(p_59357_);
        if (!itemstack.m_41619_() && m_59380_(p_59356_, itemstack, p_59357_, p_59358_)) {
           ItemStack itemstack1 = itemstack.m_41777_();
@@ -130,9 +144,13 @@
 +         if (p_59356_ instanceof CompoundContainer) {
 +            sourceInventory = new org.bukkit.craftbukkit.v1_18_R2.inventory.CraftInventoryDoubleChest((CompoundContainer) p_59356_);
 +         } else {
-+            sourceInventory = p_59356_.getOwner().getInventory();
++            // CatServer start
++            sourceInventory = CatInventoryUtils.getOwner(p_59356_).getInventory();
 +         }
-+         InventoryMoveItemEvent event = new InventoryMoveItemEvent(sourceInventory, oitemstack.clone(), p_59355_.getOwner().getInventory(), false);
++         InventoryHolder owner = CatInventoryUtils.getOwner(p_59355_);
++         org.bukkit.inventory.Inventory hopperOwner = (owner != null ? owner.getInventory() : new CatCustomInventory(p_59355_).getInventory());
++         InventoryMoveItemEvent event = new InventoryMoveItemEvent(sourceInventory, oitemstack.clone(), hopperOwner, false);
++         // CatServer end
 +         Bukkit.getServer().getPluginManager().callEvent(event);
 +         if (event.isCancelled()) {
 +            p_59356_.m_6836_(p_59357_, itemstack1);
@@ -148,12 +166,16 @@
           if (itemstack2.m_41619_()) {
              p_59356_.m_6596_();
              return true;
-@@ -211,6 +_,13 @@
+@@ -211,6 +_,17 @@
  
     public static boolean m_59331_(Container p_59332_, ItemEntity p_59333_) {
        boolean flag = false;
 +      // CraftBukkit start
-+      InventoryPickupItemEvent event = new InventoryPickupItemEvent(p_59332_.getOwner().getInventory(), (org.bukkit.entity.Item) p_59333_.getBukkitEntity());
++      // CatServer start
++      InventoryHolder owner = CatInventoryUtils.getOwner(p_59332_);
++      org.bukkit.inventory.Inventory sourceInventory = owner != null ? owner.getInventory() : new CatCustomInventory(p_59332_).getInventory();
++      // CatServer end
++      InventoryPickupItemEvent event = new InventoryPickupItemEvent(sourceInventory, (org.bukkit.entity.Item) p_59333_.getBukkitEntity());
 +      p_59333_.f_19853_.getCraftServer().getPluginManager().callEvent(event);
 +      if (event.isCancelled()) {
 +         return false;

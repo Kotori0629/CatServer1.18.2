@@ -1,5 +1,6 @@
 package org.bukkit.inventory;
 
+import catserver.server.inventory.CatForgeItemCap;
 import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class ItemStack implements Cloneable, ConfigurationSerializable {
     private int amount = 0;
     private MaterialData data = null;
     private ItemMeta meta;
+    private CatForgeItemCap forgeItemCap; // CatServer
 
     @Utility
     protected ItemStack() {}
@@ -107,6 +109,11 @@ public class ItemStack implements Cloneable, ConfigurationSerializable {
         if (stack.hasItemMeta()) {
             setItemMeta0(stack.getItemMeta(), type);
         }
+        // CatServer start
+        if (stack.hasForgeItemCap()) {
+            setForgeItemCap(stack.getForgeItemCap());
+        }
+        // CatServer end
     }
 
     /**
@@ -287,7 +294,7 @@ public class ItemStack implements Cloneable, ConfigurationSerializable {
             return true;
         }
         Material comparisonType = (this.type.isLegacy()) ? Bukkit.getUnsafe().fromLegacy(this.getData(), true) : this.type; // This may be called from legacy item stacks, try to get the right material
-        return comparisonType == stack.getType() && getDurability() == stack.getDurability() && hasItemMeta() == stack.hasItemMeta() && (hasItemMeta() ? Bukkit.getItemFactory().equals(getItemMeta(), stack.getItemMeta()) : true);
+        return comparisonType == stack.getType() && getDurability() == stack.getDurability() && hasItemMeta() == stack.hasItemMeta() && (hasItemMeta() ? Bukkit.getItemFactory().equals(getItemMeta(), stack.getItemMeta()) : true) && (hasForgeItemCap() ? getForgeItemCap().equals(stack.getForgeItemCap()) : true); // CatServer
     }
 
     @NotNull
@@ -304,6 +311,12 @@ public class ItemStack implements Cloneable, ConfigurationSerializable {
                 itemStack.data = this.data.clone();
             }
 
+            // CatServer start
+            if (this.forgeItemCap != null) {
+                itemStack.forgeItemCap = this.forgeItemCap.clone();
+            }
+            // CatServer end
+
             return itemStack;
         } catch (CloneNotSupportedException e) {
             throw new Error(e);
@@ -319,6 +332,7 @@ public class ItemStack implements Cloneable, ConfigurationSerializable {
         hash = hash * 31 + getAmount();
         hash = hash * 31 + (getDurability() & 0xffff);
         hash = hash * 31 + (hasItemMeta() ? (meta == null ? getItemMeta().hashCode() : meta.hashCode()) : 0);
+        hash = hash * 31 + (hasForgeItemCap() ? forgeItemCap.hashCode() : 0); // CatServer
 
         return hash;
     }
@@ -466,6 +480,12 @@ public class ItemStack implements Cloneable, ConfigurationSerializable {
             result.put("meta", meta);
         }
 
+        // CatServer start
+        if (hasForgeItemCap()) {
+            result.put("forgeCapNBT", forgeItemCap.serializeNBT());
+        }
+        // CatServer end
+
         return result;
     }
 
@@ -536,6 +556,12 @@ public class ItemStack implements Cloneable, ConfigurationSerializable {
             }
         }
 
+        // CatServer start
+        if (args.containsKey("forgeCapNBT")) {
+            result.setForgeItemCap(CatForgeItemCap.deserializeNBT((String) args.get("forgeCapNBT")));
+        }
+        // CatServer end
+
         return result;
     }
 
@@ -595,4 +621,18 @@ public class ItemStack implements Cloneable, ConfigurationSerializable {
 
         return true;
     }
+
+    // CatServer start
+    public boolean hasForgeItemCap() {
+        return forgeItemCap != null;
+    }
+
+    public void setForgeItemCap(CatForgeItemCap forgeItemCap) {
+        this.forgeItemCap = forgeItemCap;
+    }
+
+    public CatForgeItemCap getForgeItemCap() {
+        return this.forgeItemCap;
+    }
+    // CatServer end
 }

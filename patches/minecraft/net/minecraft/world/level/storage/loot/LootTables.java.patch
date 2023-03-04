@@ -8,6 +8,25 @@
     private final PredicateManager f_79191_;
  
     public LootTables(PredicateManager p_79194_) {
+@@ -25,6 +_,18 @@
+       this.f_79191_ = p_79194_;
+    }
+ 
++   // CatServer start
++   public ResourceLocation getKey(LootTable loot) {
++      ResourceLocation resourceLocation = ResourceLocation.m_135820_("");
++      for (Map.Entry<ResourceLocation, LootTable> tableEntry : f_79190_.entrySet()) {
++         if (loot.equals(tableEntry.getValue())) {
++            resourceLocation = tableEntry.getKey();
++         }
++      }
++      return resourceLocation;
++   }
++   // CatServer end
++
+    public LootTable m_79217_(ResourceLocation p_79218_) {
+       return this.f_79190_.getOrDefault(p_79218_, LootTable.f_79105_);
+    }
 @@ -37,8 +_,8 @@
        }
  

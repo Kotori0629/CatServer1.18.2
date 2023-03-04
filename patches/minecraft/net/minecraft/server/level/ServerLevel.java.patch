@@ -16,6 +16,14 @@
  import java.util.function.BooleanSupplier;
  import java.util.function.Function;
  import java.util.function.Predicate;
+@@ -71,6 +_,7 @@
+ import net.minecraft.util.ProgressListener;
+ import net.minecraft.util.Unit;
+ import net.minecraft.util.profiling.ProfilerFiller;
++import net.minecraft.world.Container;
+ import net.minecraft.world.DifficultyInstance;
+ import net.minecraft.world.damagesource.DamageSource;
+ import net.minecraft.world.entity.Entity;
 @@ -87,7 +_,6 @@
  import net.minecraft.world.entity.animal.Animal;
  import net.minecraft.world.entity.animal.WaterAnimal;
@@ -551,7 +559,7 @@
        Entity entity = this.m_142646_().m_142694_(p_8854_.m_142081_());
        if (entity != null) {
           f_8566_.warn("Force-added player with duplicate UUID {}", (Object)p_8854_.m_142081_().toString());
-@@ -775,26 +_,55 @@
+@@ -775,28 +_,66 @@
           this.m_143261_((ServerPlayer)entity, Entity.RemovalReason.DISCARDED);
        }
  
@@ -610,7 +618,18 @@
 +   // CatServer end
  
     public void m_8712_(LevelChunk p_8713_) {
++      // Spigot Start
++      for (net.minecraft.world.level.block.entity.BlockEntity tileentity : p_8713_.m_62954_().values()) {
++         if (tileentity instanceof net.minecraft.world.Container) {
++            for (org.bukkit.entity.HumanEntity h : Lists.newArrayList(catserver.server.inventory.CatInventoryUtils.getViewers((Container) tileentity))) { // CatServer
++               h.closeInventory();
++            }
++         }
++      }
++      // Spigot End
        p_8713_.m_187957_();
+       p_8713_.m_187979_(this);
+    }
 @@ -805,12 +_,36 @@
        p_143262_.m_142687_(p_143263_);
     }
@@ -791,7 +810,7 @@
     }
  
     public LevelEntityGetter<Entity> m_142646_() {
-@@ -1497,14 +_,12 @@
+@@ -1497,17 +_,22 @@
              ServerLevel.this.f_143246_.add(mob);
           }
  
@@ -809,6 +828,16 @@
        }
  
        public void m_141981_(Entity p_143375_) {
++         // Spigot Start
++         if (p_143375_.getBukkitEntity() instanceof org.bukkit.inventory.InventoryHolder && (!(p_143375_ instanceof ServerPlayer) || p_143375_.m_146911_() != Entity.RemovalReason.KILLED)) { // SPIGOT-6876: closeInventory clears death message
++            for (org.bukkit.entity.HumanEntity h : Lists.newArrayList(((org.bukkit.inventory.InventoryHolder) p_143375_.getBukkitEntity()).getInventory().getViewers())) { // TODO : CatServer - wait support
++               h.closeInventory();
++            }
++         }
++         // Spigot End
+          ServerLevel.this.m_7726_().m_8443_(p_143375_);
+          if (p_143375_ instanceof ServerPlayer) {
+             ServerPlayer serverplayer = (ServerPlayer)p_143375_;
 @@ -1525,10 +_,8 @@
              ServerLevel.this.f_143246_.remove(mob);
           }

@@ -13,7 +13,7 @@
           }
        }
  
-@@ -55,7 +_,9 @@
+@@ -55,7 +_,13 @@
     default boolean m_142505_() {
        NonNullList<Ingredient> nonnulllist = this.m_7527_();
        return nonnulllist.isEmpty() || nonnulllist.stream().anyMatch((p_151268_) -> {
@@ -22,5 +22,9 @@
        });
     }
 +
-+   org.bukkit.inventory.Recipe toBukkitRecipe(); // CraftBukkit
++   // CatServer start
++   default org.bukkit.inventory.Recipe toBukkitRecipe() {
++      return new catserver.server.bukkit.CustomModRecipe(this, m_6423_());
++   }
++   // CatServer end
  }
