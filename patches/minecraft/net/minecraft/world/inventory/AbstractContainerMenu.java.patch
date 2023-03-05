@@ -20,11 +20,12 @@
  import java.util.function.Supplier;
  import javax.annotation.Nullable;
  import net.minecraft.CrashReport;
-@@ -19,6 +_,8 @@
+@@ -19,6 +_,9 @@
  import net.minecraft.ReportedException;
  import net.minecraft.core.NonNullList;
  import net.minecraft.core.Registry;
 +import net.minecraft.network.chat.Component;
++import net.minecraft.network.chat.TextComponent;
 +import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
  import net.minecraft.server.level.ServerPlayer;
  import net.minecraft.util.Mth;
@@ -58,7 +59,7 @@
     private final IntList f_150395_ = new IntArrayList();
     private ItemStack f_150396_ = ItemStack.f_41583_;
     private int f_182405_;
-@@ -58,6 +_,94 @@
+@@ -58,6 +_,93 @@
     @Nullable
     private ContainerSynchronizer f_150397_;
     private boolean f_150398_;
@@ -134,8 +135,7 @@
 +   private Component title;
 +
 +   public final Component getTitle() {
-+      Preconditions.checkState(this.title != null, "Title not set");
-+      return this.title;
++      return this.title == null ? TextComponent.f_131282_ : this.title; // CatServer
 +   }
 +
 +   public final void setTitle(Component title) {
