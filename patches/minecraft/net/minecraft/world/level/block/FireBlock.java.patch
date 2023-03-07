@@ -143,7 +143,7 @@
                             }
                          }
                       }
-@@ -204,18 +_,37 @@
+@@ -204,32 +_,43 @@
        return p_53429_.m_46758_(p_53430_) || p_53429_.m_46758_(p_53430_.m_142125_()) || p_53429_.m_46758_(p_53430_.m_142126_()) || p_53429_.m_46758_(p_53430_.m_142127_()) || p_53429_.m_46758_(p_53430_.m_142128_());
     }
  
@@ -159,16 +159,10 @@
  
 -   private void m_53431_(Level p_53432_, BlockPos p_53433_, int p_53434_, Random p_53435_, int p_53436_) {
 -      int i = this.m_53492_(p_53432_.m_8055_(p_53433_));
-+   private void tryCatchFire(Level p_53432_, BlockPos p_53433_, int p_53434_, Random p_53435_, int p_53436_, Direction face, BlockPos bukkitPos) { // CraftBukkit add sourceposition
-+      CatServerCaptures.getCatServerCaptures().captureBlockPos(bukkitPos);
-+      this.tryCatchFire(p_53432_, p_53433_, p_53434_, p_53435_, p_53436_, face);
-+   }
-+
 +   private void tryCatchFire(Level p_53432_, BlockPos p_53433_, int p_53434_, Random p_53435_, int p_53436_, Direction face) {
 +      int i = p_53432_.m_8055_(p_53433_).getFlammability(p_53432_, p_53433_, face);
        if (p_53435_.nextInt(p_53434_) < i) {
           BlockState blockstate = p_53432_.m_8055_(p_53433_);
-+
 +         // CraftBukkit start
 +         var sourceposition = CatServerCaptures.getCatServerCaptures().getCaptureBlockPos();
 +         org.bukkit.block.Block theBlock = p_53432_.getWorld().getBlockAt(p_53433_.m_123341_(), p_53433_.m_123342_(), p_53433_.m_123343_());
@@ -179,14 +173,13 @@
 +            return;
 +         }
 +         // CraftBukkit end
-+
           if (p_53435_.nextInt(p_53436_ + 10) < 5 && !p_53432_.m_46758_(p_53433_)) {
              int j = Math.min(p_53436_ + p_53435_.nextInt(5) / 4, 15);
              p_53432_.m_7731_(p_53433_, this.m_53437_(p_53432_, p_53433_, j), 3);
-@@ -223,11 +_,7 @@
+          } else {
              p_53432_.m_7471_(p_53433_, false);
           }
- 
+-
 -         Block block = blockstate.m_60734_();
 -         if (block instanceof TntBlock) {
 -            TntBlock tntblock = (TntBlock)block;
@@ -194,8 +187,14 @@
 -         }
 +         blockstate.onCaughtFire(p_53432_, p_53433_, face, null);
        }
++   }
  
++   private void tryCatchFire(Level p_53432_, BlockPos p_53433_, int p_53434_, Random p_53435_, int p_53436_, Direction face, BlockPos bukkitPos) { // CraftBukkit add sourceposition
++      CatServerCaptures.getCatServerCaptures().captureBlockPos(bukkitPos);
++      this.tryCatchFire(p_53432_, p_53433_, p_53434_, p_53435_, p_53436_, face);
     }
+ 
+    private BlockState m_53437_(LevelAccessor p_53438_, BlockPos p_53439_, int p_53440_) {
 @@ -239,7 +_,7 @@
  
     private boolean m_53485_(BlockGetter p_53486_, BlockPos p_53487_) {

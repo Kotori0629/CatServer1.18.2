@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -27,6 +28,7 @@ public class CatServerCaptures {
     private AtomicBoolean isCallEvent = new AtomicBoolean(true);
     private AtomicBoolean isSilent = new AtomicBoolean(false);
     private AtomicReference<Direction> direction = new AtomicReference<>();
+    private AtomicReference<BlockState> blockState = new AtomicReference<>();
 
     public void captureEntity(Entity entity) {
         this.entity.set(entity);
@@ -78,6 +80,9 @@ public class CatServerCaptures {
     public void captureIsSlient(boolean isSlient) {
         this.isSilent.set(isSlient);
     }
+    public void captureBlockState(BlockState blockState) {
+        this.blockState.set(blockState);
+    }
 
     public CreatureSpawnEvent.SpawnReason getCaptureSpawnReason() {
         return this.spawnReason.getAndSet(null);
@@ -93,6 +98,10 @@ public class CatServerCaptures {
 
     public int getCaptureLimit() {
         return this.spawnerLimit.getAndSet(0);
+    }
+
+    public BlockState getCaptureBlockState() {
+        return this.blockState.getAndSet(null);
     }
 
     public int getCapturePortalRadius() {

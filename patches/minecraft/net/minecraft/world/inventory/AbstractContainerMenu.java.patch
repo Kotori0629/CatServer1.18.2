@@ -197,7 +197,7 @@
                       j1 -= itemstack2.m_41613_() - j;
 -                     slot1.m_5852_(itemstack2);
 +                     // slot1.set(itemstack2);
-+                     draggedSlots.put(slot1.f_40219_, itemstack3); // CraftBukkit - Put in map instead of setting // CatServer TODO: 可能会导致Mod界面物品消失
++                     draggedSlots.put(slot1.f_40219_, itemstack3); // CraftBukkit - Put in map instead of setting // CatServer TODO: 鍙兘浼氬鑷碝od鐣岄潰鐗╁搧娑堝け
                    }
                 }
  
