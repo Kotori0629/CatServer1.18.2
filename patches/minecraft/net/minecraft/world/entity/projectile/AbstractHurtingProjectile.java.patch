@@ -40,8 +40,9 @@
  
           HitResult hitresult = ProjectileUtil.m_37294_(this, this::m_5603_);
 -         if (hitresult.m_6662_() != HitResult.Type.MISS) {
+-            this.m_6532_(hitresult);
 +         if (hitresult.m_6662_() != HitResult.Type.MISS && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, hitresult)) {
-             this.m_6532_(hitresult);
++            this.preOnHit(hitresult); // CraftBukkit - projectile hit event
 +            // CraftBukkit start - Fire ProjectileHitEvent
 +            if (this.m_146910_()) {
 +               CraftEventFactory.callProjectileHitEvent(this, hitresult);
