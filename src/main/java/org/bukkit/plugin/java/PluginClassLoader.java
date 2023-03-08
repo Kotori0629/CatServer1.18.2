@@ -1,5 +1,7 @@
 package org.bukkit.plugin.java;
 
+import catserver.server.patcher.IPatcher;
+import catserver.server.patcher.PatcherManager;
 import catserver.server.remapper.ClassInheritanceProvider;
 import catserver.server.remapper.CatServerRemapper;
 import catserver.server.remapper.MappingLoader;
@@ -56,7 +58,7 @@ public final class PluginClassLoader extends URLClassLoader {
     private CatServerRemapper remapper;
     private JarMapping jarMapping;
 
-    // private IPatcher patcher; // CatServer TODO
+    private IPatcher patcher; // CatServer
 
     static {
         ClassLoader.registerAsParallelCapable();
@@ -82,7 +84,7 @@ public final class PluginClassLoader extends URLClassLoader {
         this.jarMapping.setFallbackInheritanceProvider(provider);
         this.remapper = new CatServerRemapper(jarMapping);
 
-        // this.patcher = PatcherManager.getPluginPatcher(description.getName());
+        this.patcher = PatcherManager.getPluginPatcher(description.getName());
 
         try {
             Class<?> jarClass;
@@ -227,7 +229,7 @@ public final class PluginClassLoader extends URLClassLoader {
 
                     // Remap the classes
                     byte[] bytecode = remapper.remapClassFile(stream, RuntimeRepo.getInstance());
-                    // if (this.patcher != null) bytecode = this.patcher.transform(name.replace("/", "."), bytecode);
+                    if (this.patcher != null) bytecode = this.patcher.transform(name.replace("/", "."), bytecode);
                     bytecode = ReflectionTransformer.transform(bytecode);
 
                     // Fix the package
