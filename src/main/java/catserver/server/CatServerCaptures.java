@@ -3,6 +3,7 @@ package catserver.server;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -15,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class CatServerCaptures {
     private static final CatServerCaptures catServerCaptures = new CatServerCaptures();
     private AtomicReference<Entity> entity = new AtomicReference<>();
+    private AtomicReference<ItemEntity> itemEntity = new AtomicReference<>();
     private AtomicReference<CreatureSpawnEvent.SpawnReason> spawnReason = new AtomicReference<>();
     private AtomicBoolean doPlace = new AtomicBoolean(true);
     private AtomicInteger spawnerLimit = new AtomicInteger();
@@ -83,13 +85,15 @@ public class CatServerCaptures {
     public void captureBlockState(BlockState blockState) {
         this.blockState.set(blockState);
     }
+    public void captureItemEntity(ItemEntity itemEntity) {
+        this.itemEntity.set(itemEntity);
+    }
+    public void captureDoPlace(boolean doPlace) {
+        this.doPlace.set(doPlace);
+    }
 
     public CreatureSpawnEvent.SpawnReason getCaptureSpawnReason() {
         return this.spawnReason.getAndSet(null);
-    }
-
-    public void captureDoPlace(boolean doPlace) {
-        this.doPlace.set(doPlace);
     }
 
     public boolean getCaptureDoPlace() {
@@ -141,6 +145,9 @@ public class CatServerCaptures {
     }
     public boolean getCaptureIsSlient() {
         return this.isSilent.getAndSet(false);
+    }
+    public ItemEntity getCaptureItemEntity() {
+        return this.itemEntity.getAndSet(null);
     }
 
     public static CatServerCaptures getCatServerCaptures() {
