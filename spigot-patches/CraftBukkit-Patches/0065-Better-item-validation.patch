@@ -94,26 +94,6 @@ index b3ab8c56c..82ef4a4b2 100644
                      lore.add(line);
                  }
              }
-diff --git a/src/main/java/org/spigotmc/ValidateUtils.java b/src/main/java/org/spigotmc/ValidateUtils.java
-new file mode 100644
-index 000000000..58a953481
---- /dev/null
-+++ b/src/main/java/org/spigotmc/ValidateUtils.java
-@@ -0,0 +1,14 @@
-+package org.spigotmc;
-+
-+public class ValidateUtils
-+{
-+
-+    public static String limit(String str, int limit)
-+    {
-+        if ( str.length() > limit )
-+        {
-+            return str.substring( 0, limit );
-+        }
-+        return str;
-+    }
-+}
 -- 
 2.25.1
 

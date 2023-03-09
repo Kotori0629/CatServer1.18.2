@@ -58,29 +58,6 @@ index 9b4c6c130..6ff3a2440 100644
          } else if (!(entity instanceof EntityPlayer)) {
              event = CraftEventFactory.callEntitySpawnEvent(entity);
          }
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index fb9c4fc78..8c855cf9b 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -128,4 +128,18 @@ public class SpigotWorldConfig
-         sweetBerryModifier = getAndValidateGrowth( "SweetBerry" );
-         kelpModifier = getAndValidateGrowth( "Kelp" );
-     }
-+
-+    public double itemMerge;
-+    private void itemMerge()
-+    {
-+        itemMerge = getDouble("merge-radius.item", 2.5 );
-+        log( "Item Merge Radius: " + itemMerge );
-+    }
-+
-+    public double expMerge;
-+    private void expMerge()
-+    {
-+        expMerge = getDouble("merge-radius.exp", 3.0 );
-+        log( "Experience Merge Radius: " + expMerge );
-+    }
- }
 -- 
 2.25.1
 

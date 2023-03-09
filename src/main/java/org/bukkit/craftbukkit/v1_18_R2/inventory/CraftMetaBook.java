@@ -3,15 +3,14 @@ package org.bukkit.craftbukkit.v1_18_R2.inventory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
+import java.util.*;
+
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.BaseComponent;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
@@ -195,11 +194,11 @@ public class CraftMetaBook extends CraftMetaItem implements BookMeta {
     @Override
     boolean applicableTo(Material type) {
         switch (type) {
-        case WRITTEN_BOOK:
-        case WRITABLE_BOOK:
-            return true;
-        default:
-            return false;
+            case WRITTEN_BOOK:
+            case WRITABLE_BOOK:
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -356,6 +355,7 @@ public class CraftMetaBook extends CraftMetaItem implements BookMeta {
         if (this.pages != null) {
             meta.pages = new ArrayList<String>(this.pages);
         }
+        meta.spigot = meta.new SpigotMeta(); // Spigot
         return meta;
     }
 
@@ -429,4 +429,98 @@ public class CraftMetaBook extends CraftMetaItem implements BookMeta {
 
         return builder;
     }
+
+    // Spigot start
+    private BookMeta.Spigot spigot = new SpigotMeta();
+
+    private class SpigotMeta extends BookMeta.Spigot {
+        private String pageToJSON(String page) {
+            if (CraftMetaBook.this instanceof CraftMetaBookSigned) {
+                // Page data is already in JSON format:
+                return page;
+            } else {
+                // Convert from plain String to JSON (similar to conversion between writable books and written books):
+                Component component = CraftChatMessage.fromString(page, true, true)[0];
+                return CraftChatMessage.toJSON(component);
+            }
+        }
+
+        private String componentsToPage(net.md_5.bungee.api.chat.BaseComponent[] components) {
+            // asserted: components != null
+            if (CraftMetaBook.this instanceof CraftMetaBookSigned) {
+                // Pages are in JSON format:
+                return ComponentSerializer.toString(components);
+            } else {
+                // Convert component to plain String:
+                return CraftChatMessage.fromJSONComponent(ComponentSerializer.toString(components));
+            }
+        }
+
+        @Override
+        public net.md_5.bungee.api.chat.BaseComponent[] getPage(final int page) {
+            Validate.isTrue(isValidPage(page), "Invalid page number");
+            return ComponentSerializer.parse(pageToJSON(pages.get(page - 1)));
+        }
+
+        @Override
+        public void setPage(final int page, final net.md_5.bungee.api.chat.BaseComponent... text) {
+            if (!isValidPage(page)) {
+                throw new IllegalArgumentException("Invalid page number " + page + "/" + getPageCount());
+            }
+            net.md_5.bungee.api.chat.BaseComponent[] newText = text == null ? new net.md_5.bungee.api.chat.BaseComponent[0] : text;
+            CraftMetaBook.this.pages.set(page - 1, componentsToPage(newText));
+        }
+
+        @Override
+        public void setPages(final net.md_5.bungee.api.chat.BaseComponent[]... pages) {
+            setPages(Arrays.asList(pages));
+        }
+
+        @Override
+        public void addPage(final net.md_5.bungee.api.chat.BaseComponent[]... pages) {
+            for (net.md_5.bungee.api.chat.BaseComponent[] page : pages) {
+                if (page == null) {
+                    page = new net.md_5.bungee.api.chat.BaseComponent[0];
+                }
+                CraftMetaBook.this.internalAddPage(componentsToPage(page));
+            }
+        }
+
+        @Override
+        public List<net.md_5.bungee.api.chat.BaseComponent[]> getPages() {
+            if (CraftMetaBook.this.pages == null) return ImmutableList.of();
+            final List<String> copy = ImmutableList.copyOf(CraftMetaBook.this.pages);
+            return new AbstractList<net.md_5.bungee.api.chat.BaseComponent[]>() {
+                @Override
+                public net.md_5.bungee.api.chat.BaseComponent[] get(int index) {
+                    return ComponentSerializer.parse(pageToJSON(copy.get(index)));
+                }
+
+                @Override
+                public int size() {
+                    return copy.size();
+                }
+            };
+        }
+
+        @Override
+        public void setPages(List<net.md_5.bungee.api.chat.BaseComponent[]> pages) {
+            if (pages.isEmpty()) {
+                CraftMetaBook.this.pages = null;
+                return;
+            }
+            if (CraftMetaBook.this.pages != null) {
+                CraftMetaBook.this.pages.clear();
+            }
+            for (net.md_5.bungee.api.chat.BaseComponent[] page : pages) {
+                addPage(page);
+            }
+        }
+    }
+
+    @Override
+    public BookMeta.Spigot spigot() {
+        return spigot;
+    }
+    // Spigot end
 }

@@ -233,29 +233,6 @@ index 2e057fd4c..ddef523ea 100644
              server.close();
          } finally {
              try {
-diff --git a/src/main/java/org/spigotmc/AsyncCatcher.java b/src/main/java/org/spigotmc/AsyncCatcher.java
-new file mode 100644
-index 000000000..aeed76972
---- /dev/null
-+++ b/src/main/java/org/spigotmc/AsyncCatcher.java
-@@ -0,0 +1,17 @@
-+package org.spigotmc;
-+
-+import net.minecraft.server.MinecraftServer;
-+
-+public class AsyncCatcher
-+{
-+
-+    public static boolean enabled = true;
-+
-+    public static void catchOp(String reason)
-+    {
-+        if ( enabled && Thread.currentThread() != MinecraftServer.getServer().serverThread )
-+        {
-+            throw new IllegalStateException( "Asynchronous " + reason + "!" );
-+        }
-+    }
-+}
 -- 
 2.25.1
 

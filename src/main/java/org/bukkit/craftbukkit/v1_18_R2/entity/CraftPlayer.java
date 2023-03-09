@@ -6,6 +6,7 @@ import com.google.common.io.BaseEncoding;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.Unpooled;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -28,6 +29,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nullable;
 
 import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.Util;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.BlockPos;
@@ -369,36 +371,36 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
         String instrumentName = null;
         switch (instrument) {
-        case 0:
-            instrumentName = "harp";
-            break;
-        case 1:
-            instrumentName = "basedrum";
-            break;
-        case 2:
-            instrumentName = "snare";
-            break;
-        case 3:
-            instrumentName = "hat";
-            break;
-        case 4:
-            instrumentName = "bass";
-            break;
-        case 5:
-            instrumentName = "flute";
-            break;
-        case 6:
-            instrumentName = "bell";
-            break;
-        case 7:
-            instrumentName = "guitar";
-            break;
-        case 8:
-            instrumentName = "chime";
-            break;
-        case 9:
-            instrumentName = "xylophone";
-            break;
+            case 0:
+                instrumentName = "harp";
+                break;
+            case 1:
+                instrumentName = "basedrum";
+                break;
+            case 2:
+                instrumentName = "snare";
+                break;
+            case 3:
+                instrumentName = "hat";
+                break;
+            case 4:
+                instrumentName = "bass";
+                break;
+            case 5:
+                instrumentName = "flute";
+                break;
+            case 6:
+                instrumentName = "bell";
+                break;
+            case 7:
+                instrumentName = "guitar";
+                break;
+            case 8:
+                instrumentName = "chime";
+                break;
+            case 9:
+                instrumentName = "xylophone";
+                break;
         }
 
         float f = (float) Math.pow(2.0D, (note - 12.0D) / 12.0D);
@@ -500,7 +502,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
 
     @Override
     public void playSound(org.bukkit.entity.Entity entity, Sound sound, org.bukkit.SoundCategory category, float volume, float pitch) {
-        if (!(entity instanceof CraftEntity craftEntity) || sound == null || category == null || getHandle().connection == null) return;
+        if (!(entity instanceof CraftEntity craftEntity) || sound == null || category == null || getHandle().connection == null)
+            return;
 
         ClientboundSoundEntityPacket packet = new ClientboundSoundEntityPacket(CraftSound.getSoundEffect(sound), net.minecraft.sounds.SoundSource.valueOf(category.name()), craftEntity.getHandle(), volume, pitch);
         getHandle().connection.send(packet);
@@ -710,10 +713,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
             }
 
             @Override
-            public void onBorderSetDamagePerBlock(net.minecraft.world.level.border.WorldBorder border, double damage) {} // NO OP
+            public void onBorderSetDamagePerBlock(net.minecraft.world.level.border.WorldBorder border, double damage) {
+            } // NO OP
 
             @Override
-            public void onBorderSetDamageSafeZOne(net.minecraft.world.level.border.WorldBorder border, double blocks) {} // NO OP
+            public void onBorderSetDamageSafeZOne(net.minecraft.world.level.border.WorldBorder border, double blocks) {
+            } // NO OP
         };
     }
 
@@ -755,7 +760,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
         }
 
         if (entity.connection == null) {
-           return false;
+            return false;
         }
 
         if (entity.isVehicle()) {
@@ -1700,7 +1705,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
                 break;
             }
         }
-        AttributeInstance dummy = new AttributeInstance(Attributes.MAX_HEALTH, (attribute) -> { });
+        AttributeInstance dummy = new AttributeInstance(Attributes.MAX_HEALTH, (attribute) -> {
+        });
         dummy.setBaseValue(scaledHealth ? healthScale : getMaxHealth());
         collection.add(dummy);
     }
@@ -1869,4 +1875,91 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     public boolean isAllowingServerListings() {
         return getHandle().allowsListing();
     }
+
+    // Spigot start
+    private final Player.Spigot spigot = new Player.Spigot() {
+        @Override
+        public boolean getCollidesWithEntities() {
+            return CraftPlayer.this.isCollidable();
+        }
+
+        @Override
+        public void setCollidesWithEntities(boolean collides) {
+            CraftPlayer.this.setCollidable(collides);
+        }
+
+        @Override
+        public void respawn() {
+            if (getHealth() <= 0 && isOnline()) {
+                server.getServer().getPlayerList().respawn(getHandle(), false);
+            }
+        }
+
+        @Override
+        public Set<Player> getHiddenPlayers() {
+            Set<Player> ret = new HashSet<Player>();
+            for (UUID u : hiddenEntities.keySet()) {
+                Player p = getServer().getPlayer(u);
+                if (p != null) {
+                    ret.add(p);
+                }
+            }
+
+            return java.util.Collections.unmodifiableSet(ret);
+        }
+
+        @Override
+        public void sendMessage(BaseComponent component) {
+            sendMessage(new BaseComponent[]{component});
+        }
+
+        @Override
+        public void sendMessage(BaseComponent... components) {
+            if (getHandle().connection == null) return;
+            ClientboundChatPacket packet = new ClientboundChatPacket(null, net.minecraft.network.chat.ChatType.SYSTEM, Util.NIL_UUID);
+            packet.components = components;
+            getHandle().connection.send(packet);
+        }
+
+        @Override
+        public void sendMessage(UUID sender, BaseComponent component) {
+            this.sendMessage(net.md_5.bungee.api.ChatMessageType.CHAT, sender, component);
+        }
+
+        @Override
+        public void sendMessage(UUID sender, BaseComponent... components) {
+            this.sendMessage(net.md_5.bungee.api.ChatMessageType.CHAT, sender, components);
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, BaseComponent component) {
+            sendMessage(position, new BaseComponent[]{component});
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, BaseComponent... components) {
+            if (getHandle().connection == null) return;
+            ClientboundChatPacket packet = new ClientboundChatPacket(null, net.minecraft.network.chat.ChatType.getForIndex((byte) position.ordinal()), Util.NIL_UUID);
+            packet.components = components;
+            getHandle().connection.send(packet);
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent component) {
+            sendMessage(position, sender, new BaseComponent[]{component});
+        }
+
+        @Override
+        public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent... components) {
+            if (getHandle().connection == null) return;
+            ClientboundChatPacket packet = new ClientboundChatPacket(null, net.minecraft.network.chat.ChatType.getForIndex((byte) position.ordinal()), sender == null ? Util.NIL_UUID : sender);
+            packet.components = components;
+            getHandle().connection.send(packet);
+        }
+    };
+
+    public Player.Spigot spigot() {
+        return spigot;
+    }
+    // Spigot end
 }

@@ -16,21 +16,6 @@ index d6538cafc..a0f16bbe8 100644
          this.LOGGER.info(this.player.getScoreboardName() + " issued server command: " + s);
  
          CraftPlayer player = this.getCraftPlayer();
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index 7f14cbc63..bc9fbcc58 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -150,4 +150,10 @@ public class SpigotConfig
-         config.addDefault( path, def );
-         return config.getDouble( path, config.getDouble( path ) );
-     }
-+
-+    public static boolean logCommands;
-+    private static void logCommands()
-+    {
-+        logCommands = getBoolean( "commands.log", true );
-+    }
- }
 -- 
 2.25.1
 

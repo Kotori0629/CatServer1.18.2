@@ -17,21 +17,6 @@ index c9a9e6266..961db661e 100644
              jsonarray.add(writeGameProfile(usercache_usercacheentry, dateformat));
          });
          String s = this.gson.toJson(jsonarray);
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index fe7eed4d9..4138d939e 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -314,4 +314,10 @@ public class SpigotConfig
-         replaceCommands = new HashSet<String>( (List<String>) getList( "commands.replace-commands",
-                 Arrays.asList( "setblock", "summon", "testforblock", "tellraw" ) ) );
-     }
-+
-+    public static int userCacheCap;
-+    private static void userCacheCap()
-+    {
-+        userCacheCap = getInt( "settings.user-cache-size", 1000 );
-+    }
- }
 -- 
 2.25.1
 

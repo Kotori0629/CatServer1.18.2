@@ -134,32 +134,6 @@ index b8f5c6ad0..92f93542c 100644
 +                        tileentityhopper.setCooldown(tileentityhopper.level.spigotConfig.hopperTransfer - b0); // Spigot
                      }
                  }
- 
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index ee822b2a3..a03727d59 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -220,4 +220,20 @@ public class SpigotWorldConfig
-         otherTrackingRange = getInt( "entity-tracking-range.other", otherTrackingRange );
-         log( "Entity Tracking Range: Pl " + playerTrackingRange + " / An " + animalTrackingRange + " / Mo " + monsterTrackingRange + " / Mi " + miscTrackingRange + " / Other " + otherTrackingRange );
-     }
-+
-+    public int hopperTransfer;
-+    public int hopperCheck;
-+    public int hopperAmount;
-+    private void hoppers()
-+    {
-+        // Set the tick delay between hopper item movements
-+        hopperTransfer = getInt( "ticks-per.hopper-transfer", 8 );
-+        if ( SpigotConfig.version < 11 )
-+        {
-+            set( "ticks-per.hopper-check", 1 );
-+        }
-+        hopperCheck = getInt( "ticks-per.hopper-check", 1 );
-+        hopperAmount = getInt( "hopper-amount", 1 );
-+        log( "Hopper Transfer: " + hopperTransfer + " Hopper Check: " + hopperCheck + " Hopper Amount: " + hopperAmount );
-+    }
- }
 -- 
 2.25.1
 

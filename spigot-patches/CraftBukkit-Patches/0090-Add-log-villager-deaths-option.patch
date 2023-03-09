@@ -30,22 +30,6 @@ index fb63c8e1a..40c76a861 100644
          Entity entity = damagesource.getEntity();
  
          if (entity != null) {
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index c44267305..4abcb9ec0 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -386,4 +386,11 @@ public class SpigotConfig
-         disableAdvancementSaving = getBoolean("advancements.disable-saving", false);
-         disabledAdvancements = getList("advancements.disabled", Arrays.asList(new String[]{"minecraft:story/disabled"}));
-     }
-+
-+    public static boolean logVillagerDeaths;
-+    public static boolean logNamedDeaths;
-+    private static void logDeaths() {
-+        logVillagerDeaths = getBoolean("settings.log-villager-deaths", true);
-+        logNamedDeaths = getBoolean("settings.log-named-deaths", true);
-+    }
- }
 -- 
 2.25.1
 

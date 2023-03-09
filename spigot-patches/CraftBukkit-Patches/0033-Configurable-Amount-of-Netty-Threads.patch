@@ -27,22 +27,6 @@ index c30918640..c3153ed8d 100644
      }
  
      public boolean isReady() {
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index 3bb51f452..c5989e8e9 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -224,4 +224,11 @@ public class SpigotConfig
-         }
-         bungee = getBoolean( "settings.bungeecord", false );
-     }
-+
-+    private static void nettyThreads()
-+    {
-+        int count = getInt( "settings.netty-threads", 4 );
-+        System.setProperty( "io.netty.eventLoopThreads", Integer.toString( count ) );
-+        Bukkit.getLogger().log( Level.INFO, "Using {0} threads for Netty based IO", count );
-+    }
- }
 -- 
 2.25.1
 

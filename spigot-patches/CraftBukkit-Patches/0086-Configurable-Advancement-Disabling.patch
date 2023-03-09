@@ -34,22 +34,6 @@ index 54bc56c07..d2aed1f7f 100644
              try {
                  JsonObject jsonobject = ChatDeserializer.convertToJsonObject(jsonelement, "advancement");
                  Advancement.SerializedAdvancement advancement_serializedadvancement = Advancement.SerializedAdvancement.fromJson(jsonobject, new LootDeserializationContext(minecraftkey, this.predicateManager));
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index f7033b08c..c44267305 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -379,4 +379,11 @@ public class SpigotConfig
-             Bukkit.getLogger().info( "Debug logging is disabled" );
-         }
-     }
-+
-+    public static boolean disableAdvancementSaving;
-+    public static List<String> disabledAdvancements;
-+    private static void disabledAdvancements() {
-+        disableAdvancementSaving = getBoolean("advancements.disable-saving", false);
-+        disabledAdvancements = getList("advancements.disabled", Arrays.asList(new String[]{"minecraft:story/disabled"}));
-+    }
- }
 -- 
 2.25.1
 

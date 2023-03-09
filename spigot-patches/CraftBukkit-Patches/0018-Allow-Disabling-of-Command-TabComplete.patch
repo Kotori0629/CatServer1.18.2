@@ -42,34 +42,6 @@ index 9c9c4771b..059814bde 100644
          List<String> completions = null;
          try {
              if (message.startsWith("/")) {
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index bc9fbcc58..fc352ecf1 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -156,4 +156,23 @@ public class SpigotConfig
-     {
-         logCommands = getBoolean( "commands.log", true );
-     }
-+
-+    public static int tabComplete;
-+    public static boolean sendNamespaced;
-+    private static void tabComplete()
-+    {
-+        if ( version < 6 )
-+        {
-+            boolean oldValue = getBoolean( "commands.tab-complete", true );
-+            if ( oldValue )
-+            {
-+                set( "commands.tab-complete", 0 );
-+            } else
-+            {
-+                set( "commands.tab-complete", -1 );
-+            }
-+        }
-+        tabComplete = getInt( "commands.tab-complete", 0 );
-+        sendNamespaced = getBoolean( "commands.send-namespaced", true );
-+    }
- }
 -- 
 2.25.1
 

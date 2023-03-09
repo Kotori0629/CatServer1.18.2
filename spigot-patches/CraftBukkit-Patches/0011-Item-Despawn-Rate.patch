@@ -26,22 +26,6 @@ index 2e93c1e67..97d6a3df0 100644
      }
  
      public float getSpin(float f) {
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index 55af2f874..9fc17f219 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -181,4 +181,11 @@ public class SpigotWorldConfig
-         mobSpawnRange = (byte) getInt( "mob-spawn-range", 6 );
-         log( "Mob Spawn Range: " + mobSpawnRange );
-     }
-+
-+    public int itemDespawnRate;
-+    private void itemDespawnRate()
-+    {
-+        itemDespawnRate = getInt( "item-despawn-rate", 6000 );
-+        log( "Item Despawn Rate: " + itemDespawnRate );
-+    }
- }
 -- 
 2.25.1
 

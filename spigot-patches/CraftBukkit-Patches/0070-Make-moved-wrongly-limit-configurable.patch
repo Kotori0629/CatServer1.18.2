@@ -26,21 +26,6 @@ index de4011001..b49ecff59 100644
                                  flag2 = true;
                                  PlayerConnection.LOGGER.warn("{} moved wrongly!", this.player.getName().getString());
                              }
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index b29ae9c67..cd677f51c 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -326,4 +326,10 @@ public class SpigotConfig
-     {
-         saveUserCacheOnStopOnly = getBoolean( "settings.save-user-cache-on-stop-only", false );
-     }
-+
-+    public static double movedWronglyThreshold;
-+    private static void movedWronglyThreshold()
-+    {
-+        movedWronglyThreshold = getDouble( "settings.moved-wrongly-threshold", 0.0625D );
-+    }
- }
 -- 
 2.25.1
 

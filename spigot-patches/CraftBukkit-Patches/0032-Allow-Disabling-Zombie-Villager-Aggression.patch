@@ -18,22 +18,6 @@ index 846671c76..6bb1ba41c 100644
          this.targetSelector.addGoal(3, new PathfinderGoalNearestAttackableTarget<>(this, EntityIronGolem.class, true));
          this.targetSelector.addGoal(5, new PathfinderGoalNearestAttackableTarget<>(this, EntityTurtle.class, 10, true, false, EntityTurtle.BABY_ON_LAND_SELECTOR));
      }
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index b16c9e292..e8d87c4b2 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -245,4 +245,11 @@ public class SpigotWorldConfig
-         tridentDespawnRate = getInt( "trident-despawn-rate", arrowDespawnRate );
-         log( "Arrow Despawn Rate: " + arrowDespawnRate + " Trident Respawn Rate:" + tridentDespawnRate );
-     }
-+
-+    public boolean zombieAggressiveTowardsVillager;
-+    private void zombieAggressiveTowardsVillager()
-+    {
-+        zombieAggressiveTowardsVillager = getBoolean( "zombie-aggressive-towards-villager", true );
-+        log( "Zombie Aggressive Towards Villager: " + zombieAggressiveTowardsVillager );
-+    }
- }
 -- 
 2.25.1
 

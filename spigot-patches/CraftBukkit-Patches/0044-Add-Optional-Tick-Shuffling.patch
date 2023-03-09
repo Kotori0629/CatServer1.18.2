@@ -23,21 +23,6 @@ index a69191df0..a2a2d1fa4 100644
              Iterator iterator = this.connections.iterator();
  
              while (iterator.hasNext()) {
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index 1569b0bdd..245a9e5e9 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -278,4 +278,10 @@ public class SpigotConfig
-         playerSample = getInt( "settings.sample-count", 12 );
-         System.out.println( "Server Ping Player Sample Count: " + playerSample );
-     }
-+
-+    public static int playerShuffle;
-+    private static void playerShuffle()
-+    {
-+        playerShuffle = getInt( "settings.player-shuffle", 0 );
-+    }
- }
 -- 
 2.25.1
 

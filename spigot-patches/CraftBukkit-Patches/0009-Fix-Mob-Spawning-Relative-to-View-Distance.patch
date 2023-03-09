@@ -75,23 +75,6 @@ index 1681b9771..8e9aaaa26 100644
 +            return d0 < range; // Spigot
          }
      }
- 
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index e5df553a9..55af2f874 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -174,4 +174,11 @@ public class SpigotWorldConfig
- 
-         log( "Simulation Distance: " + simulationDistance );
-     }
-+
-+    public byte mobSpawnRange;
-+    private void mobSpawnRange()
-+    {
-+        mobSpawnRange = (byte) getInt( "mob-spawn-range", 6 );
-+        log( "Mob Spawn Range: " + mobSpawnRange );
-+    }
- }
 -- 
 2.25.1
 

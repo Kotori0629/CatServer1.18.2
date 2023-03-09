@@ -21,23 +21,6 @@ index d8cbae670..868237a37 100644
 +                // Spigot End
                  playerSample.setSample(profiles.toArray(new GameProfile[profiles.size()]));
              }
- 
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index 123512de6..1569b0bdd 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -271,4 +271,11 @@ public class SpigotConfig
-     {
-         commands.put( "tps", new TicksPerSecondCommand( "tps" ) );
-     }
-+
-+    public static int playerSample;
-+    private static void playerSample()
-+    {
-+        playerSample = getInt( "settings.sample-count", 12 );
-+        System.out.println( "Server Ping Player Sample Count: " + playerSample );
-+    }
- }
 -- 
 2.25.1
 

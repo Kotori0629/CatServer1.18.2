@@ -173,25 +173,6 @@ index 670338a5f..7fb7dc5b7 100644
          @Override
          public boolean getCollidesWithEntities() {
              return CraftPlayer.this.isCollidable();
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index 130016282..3bb51f452 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -214,4 +214,14 @@ public class SpigotConfig
-         commands.put( "restart", new RestartCommand( "restart" ) );
-         WatchdogThread.doStart( timeoutTime, restartOnCrash );
-     }
-+
-+    public static boolean bungee;
-+    private static void bungee() {
-+        if ( version < 4 )
-+        {
-+            set( "settings.bungeecord", false );
-+            System.out.println( "Oudated config, disabling BungeeCord support!" );
-+        }
-+        bungee = getBoolean( "settings.bungeecord", false );
-+    }
- }
 -- 
 2.25.1
 

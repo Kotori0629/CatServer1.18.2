@@ -44,39 +44,6 @@ index 21aab1d9c..dba66fefa 100644
 +            // Spigot end
          }
      }
- 
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index 6ed26b5de..fe7eed4d9 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -8,8 +8,10 @@ import java.lang.reflect.Method;
- import java.lang.reflect.Modifier;
- import java.util.Arrays;
- import java.util.HashMap;
-+import java.util.HashSet;
- import java.util.List;
- import java.util.Map;
-+import java.util.Set;
- import java.util.logging.Level;
- import net.minecraft.core.IRegistry;
- import net.minecraft.resources.MinecraftKey;
-@@ -300,4 +302,16 @@ public class SpigotConfig
-     {
-         silentCommandBlocks = getBoolean( "commands.silent-commandblock-console", false );
-     }
-+
-+    public static Set<String> replaceCommands;
-+    private static void replaceCommands()
-+    {
-+        if ( config.contains( "replace-commands" ) )
-+        {
-+            set( "commands.replace-commands", config.getStringList( "replace-commands" ) );
-+            config.set( "replace-commands", null );
-+        }
-+        replaceCommands = new HashSet<String>( (List<String>) getList( "commands.replace-commands",
-+                Arrays.asList( "setblock", "summon", "testforblock", "tellraw" ) ) );
-+    }
- }
 -- 
 2.25.1
 

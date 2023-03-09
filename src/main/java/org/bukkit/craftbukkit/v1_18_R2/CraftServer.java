@@ -19,6 +19,7 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import jline.console.ConsoleReader;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -721,11 +722,11 @@ public final class CraftServer implements Server {
             return true;
         }
 
-        if (sender instanceof Player) {
-            sender.sendMessage("Unknown command. Type \"/help\" for help.");
-        } else {
-            sender.sendMessage("Unknown command. Type \"help\" for help.");
+        // Spigot start
+        if (!org.spigotmc.SpigotConfig.unknownCommandMessage.isEmpty()) {
+            sender.sendMessage(org.spigotmc.SpigotConfig.unknownCommandMessage);
         }
+        // Spigot end
 
         return false;
     }
@@ -775,11 +776,13 @@ public final class CraftServer implements Server {
                     }
                 }
             }
+            world.spigotConfig.init(); // Spigot
         }
 
         pluginManager.clearPlugins();
         commandMap.clearCommands();
         reloadData();
+        org.spigotmc.SpigotConfig.registerCommands(); // Spigot
         overrideAllCommandCommandBlocks = commandsConfiguration.getStringList("command-block-overrides").contains("*");
         ignoreVanillaPermissions = commandsConfiguration.getBoolean("ignore-vanilla-permissions");
 
@@ -789,7 +792,8 @@ public final class CraftServer implements Server {
         while (pollCount < 50 && getScheduler().getActiveWorkers().size() > 0) {
             try {
                 Thread.sleep(50);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
             pollCount++;
         }
 
@@ -797,10 +801,10 @@ public final class CraftServer implements Server {
         for (BukkitWorker worker : overdueWorkers) {
             Plugin plugin = worker.getOwner();
             getLogger().log(Level.SEVERE, String.format(
-                "Nag author(s): '%s' of '%s' about the following: %s",
-                plugin.getDescription().getAuthors(),
-                plugin.getDescription().getFullName(),
-                "This plugin is not properly shutting down its async tasks when it is being reloaded.  This may cause conflicts with the newly loaded version of the plugin"
+                    "Nag author(s): '%s' of '%s' about the following: %s",
+                    plugin.getDescription().getAuthors(),
+                    plugin.getDescription().getFullName(),
+                    "This plugin is not properly shutting down its async tasks when it is being reloaded.  This may cause conflicts with the newly loaded version of the plugin"
             ));
         }
         loadPlugins();
@@ -826,7 +830,7 @@ public final class CraftServer implements Server {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "finally" })
+    @SuppressWarnings({"unchecked", "finally"})
     private void loadCustomPermissions() {
         File file = new File(configuration.getString("settings.permissions-file"));
         FileInputStream stream;
@@ -854,7 +858,8 @@ public final class CraftServer implements Server {
         } finally {
             try {
                 stream.close();
-            } catch (IOException ex) {}
+            } catch (IOException ex) {
+            }
         }
 
         if (perms == null) {
@@ -1592,11 +1597,11 @@ public final class CraftServer implements Server {
         Validate.notNull(type, "Type cannot be null");
 
         switch (type) {
-        case IP:
-            return new CraftIpBanList(playerList.getIpBans());
-        case NAME:
-        default:
-            return new CraftProfileBanList(playerList.getBans());
+            case IP:
+                return new CraftIpBanList(playerList.getIpBans());
+            case NAME:
+            default:
+                return new CraftProfileBanList(playerList.getBans());
         }
     }
 
@@ -2179,4 +2184,36 @@ public final class CraftServer implements Server {
     public UnsafeValues getUnsafe() {
         return CraftMagicNumbers.INSTANCE;
     }
+
+    // Spigot start
+    private final org.bukkit.Server.Spigot spigot = new org.bukkit.Server.Spigot() {
+        @Override
+        public YamlConfiguration getConfig() {
+            return org.spigotmc.SpigotConfig.config;
+        }
+
+        @Override
+        public void restart() {
+            org.spigotmc.RestartCommand.restart();
+        }
+
+        @Override
+        public void broadcast(BaseComponent component) {
+            for (Player player : getOnlinePlayers()) {
+                player.spigot().sendMessage(component);
+            }
+        }
+
+        @Override
+        public void broadcast(BaseComponent... components) {
+            for (Player player : getOnlinePlayers()) {
+                player.spigot().sendMessage(components);
+            }
+        }
+    };
+
+    public org.bukkit.Server.Spigot spigot() {
+        return spigot;
+    }
+    // Spigot end
 }

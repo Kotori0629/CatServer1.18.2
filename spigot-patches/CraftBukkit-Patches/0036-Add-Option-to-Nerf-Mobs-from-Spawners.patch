@@ -21,22 +21,6 @@ index 5905ba5ef..452de2c89 100644
                          }
  
                          if (!worldserver.tryAddFreshEntityWithPassengers(entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.SPAWNER)) { // CraftBukkit
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index e8d87c4b2..e5e1f112b 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -252,4 +252,11 @@ public class SpigotWorldConfig
-         zombieAggressiveTowardsVillager = getBoolean( "zombie-aggressive-towards-villager", true );
-         log( "Zombie Aggressive Towards Villager: " + zombieAggressiveTowardsVillager );
-     }
-+
-+    public boolean nerfSpawnerMobs;
-+    private void nerfSpawnerMobs()
-+    {
-+        nerfSpawnerMobs = getBoolean( "nerf-spawner-mobs", false );
-+        log( "Nerfing mobs spawned from spawners: " + nerfSpawnerMobs );
-+    }
- }
 -- 
 2.25.1
 

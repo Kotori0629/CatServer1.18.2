@@ -36,34 +36,6 @@ index b5eb33275..1e3c7fc4b 100644
          nbttagcompound.remove("__context");
          return nbttagcompound;
      }
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index c47a8b670..aab9684a7 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -398,4 +398,9 @@ public class SpigotConfig
-     private static void disablePlayerDataSaving() {
-         disablePlayerDataSaving = getBoolean("players.disable-saving", false);
-     }
-+
-+    public static boolean belowZeroGenerationInExistingChunks;
-+    private static void belowZeroGenerationInExistingChunks() {
-+        belowZeroGenerationInExistingChunks = getBoolean("world-settings.default.below-zero-generation-in-existing-chunks", true);
-+    }
- }
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index d34214597..63cb53cad 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -378,4 +378,9 @@ public class SpigotWorldConfig
-     {
-         thunderChance = getInt("thunder-chance", 100000);
-     }
-+
-+    public boolean belowZeroGenerationInExistingChunks;
-+    private void belowZeroGenerationInExistingChunks() {
-+        belowZeroGenerationInExistingChunks = getBoolean("below-zero-generation-in-existing-chunks", true);
-+    }
- }
 -- 
 2.25.1
 

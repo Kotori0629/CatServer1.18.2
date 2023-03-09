@@ -17,21 +17,6 @@ index 0a79a2eee..b47fd1c13 100644
                  this.checkInterval = 0;
                  if (!this.isRemoved() && !this.survives()) {
                      // CraftBukkit start - fire break events
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index 6a7d30fee..035da1752 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -357,4 +357,10 @@ public class SpigotWorldConfig
-         maxTntTicksPerTick = getInt( "max-tnt-per-tick", 100 );
-         log( "Max TNT Explosions: " + maxTntTicksPerTick );
-     }
-+
-+    public int hangingTickFrequency;
-+    private void hangingTickFrequency()
-+    {
-+        hangingTickFrequency = getInt( "hanging-tick-frequency", 100 );
-+    }
- }
 -- 
 2.25.1
 

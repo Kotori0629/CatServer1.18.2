@@ -1,9 +1,10 @@
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -1,11 +_,10 @@
+@@ -1,15 +_,17 @@
  package net.minecraft.world.level;
  
 +import catserver.server.BukkitInjector;
++import catserver.server.CatServer;
  import com.google.common.collect.Lists;
  import com.mojang.serialization.Codec;
  import java.io.IOException;
@@ -14,6 +15,12 @@
  import java.util.function.Consumer;
  import java.util.function.Predicate;
  import java.util.function.Supplier;
+ import javax.annotation.Nullable;
++
++import joptsimple.internal.Strings;
+ import net.minecraft.CrashReport;
+ import net.minecraft.CrashReportCategory;
+ import net.minecraft.ReportedException;
 @@ -21,10 +_,12 @@
  import net.minecraft.core.particles.ParticleOptions;
  import net.minecraft.nbt.CompoundTag;
@@ -35,7 +42,7 @@
  import net.minecraft.world.entity.player.Player;
  import net.minecraft.world.item.ItemStack;
  import net.minecraft.world.item.crafting.RecipeManager;
-@@ -45,25 +_,41 @@
+@@ -45,25 +_,40 @@
  import net.minecraft.world.level.block.entity.BlockEntity;
  import net.minecraft.world.level.block.entity.TickingBlockEntity;
  import net.minecraft.world.level.block.state.BlockState;
@@ -55,11 +62,12 @@
  import net.minecraft.world.level.material.FluidState;
  import net.minecraft.world.level.material.Fluids;
  import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
- import net.minecraft.world.level.storage.LevelData;
-+import net.minecraft.world.level.storage.ServerLevelData;
- import net.minecraft.world.level.storage.WritableLevelData;
+-import net.minecraft.world.level.storage.LevelData;
+-import net.minecraft.world.level.storage.WritableLevelData;
++import net.minecraft.world.level.storage.*;
  import net.minecraft.world.phys.AABB;
  import net.minecraft.world.scores.Scoreboard;
++import org.apache.commons.lang3.Validate;
 +import org.bukkit.Bukkit;
 +import org.bukkit.Location;
 +import org.bukkit.World;
@@ -78,7 +86,7 @@
     public static final Codec<ResourceKey<Level>> f_46427_ = ResourceLocation.f_135803_.xmap(ResourceKey.m_135797_(Registry.f_122819_), ResourceKey::m_135782_);
     public static final ResourceKey<Level> f_46428_ = ResourceKey.m_135785_(Registry.f_122819_, new ResourceLocation("overworld"));
     public static final ResourceKey<Level> f_46429_ = ResourceKey.m_135785_(Registry.f_122819_, new ResourceLocation("the_nether"));
-@@ -91,38 +_,202 @@
+@@ -91,38 +_,242 @@
     public final Random f_46441_ = new Random();
     final DimensionType f_46445_;
     private final Holder<DimensionType> f_204147_;
@@ -108,7 +116,7 @@
 +   public Map<BlockPos, CapturedBlockState> capturedBlockStates = new java.util.LinkedHashMap<>();
 +   public Map<BlockPos, BlockEntity> capturedTileEntities = new HashMap<>();
 +   public List<ItemEntity> captureDrops;
-+
++   public final org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
 +   protected final ResourceKey<Level> typeKey;
 +
 +   public ResourceKey<LevelStem> getTypeKey() {
@@ -117,6 +125,10 @@
 +
 +   public final it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<SpawnCategory> ticksPerSpawnCategory = new it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<>();
 +   public boolean populating;
++   public static BlockPos lastPhysicsProblem; // Spigot
++   private org.spigotmc.TickLimiter entityLimiter;
++   private org.spigotmc.TickLimiter tileLimiter;
++   private int tileTickPosition;
  
     protected Level(WritableLevelData p_204149_, ResourceKey<Level> p_204150_, Holder<DimensionType> p_204151_, Supplier<ProfilerFiller> p_204152_, boolean p_204153_, boolean p_204154_, long p_204155_) {
 -      this.f_46446_ = p_204152_;
@@ -151,6 +163,22 @@
 +      }
 +      // CraftBukkit end
 +      this.typeKey = p_204150_;
++      // CatServer start
++      var levelName = Strings.EMPTY;
++      try {
++         if (p_204149_ instanceof PrimaryLevelData primaryLevelData) {
++            levelName = primaryLevelData.m_5462_();
++         } else if (p_204149_ instanceof DerivedLevelData derivedLevelData) {
++            levelName = derivedLevelData.m_5462_();
++         } else {
++            levelName = ((ServerLevelData) p_204149_).m_5462_();
++         }
++      } catch (ClassCastException exception) {
++         levelName = null;
++      }
++      Validate.notNull(levelName, "Unable to get dimension name!");
++      // CatServer end
++      this.spigotConfig = new org.spigotmc.SpigotWorldConfig(levelName); // Spigot
 +      if (generator == null && p_204149_ != null) {
 +         generator = getCraftServer().getGenerator(((ServerLevelData) p_204149_).m_5462_());
 +      }
@@ -215,6 +243,8 @@
 +         public void m_6313_(WorldBorder worldborder, double d0) {}
 +      });
 +      // CraftBukkit end
++      this.entityLimiter = new org.spigotmc.TickLimiter(spigotConfig.entityMaxTickTime);
++      this.tileLimiter = new org.spigotmc.TickLimiter(spigotConfig.tileMaxTickTime);
 +   }
 +
 +   protected Level(WritableLevelData p_204149_, ResourceKey<Level> p_204150_, Holder<DimensionType> p_204151_, Supplier<ProfilerFiller> p_204152_, boolean p_204153_, boolean p_204154_, long p_204155_, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env) {
@@ -230,6 +260,22 @@
 +      }
 +      // CraftBukkit end
 +      this.typeKey = p_204150_;
++      // CatServer start
++      var levelName = Strings.EMPTY;
++      try {
++         if (p_204149_ instanceof PrimaryLevelData primaryLevelData) {
++            levelName = primaryLevelData.m_5462_();
++         } else if (p_204149_ instanceof DerivedLevelData derivedLevelData) {
++            levelName = derivedLevelData.m_5462_();
++         } else {
++            levelName = ((ServerLevelData) p_204149_).m_5462_();
++         }
++      } catch (ClassCastException exception) {
++         levelName = null;
++      }
++      Validate.notNull(levelName, "Unable to get dimension name!");
++      // CatServer end
++      this.spigotConfig = new org.spigotmc.SpigotWorldConfig(levelName); // Spigot
 +      if (generator == null && p_204149_ != null) {
 +         generator = getCraftServer().getGenerator(((ServerLevelData) p_204149_).m_5462_());
 +      }
@@ -294,6 +340,8 @@
 +         public void m_6313_(WorldBorder worldborder, double d0) {}
 +      });
 +      // CraftBukkit end
++      this.entityLimiter = new org.spigotmc.TickLimiter(spigotConfig.entityMaxTickTime);
++      this.tileLimiter = new org.spigotmc.TickLimiter(spigotConfig.tileMaxTickTime);
 +   }
 +
 +   public CraftWorld getWorld() {
@@ -633,7 +681,7 @@
                    blockstate.m_60690_(this, blockpos, p_46719_, p_46718_, false);
                 }
              }
-@@ -870,6 +_,18 @@
+@@ -870,13 +_,33 @@
        return this.f_46420_;
     }
  
@@ -652,8 +700,9 @@
     public final boolean m_46659_() {
        return this.f_46424_;
     }
-@@ -877,6 +_,14 @@
-    protected abstract LevelEntityGetter<Entity> m_142646_();
+ 
+-   protected abstract LevelEntityGetter<Entity> m_142646_();
++   public abstract LevelEntityGetter<Entity> m_142646_();
  
     protected void m_151513_(@Nullable Entity p_151514_, GameEvent p_151515_, BlockPos p_151516_, int p_151517_) {
 +      // CraftBukkit start

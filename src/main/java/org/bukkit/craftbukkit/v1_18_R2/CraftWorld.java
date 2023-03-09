@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -37,6 +39,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.SortedArraySet;
 import net.minecraft.util.Unit;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.ChunkPos;
@@ -136,7 +140,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     private static final Random rand = new Random();
 
-    public CraftWorld(ServerLevel world, ChunkGenerator gen, BiomeProvider biomeProvider,  Environment env) {
+    public CraftWorld(ServerLevel world, ChunkGenerator gen, BiomeProvider biomeProvider, Environment env) {
         this.world = world;
         this.generator = gen;
         this.biomeProvider = biomeProvider;
@@ -1547,7 +1551,8 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public void playSound(Entity entity, Sound sound, org.bukkit.SoundCategory category, float volume, float pitch) {
-        if (!(entity instanceof CraftEntity craftEntity) || entity.getWorld() != this || sound == null || category == null) return;
+        if (!(entity instanceof CraftEntity craftEntity) || entity.getWorld() != this || sound == null || category == null)
+            return;
 
         ClientboundSoundEntityPacket packet = new ClientboundSoundEntityPacket(CraftSound.getSoundEffect(sound), net.minecraft.sounds.SoundSource.valueOf(category.name()), craftEntity.getHandle(), volume, pitch);
         ChunkMap.TrackedEntity entityTracker = getHandle().getChunkSource().chunkMap.entityMap.get(entity.getEntityId());
@@ -1557,6 +1562,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     }
 
     private static Map<String, GameRules.Key<?>> gamerules;
+
     public static synchronized Map<String, GameRules.Key<?>> getGameRulesNMS() {
         if (gamerules != null) {
             return gamerules;
@@ -1574,6 +1580,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
     }
 
     private static Map<String, GameRules.Type<?>> gameruleDefinitions;
+
     public static synchronized Map<String, GameRules.Type<?>> getGameRuleDefinitions() {
         if (gameruleDefinitions != null) {
             return gameruleDefinitions;
@@ -1804,4 +1811,42 @@ public class CraftWorld extends CraftRegionAccessor implements World {
             this.persistentDataContainer.putAll((CompoundTag) c);
         }
     }
+
+    // Spigot start
+    @Override
+    public int getViewDistance() {
+        return world.spigotConfig.viewDistance;
+    }
+
+    @Override
+    public int getSimulationDistance() {
+        return world.spigotConfig.simulationDistance;
+    }
+    // Spigot end
+
+    // Spigot start
+    private final org.bukkit.World.Spigot spigot = new org.bukkit.World.Spigot() {
+        @Override
+        public LightningStrike strikeLightning(Location loc, boolean isSilent) {
+            LightningBolt lightning = EntityType.LIGHTNING_BOLT.create(world);
+            lightning.moveTo(loc.getX(), loc.getY(), loc.getZ());
+            lightning.isSilent = isSilent;
+            world.strikeLightning(lightning);
+            return (LightningStrike) lightning.getBukkitEntity();
+        }
+
+        @Override
+        public LightningStrike strikeLightningEffect(Location loc, boolean isSilent) {
+            LightningBolt lightning = EntityType.LIGHTNING_BOLT.create(world);
+            lightning.moveTo(loc.getX(), loc.getY(), loc.getZ());
+            lightning.visualOnly = true;
+            lightning.isSilent = isSilent;
+            return (LightningStrike) lightning.getBukkitEntity();
+        }
+    };
+
+    public org.bukkit.World.Spigot spigot() {
+        return spigot;
+    }
+    // Spigot end
 }

@@ -16,25 +16,6 @@ index db1bd7c1d..07730d9f4 100644
 +        if (this.life >= ((this instanceof EntityThrownTrident) ? level.spigotConfig.tridentDespawnRate : level.spigotConfig.arrowDespawnRate)) { // Spigot
              this.discard();
          }
- 
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index a03727d59..b16c9e292 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -236,4 +236,13 @@ public class SpigotWorldConfig
-         hopperAmount = getInt( "hopper-amount", 1 );
-         log( "Hopper Transfer: " + hopperTransfer + " Hopper Check: " + hopperCheck + " Hopper Amount: " + hopperAmount );
-     }
-+
-+    public int arrowDespawnRate;
-+    public int tridentDespawnRate;
-+    private void arrowDespawnRate()
-+    {
-+        arrowDespawnRate = getInt( "arrow-despawn-rate", 1200 );
-+        tridentDespawnRate = getInt( "trident-despawn-rate", arrowDespawnRate );
-+        log( "Arrow Despawn Rate: " + arrowDespawnRate + " Trident Respawn Rate:" + tridentDespawnRate );
-+    }
- }
 -- 
 2.25.1
 

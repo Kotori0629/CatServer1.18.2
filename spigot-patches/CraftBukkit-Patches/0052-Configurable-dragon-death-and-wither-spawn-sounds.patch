@@ -77,33 +77,6 @@ index bc1cd08ae..f8b6cf40f 100644
                  }
  
                  return EnumInteractionResult.CONSUME;
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index 280d1a4b1..0b76be971 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -266,4 +266,22 @@ public class SpigotWorldConfig
-         enableZombiePigmenPortalSpawns = getBoolean( "enable-zombie-pigmen-portal-spawns", true );
-         log( "Allow Zombie Pigmen to spawn from portal blocks: " + enableZombiePigmenPortalSpawns );
-     }
-+
-+    public int dragonDeathSoundRadius;
-+    private void keepDragonDeathPerWorld()
-+    {
-+        dragonDeathSoundRadius = getInt( "dragon-death-sound-radius", 0 );
-+    }
-+
-+    public int witherSpawnSoundRadius;
-+    private void witherSpawnSoundRadius()
-+    {
-+        witherSpawnSoundRadius = getInt( "wither-spawn-sound-radius", 0 );
-+    }
-+
-+    public int endPortalSoundRadius;
-+    private void endPortalSoundRadius()
-+    {
-+        endPortalSoundRadius = getInt( "end-portal-sound-radius", 0 );
-+    }
- }
 -- 
 2.25.1
 

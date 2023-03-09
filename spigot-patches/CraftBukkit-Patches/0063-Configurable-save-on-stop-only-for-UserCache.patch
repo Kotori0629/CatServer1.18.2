@@ -42,22 +42,6 @@ index 961db661e..45dd649be 100644
 +        if (flag && !org.spigotmc.SpigotConfig.saveUserCacheOnStopOnly) { // Spigot - skip saving if disabled
              this.save();
          }
- 
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index 4138d939e..b29ae9c67 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -320,4 +320,10 @@ public class SpigotConfig
-     {
-         userCacheCap = getInt( "settings.user-cache-size", 1000 );
-     }
-+
-+    public static boolean saveUserCacheOnStopOnly;
-+    private static void saveUserCacheOnStopOnly()
-+    {
-+        saveUserCacheOnStopOnly = getBoolean( "settings.save-user-cache-on-stop-only", false );
-+    }
- }
 -- 
 2.25.1
 

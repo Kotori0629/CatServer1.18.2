@@ -16,20 +16,6 @@ index dae8536d4..f75d68530 100644
          try {
              NBTTagCompound nbttagcompound = entityhuman.saveWithoutId(new NBTTagCompound());
              File file = File.createTempFile(entityhuman.getStringUUID() + "-", ".dat", this.playerDir);
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index 4abcb9ec0..c47a8b670 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -393,4 +393,9 @@ public class SpigotConfig
-         logVillagerDeaths = getBoolean("settings.log-villager-deaths", true);
-         logNamedDeaths = getBoolean("settings.log-named-deaths", true);
-     }
-+
-+    public static boolean disablePlayerDataSaving;
-+    private static void disablePlayerDataSaving() {
-+        disablePlayerDataSaving = getBoolean("players.disable-saving", false);
-+    }
- }
 -- 
 2.25.1
 

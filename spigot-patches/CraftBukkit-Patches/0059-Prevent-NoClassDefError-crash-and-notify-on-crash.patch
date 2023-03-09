@@ -12,7 +12,6 @@ index d4dd846db..c57e2d40b 100644
      public final org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
  
      public final SpigotTimings.WorldTimingsHandler timings; // Spigot
-+    public static BlockPosition lastPhysicsProblem; // Spigot
  
      public CraftWorld getWorld() {
          return this.world;
@@ -42,24 +41,6 @@ index d4dd846db..c57e2d40b 100644
              } catch (Throwable throwable) {
                  CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception while updating neighbours");
                  CrashReportSystemDetails crashreportsystemdetails = crashreport.addCategory("Block being updated");
-diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index 4734d4ae8..b4eeeb0d0 100644
---- a/src/main/java/org/spigotmc/WatchdogThread.java
-+++ b/src/main/java/org/spigotmc/WatchdogThread.java
-@@ -74,6 +74,13 @@ public class WatchdogThread extends Thread
-                 log.log( Level.SEVERE, "Be sure to include ALL relevant console errors and Minecraft crash reports" );
-                 log.log( Level.SEVERE, "Spigot version: " + Bukkit.getServer().getVersion() );
-                 //
-+                if ( net.minecraft.world.level.World.lastPhysicsProblem != null )
-+                {
-+                    log.log( Level.SEVERE, "------------------------------" );
-+                    log.log( Level.SEVERE, "During the run of the server, a physics stackoverflow was supressed" );
-+                    log.log( Level.SEVERE, "near " + net.minecraft.world.level.World.lastPhysicsProblem );
-+                }
-+                //
-                 log.log( Level.SEVERE, "------------------------------" );
-                 log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Spigot!):" );
-                 dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
 -- 
 2.25.1
 

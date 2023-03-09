@@ -17,22 +17,6 @@ index 7a8b19ccc..a3ad3a5ab 100644
              while (worldserver.getBlockState(blockposition).is((Block) this)) {
                  blockposition = blockposition.below();
              }
-diff --git a/src/main/java/org/spigotmc/SpigotWorldConfig.java b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-index e5e1f112b..280d1a4b1 100644
---- a/src/main/java/org/spigotmc/SpigotWorldConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotWorldConfig.java
-@@ -259,4 +259,11 @@ public class SpigotWorldConfig
-         nerfSpawnerMobs = getBoolean( "nerf-spawner-mobs", false );
-         log( "Nerfing mobs spawned from spawners: " + nerfSpawnerMobs );
-     }
-+
-+    public boolean enableZombiePigmenPortalSpawns;
-+    private void enableZombiePigmenPortalSpawns()
-+    {
-+        enableZombiePigmenPortalSpawns = getBoolean( "enable-zombie-pigmen-portal-spawns", true );
-+        log( "Allow Zombie Pigmen to spawn from portal blocks: " + enableZombiePigmenPortalSpawns );
-+    }
- }
 -- 
 2.25.1
 

@@ -30,32 +30,6 @@ index eb86a448c..96404894f 100644
                  if (!isSync) {
                      Waitable waitable = new Waitable() {
                          @Override
-diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
-index 245a9e5e9..5f0b27ad2 100644
---- a/src/main/java/org/spigotmc/SpigotConfig.java
-+++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -6,6 +6,7 @@ import java.io.IOException;
- import java.lang.reflect.InvocationTargetException;
- import java.lang.reflect.Method;
- import java.lang.reflect.Modifier;
-+import java.util.Arrays;
- import java.util.HashMap;
- import java.util.List;
- import java.util.Map;
-@@ -284,4 +285,13 @@ public class SpigotConfig
-     {
-         playerShuffle = getInt( "settings.player-shuffle", 0 );
-     }
-+
-+    public static List<String> spamExclusions;
-+    private static void spamExclusions()
-+    {
-+        spamExclusions = getList( "commands.spam-exclusions", Arrays.asList( new String[]
-+        {
-+                "/skill"
-+        } ) );
-+    }
- }
 -- 
 2.25.1
 
