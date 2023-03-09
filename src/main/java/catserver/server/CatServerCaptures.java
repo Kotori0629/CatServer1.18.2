@@ -2,6 +2,7 @@ package catserver.server;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -31,9 +32,14 @@ public class CatServerCaptures {
     private AtomicBoolean isSilent = new AtomicBoolean(false);
     private AtomicReference<Direction> direction = new AtomicReference<>();
     private AtomicReference<BlockState> blockState = new AtomicReference<>();
+    private AtomicReference<ServerPlayer> serverPlayer = new AtomicReference<>();
 
     public void captureEntity(Entity entity) {
         this.entity.set(entity);
+    }
+
+    public void captureServerPlayer(ServerPlayer player) {
+        this.serverPlayer.set(player);
     }
 
     public Entity getCaptureEntity() {
@@ -148,6 +154,9 @@ public class CatServerCaptures {
     }
     public ItemEntity getCaptureItemEntity() {
         return this.itemEntity.getAndSet(null);
+    }
+    public ServerPlayer getCaptureServerPlayer() {
+        return this.serverPlayer.getAndSet(null);
     }
 
     public static CatServerCaptures getCatServerCaptures() {
