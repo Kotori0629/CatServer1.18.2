@@ -22,6 +22,7 @@ import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.TimedRegisteredListener;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
+import org.spigotmc.CustomTimingsHandler;
 
 public class TimingsCommand extends BukkitCommand {
     private static final List<String> TIMINGS_SUBCOMMANDS = ImmutableList.of("report", "reset", "on", "off", "paste"); // Spigot
