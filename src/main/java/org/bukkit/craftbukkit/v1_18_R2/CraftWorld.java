@@ -618,7 +618,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public long getGameTime() {
-        return world.levelData.getGameTime();
+        return world.worldDataServer.getGameTime(); // CatServer
     }
 
     @Override
@@ -990,7 +990,13 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public void setDifficulty(Difficulty difficulty) {
+        // CatServer start
+        if (this.getHandle().convertable != this.getHandle().getServer().storageSource) {
+            this.getHandle().worldDataServer.setDifficulty(net.minecraft.world.Difficulty.byId(difficulty.getValue()));
+            return;
+        }
         this.getHandle().getServer().getWorldData().setDifficulty(net.minecraft.world.Difficulty.byId(difficulty.getValue()));
+        // CatServer end
     }
 
     @Override

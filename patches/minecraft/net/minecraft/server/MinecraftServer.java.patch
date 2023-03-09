@@ -8,11 +8,12 @@
  import com.google.common.base.Splitter;
  import com.google.common.collect.ImmutableList;
  import com.google.common.collect.Lists;
-@@ -10,7 +_,9 @@
+@@ -10,7 +_,10 @@
  import com.mojang.authlib.minecraft.MinecraftSessionService;
  import com.mojang.datafixers.DataFixer;
  import com.mojang.logging.LogUtils;
 +import com.mojang.serialization.DynamicOps;
++import com.mojang.serialization.Lifecycle;
  import it.unimi.dsi.fastutil.longs.LongIterator;
 +
  import java.awt.image.BufferedImage;
@@ -36,7 +37,7 @@
  import net.minecraft.network.chat.Component;
  import net.minecraft.network.chat.TextComponent;
  import net.minecraft.network.chat.TranslatableComponent;
-@@ -144,1693 +_,1995 @@
+@@ -144,1693 +_,2007 @@
  import net.minecraft.world.level.levelgen.WorldGenSettings;
  import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
  import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
@@ -540,7 +541,7 @@
 +
 +        ServerLevel serverlevel = new ServerLevel(this, this.f_129738_, this.f_129744_, serverleveldata, Level.f_46428_, holder, p_129816_, chunkgenerator, flag, j, list, true);
 +        BukkitInjector.registerEnvironments(this.f_129749_.m_5961_().m_204655_()); // CatServer
-+        this.f_129762_.put(Level.f_46428_, this.worldInit(serverlevel)); // CatServer
++        this.f_129762_.put(Level.f_46428_, serverlevel);
 +        DimensionDataStorage dimensiondatastorage = serverlevel.m_8895_();
 +        this.m_129841_(dimensiondatastorage);
 +        this.f_129732_ = new CommandStorage(dimensiondatastorage);
@@ -2049,8 +2050,20 @@
 +                ResourceKey<Level> resourcekey1 = ResourceKey.m_135785_(Registry.f_122819_, resourcekey.m_135782_());
 +                Holder<DimensionType> holder1 = entry.getValue().m_204521_();
 +                ChunkGenerator chunkgenerator1 = entry.getValue().m_63990_();
-+                DerivedLevelData derivedleveldata = new DerivedLevelData(this.f_129749_, serverleveldata);
++                // CatServer start
++                DerivedLevelData derivedleveldata = new DerivedLevelData(this.f_129749_, serverleveldata, DimensionType.m_196975_(resourcekey1, this.f_129744_.getWorldDir()).toFile().getName());
 +                ServerLevel serverlevel1 = new ServerLevel(this, this.f_129738_, this.f_129744_, derivedleveldata, resourcekey1, holder1, p_129816_, chunkgenerator1, flag, j, ImmutableList.of(), false);
++                serverlevel1.worldDataServer = new PrimaryLevelData(
++                        new LevelSettings(
++                                derivedleveldata.m_5462_(),
++                                derivedleveldata.m_5464_(),
++                                derivedleveldata.m_5466_(),
++                                derivedleveldata.m_5472_(),
++                                false,
++                                derivedleveldata.m_5470_(),
++                                this.datapackconfiguration),
++                        ((PrimaryLevelData) serverleveldata).m_5961_(), Lifecycle.stable());
++                // CatServer end
 +                worldborder.m_61929_(new BorderChangeListener.DelegateBorderChangeListener(serverlevel1.m_6857_()));
 +                this.f_129762_.put(resourcekey1, this.worldInit(serverlevel1)); // CatServer
 +                net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.world.WorldEvent.Load(f_129762_.get(resourcekey)));

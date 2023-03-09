@@ -70,7 +70,7 @@
     public boolean f_8564_;
     private final SleepStatus f_143245_;
     private int f_8551_;
-@@ -181,48 +_,139 @@
+@@ -181,48 +_,136 @@
     private final List<CustomSpawner> f_8558_;
     @Nullable
     private final EndDragonFight f_8559_;
@@ -129,15 +129,21 @@
 -      this.f_143245_ = new SleepStatus();
 +      this.convertable = p_203764_;
 +      this.pvpMode = p_203762_.m_129799_();
-+      this.uuid = WorldUUID.getUUID(p_203764_.f_78271_.toFile());
-+      // CraftBukkit end
++      this.uuid = WorldUUID.getUUID(p_203762_.f_129744_.m_197394_(p_203766_).toFile()); // CatServer
++      // CatServer start
++      if (p_203765_ instanceof PrimaryLevelData primaryLevelData) {
++         this.worldDataServer = primaryLevelData;
++      } else if (p_203765_ instanceof DerivedLevelData derivedLevelData) {
++         this.worldDataServer = CustomDerivedLevelData.wrap(derivedLevelData);
++      }
++      if (generator != null) {
++         p_203769_ = new org.bukkit.craftbukkit.v1_18_R2.generator.CustomChunkGenerator(this, p_203769_, generator);
++      }
++      // CatServer end
 +      this.f_8561_ = p_203773_;
 +      this.f_8548_ = p_203762_;
 +      this.f_8558_ = p_203772_;
 +      this.f_8549_ = p_203765_;
-+      if (generator != null) {
-+         p_203769_ = new org.bukkit.craftbukkit.v1_18_R2.generator.CustomChunkGenerator(this, p_203769_, generator);
-+      }
 +      p_203769_.m_211700_();
 +      boolean flag = p_203762_.m_6365_();
 +      DataFixer datafixer = p_203762_.m_129933_();
@@ -171,18 +177,10 @@
 +      this.f_143245_ = new SleepStatus();
 +      this.initCapabilities();
 +
-+      this.world = new CraftWorld(this, generator, biomeProvider, environment);
 +      m_6857_().world = this;
-+      this.getCraftServer().addWorld(this.getWorld());
-+
-+      // CatServer start
-+      if (p_203765_ instanceof PrimaryLevelData primaryLevelData) {
-+         this.worldDataServer = primaryLevelData;
-+      } else if (p_203765_ instanceof DerivedLevelData derivedLevelData) {
-+         this.worldDataServer = CustomDerivedLevelData.wrap(derivedLevelData);
-+      }
++      this.world = new CraftWorld(this, generator, biomeProvider, environment);
++      this.getCraftServer().addWorld(this.world);
 +      this.worldDataServer.setWorld(this);
-+      // CatServer end
 +   }
 +
 +   // CatServer - Add env and gen and biomeProvider to constructor,
@@ -190,15 +188,21 @@
 +      super(p_203765_, p_203766_, p_203767_, p_203762_::m_129905_, false, p_203770_, p_203771_, gen, biomeProvider, env);
 +      this.convertable = p_203764_;
 +      this.pvpMode = p_203762_.m_129799_();
-+      this.uuid = WorldUUID.getUUID(p_203764_.f_78271_.toFile());
-+      // CraftBukkit end
++      this.uuid = WorldUUID.getUUID(p_203762_.f_129744_.m_197394_(p_203766_).toFile()); // CatServer
++      // CatServer start
++      if (p_203765_ instanceof PrimaryLevelData primaryLevelData) {
++         this.worldDataServer = primaryLevelData;
++      } else if (p_203765_ instanceof DerivedLevelData derivedLevelData) {
++         this.worldDataServer = CustomDerivedLevelData.wrap(derivedLevelData);
++      }
++      if (generator != null) {
++         p_203769_ = new org.bukkit.craftbukkit.v1_18_R2.generator.CustomChunkGenerator(this, p_203769_, generator);
++      }
++      // CatServer end
 +      this.f_8561_ = p_203773_;
 +      this.f_8548_ = p_203762_;
 +      this.f_8558_ = p_203772_;
 +      this.f_8549_ = p_203765_;
-+      if (generator != null) {
-+         p_203769_ = new org.bukkit.craftbukkit.v1_18_R2.generator.CustomChunkGenerator(this, p_203769_, generator);
-+      }
 +      p_203769_.m_211700_();
 +      boolean flag = p_203762_.m_6365_();
 +      DataFixer datafixer = p_203762_.m_129933_();
@@ -232,17 +236,10 @@
 +      this.f_143245_ = new SleepStatus();
 +      this.initCapabilities();
 +
-+      this.world = new CraftWorld(this, generator, biomeProvider, environment);
 +      m_6857_().world = this;
-+      this.getCraftServer().addWorld(this.getWorld());
-+      // CatServer start
-+      if (p_203765_ instanceof PrimaryLevelData primaryLevelData) {
-+         this.worldDataServer = primaryLevelData;
-+      } else if (p_203765_ instanceof DerivedLevelData derivedLevelData) {
-+         this.worldDataServer = CustomDerivedLevelData.wrap(derivedLevelData);
-+      }
++      this.world = new CraftWorld(this, generator, biomeProvider, environment);
++      this.getCraftServer().addWorld(this.world);
 +      this.worldDataServer.setWorld(this);
-+      // CatServer end
     }
  
     public void m_8606_(int p_8607_, int p_8608_, boolean p_8609_, boolean p_8610_) {
