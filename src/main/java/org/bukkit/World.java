@@ -2573,6 +2573,27 @@ public interface World extends RegionAccessor, WorldInfo, PluginMessageRecipient
     @Nullable
     public Location locateNearestStructure(@NotNull Location origin, @NotNull StructureType structureType, int radius, boolean findUnexplored);
 
+    int getViewDistance();
+
+    int getSimulationDistance();
+
+    // Spigot start
+    public class Spigot {
+        @NotNull
+        public LightningStrike strikeLightning(@NotNull Location loc, boolean isSilent) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @NotNull
+        public LightningStrike strikeLightningEffect(@NotNull Location loc, boolean isSilent) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
+    @NotNull
+    Spigot spigot();
+    // Spigot end
+
     /**
      * Finds the nearest raid close to the given location.
      *

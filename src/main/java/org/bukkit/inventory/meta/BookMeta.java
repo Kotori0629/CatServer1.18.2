@@ -1,6 +1,8 @@
 package org.bukkit.inventory.meta;
 
 import java.util.List;
+
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -185,4 +187,37 @@ public interface BookMeta extends ItemMeta {
     @Override
     @NotNull
     BookMeta clone();
+
+    // Spigot start
+    public class Spigot {
+        @NotNull
+        public BaseComponent[] getPage(int page) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void setPage(int page, @Nullable BaseComponent... data) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @NotNull
+        public List<BaseComponent[]> getPages() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void setPages(@NotNull List<BaseComponent[]> pages) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void setPages(@NotNull BaseComponent[]... pages) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void addPage(@NotNull BaseComponent[]... pages) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
+    @NotNull
+    Spigot spigot();
+    // Spigot end
 }

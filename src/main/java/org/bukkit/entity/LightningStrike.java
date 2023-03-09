@@ -1,5 +1,7 @@
 package org.bukkit.entity;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents an instance of a lightning strike. May or may not do damage.
  */
@@ -12,4 +14,15 @@ public interface LightningStrike extends Entity {
      */
     public boolean isEffect();
 
+    // Spigot start
+    public class Spigot extends Entity.Spigot {
+        public boolean isSilent() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
+    @NotNull
+    @Override
+    Spigot spigot();
+    // Spigot end
 }
