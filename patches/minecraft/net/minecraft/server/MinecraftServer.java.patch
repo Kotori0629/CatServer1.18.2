@@ -37,7 +37,7 @@
  import net.minecraft.network.chat.Component;
  import net.minecraft.network.chat.TextComponent;
  import net.minecraft.network.chat.TranslatableComponent;
-@@ -144,1693 +_,2007 @@
+@@ -144,1693 +_,2033 @@
  import net.minecraft.world.level.levelgen.WorldGenSettings;
  import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
  import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
@@ -541,7 +541,7 @@
 +
 +        ServerLevel serverlevel = new ServerLevel(this, this.f_129738_, this.f_129744_, serverleveldata, Level.f_46428_, holder, p_129816_, chunkgenerator, flag, j, list, true);
 +        BukkitInjector.registerEnvironments(this.f_129749_.m_5961_().m_204655_()); // CatServer
-+        this.f_129762_.put(Level.f_46428_, serverlevel);
++        this.f_129762_.put(Level.f_46428_, this.worldInit(serverlevel)); // CatServer
 +        DimensionDataStorage dimensiondatastorage = serverlevel.m_8895_();
 +        this.m_129841_(dimensiondatastorage);
 +        this.f_129732_ = new CommandStorage(dimensiondatastorage);
@@ -2066,6 +2066,18 @@
 +                // CatServer end
 +                worldborder.m_61929_(new BorderChangeListener.DelegateBorderChangeListener(serverlevel1.m_6857_()));
 +                this.f_129762_.put(resourcekey1, this.worldInit(serverlevel1)); // CatServer
++                // CatServer start - Fix Multiverse-Core plugin
++                if (!"minecraft".equals(resourcekey.m_135782_().m_135827_()) ) {
++                    try {
++                        File bukkitWorldDir = new File(m_129783_().convertable.getWorldDir().toFile(), resourcekey.m_135782_().m_135815_());
++                        if (!bukkitWorldDir.exists()) {
++                            bukkitWorldDir.mkdir(); // Create empty dir to bypass Multiverse-Core check
++                        }
++                    } catch (Exception e) {
++                        System.out.println(e.toString());
++                    }
++                }
++                // CatServer end
 +                net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.world.WorldEvent.Load(f_129762_.get(resourcekey)));
 +            }
 +        }
@@ -2109,6 +2121,20 @@
 +
 +    public void prepareLevels(ChunkProgressListener listener, ServerLevel serverWorld) {
 +        this.markWorldsDirty();
++        // CatServer start - Fix Multiverse-Core plugin
++        if (!serverWorld.isBukkitWorld) {
++            try {
++                File bukkitWorldDir = new File(m_129783_().convertable.getWorldDir().toFile(), f_129744_.m_78277_());
++                if (!bukkitWorldDir.exists()) {
++                    bukkitWorldDir.mkdir(); // Create empty dir to bypass Multiverse-Core check
++                }
++            } catch (Exception e) {
++                System.out.println(e.toString());
++            }
++        }
++        // CatServer end
++        Bukkit.getPluginManager().callEvent(new WorldInitEvent(serverWorld.getWorld()));
++        Bukkit.getPluginManager().callEvent(new WorldLoadEvent(serverWorld.getWorld()));
 +        MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.world.WorldEvent.Load(serverWorld));
 +        if (!serverWorld.getWorld().getKeepSpawnInMemory()) {
 +            return;

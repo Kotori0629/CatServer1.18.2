@@ -48,7 +48,7 @@
  import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
  import net.minecraft.world.entity.npc.Npc;
  import net.minecraft.world.entity.player.Player;
-@@ -136,1408 +_,1780 @@
+@@ -136,1408 +_,1781 @@
  import net.minecraft.world.level.portal.PortalForcer;
  import net.minecraft.world.level.saveddata.maps.MapIndex;
  import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
@@ -220,6 +220,7 @@
 +    private int tickPosition;
 +    public final LevelStorageSource.LevelStorageAccess convertable;
 +    public final UUID uuid;
++    public boolean isBukkitWorld = false; // CatServer
 +
 +    public LevelChunk getChunkIfLoaded(int x, int z) {
 +        return this.f_8547_.m_62227_(x, z, false);

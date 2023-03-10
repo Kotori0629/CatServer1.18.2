@@ -41,7 +41,7 @@
  import net.minecraft.world.entity.player.Player;
  import net.minecraft.world.item.ItemStack;
  import net.minecraft.world.item.crafting.RecipeManager;
-@@ -45,859 +_,1211 @@
+@@ -45,859 +_,1213 @@
  import net.minecraft.world.level.block.entity.BlockEntity;
  import net.minecraft.world.level.block.entity.TickingBlockEntity;
  import net.minecraft.world.level.block.state.BlockState;
@@ -278,9 +278,11 @@
 +    public CraftWorld world;
 +    public boolean pvpMode;
 +    public boolean keepSpawnInMemory = true;
-+    public org.bukkit.generator.ChunkGenerator generator;
-+    public org.bukkit.World.Environment environment;
-+    public org.bukkit.generator.BiomeProvider biomeProvider;
++    // CatServer start
++    public org.bukkit.generator.ChunkGenerator generator = catserver.server.utils.BukkitWorldHelper.get().getChunkGenerator();
++    public org.bukkit.World.Environment environment = catserver.server.utils.BukkitWorldHelper.get().getEnvironment();
++    public org.bukkit.generator.BiomeProvider biomeProvider = catserver.server.utils.BukkitWorldHelper.get().getBiomeProvider();
++    // CatServer end
 +    public boolean preventPoiUpdated = false; // CraftBukkit - SPIGOT-5710
 +    public boolean captureBlockStates = false;
 +    public boolean captureTreeGeneration = false;

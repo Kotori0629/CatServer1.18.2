@@ -77,6 +77,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
 import org.bukkit.Warning.WarningState;
@@ -918,6 +919,8 @@ public final class CraftServer implements Server {
             throw new IllegalArgumentException("File exists with the name '" + name + "' and isn't a folder");
         }
 
+        if ("DIM1".equalsIgnoreCase(name) || "DIM-1".equalsIgnoreCase(name)) throw new IllegalArgumentException("Dynamic loading is not supported: " + name); // CatServer
+
         if (generator == null) {
             generator = getGenerator(name);
         }
@@ -941,9 +944,20 @@ public final class CraftServer implements Server {
                 throw new IllegalArgumentException("Illegal dimension");
         }
 
-        LevelStorageSource.LevelStorageAccess worldSession;
+        // CatServer start
+        LevelStorageSource.LevelStorageAccess worldSession = console.storageSource;
         try {
-            worldSession = LevelStorageSource.createDefault(getWorldContainer().toPath()).createAccess(name, actualDimension); // CatServer TODO
+            worldSession = LevelStorageSource.createDefault(getWorldContainer().toPath()).createAccess(name, actualDimension);
+            for (String s : new String[]{ "region", "data", "entities", "poi" }) {
+                File saveDir = new File(worldSession.getWorldDir().toFile(), "dimensions/minecraft/" + name + "/" + s);
+                if (!saveDir.exists()) {
+                    File importDir = new File(worldSession.levelPath.toFile(), s);
+                    if (importDir.exists()) {
+                        logger.info(String.format("[Import Fixer] Copying %s to %s", importDir.getAbsolutePath(), saveDir.getAbsolutePath()));
+                        FileUtils.copyDirectory(importDir, saveDir);
+                    }
+                }
+            }
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -1008,8 +1022,17 @@ public final class CraftServer implements Server {
             worldKey = ResourceKey.create(net.minecraft.core.Registry.DIMENSION_REGISTRY, new ResourceLocation(name.toLowerCase(java.util.Locale.ENGLISH)));
         }
 
-        ServerLevel internal = new ServerLevel(console, console.executor, worldSession, worlddata, worldKey, holder, getServer().progressListenerFactory.create(11),
-                chunkgenerator, worlddata.worldGenSettings().isDebug(), j, creator.environment() == Environment.NORMAL ? list : ImmutableList.of(), true, creator.environment(), generator, biomeProvider);
+        // CatServer start
+        ServerLevel internal;
+        try {
+            catserver.server.utils.BukkitWorldHelper.get().setWorld(generator, creator.environment(), biomeProvider);
+            internal = new ServerLevel(console, console.executor, worldSession, worlddata, worldKey, holder, getServer().progressListenerFactory.create(11),
+                    chunkgenerator, worlddata.worldGenSettings().isDebug(), j, creator.environment() == Environment.NORMAL ? list : ImmutableList.of(), true, creator.environment(), generator, biomeProvider);
+            internal.isBukkitWorld = true;
+        } finally {
+            catserver.server.utils.BukkitWorldHelper.get().reset();
+        }
+        // CatServer end
 
         if (!(worlds.containsKey(name.toLowerCase(java.util.Locale.ENGLISH)))) {
             return null;
@@ -1022,8 +1045,6 @@ public final class CraftServer implements Server {
 
         getServer().prepareLevels(internal.getChunkSource().chunkMap.progressListener, internal);
         internal.entityManager.tick(); // SPIGOT-6526: Load pending entities so they are available to the API
-
-        pluginManager.callEvent(new WorldLoadEvent(internal.getWorld()));
         return internal.getWorld();
     }
 
@@ -1681,7 +1702,7 @@ public final class CraftServer implements Server {
 
     @Override
     public File getWorldContainer() {
-        return this.getServer().storageSource.getDimensionPath(net.minecraft.world.level.Level.OVERWORLD).getParent().toFile();
+        return this.getServer().storageSource.levelPath.toFile().getAbsoluteFile();
     }
 
     @Override
